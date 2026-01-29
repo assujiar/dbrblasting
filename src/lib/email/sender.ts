@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import { replaceTemplatePlaceholders } from '@/lib/utils'
+import { replaceTemplatePlaceholders, generateEmailSignature } from '@/lib/utils'
 
 interface EmailConfig {
   host: string
@@ -9,6 +9,14 @@ interface EmailConfig {
     user: string
     pass: string
   }
+}
+
+interface SenderData {
+  name: string
+  email: string
+  phone: string
+  position: string
+  company: string
 }
 
 interface EmailOptions {
@@ -22,6 +30,7 @@ interface EmailOptions {
     email: string
     phone: string
   }
+  senderData?: SenderData
 }
 
 function getEmailConfig(): EmailConfig {
@@ -42,10 +51,25 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     const transporter = nodemailer.createTransport(config)
 
     // Replace placeholders in subject and body
-    const personalizedSubject = replaceTemplatePlaceholders(options.subject, options.recipientData)
-    const personalizedBody = replaceTemplatePlaceholders(options.htmlBody, options.recipientData)
+    const personalizedSubject = replaceTemplatePlaceholders(
+      options.subject,
+      options.recipientData,
+      options.senderData
+    )
+    let personalizedBody = replaceTemplatePlaceholders(
+      options.htmlBody,
+      options.recipientData,
+      options.senderData
+    )
 
-    const fromName = process.env.MAIL_FROM_NAME || 'Email Blasting'
+    // Append signature if sender data is provided
+    if (options.senderData && options.senderData.name) {
+      const signature = generateEmailSignature(options.senderData)
+      personalizedBody += signature
+    }
+
+    // Use sender data for from name/email if available, otherwise use env vars
+    const fromName = options.senderData?.name || process.env.MAIL_FROM_NAME || 'Email Blasting'
     const fromEmail = process.env.MAIL_FROM_EMAIL || 'noreply@example.com'
 
     await transporter.sendMail({
@@ -53,6 +77,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
       to: options.toName ? `"${options.toName}" <${options.to}>` : options.to,
       subject: personalizedSubject,
       html: personalizedBody,
+      replyTo: options.senderData?.email || undefined,
     })
 
     return { success: true }

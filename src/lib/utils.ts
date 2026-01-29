@@ -28,19 +28,73 @@ export function formatDateShort(date: string | Date): string {
   }).format(new Date(date))
 }
 
-interface TemplateData {
+interface RecipientData {
   name: string
   company: string
   email: string
   phone: string
 }
 
-export function replaceTemplatePlaceholders(template: string, data: TemplateData): string {
-  return template
-    .replace(/\{\{name\}\}/gi, data.name || '')
-    .replace(/\{\{company\}\}/gi, data.company || '')
-    .replace(/\{\{email\}\}/gi, data.email || '')
-    .replace(/\{\{phone\}\}/gi, data.phone || '')
+interface SenderData {
+  name: string
+  email: string
+  phone: string
+  position: string
+  company: string
+}
+
+export function replaceTemplatePlaceholders(
+  template: string,
+  recipient: RecipientData,
+  sender?: SenderData
+): string {
+  // Replace recipient placeholders
+  let result = template
+    .replace(/\{\{name\}\}/gi, recipient.name || '')
+    .replace(/\{\{company\}\}/gi, recipient.company || '')
+    .replace(/\{\{email\}\}/gi, recipient.email || '')
+    .replace(/\{\{phone\}\}/gi, recipient.phone || '')
+
+  // Replace sender placeholders if provided
+  if (sender) {
+    result = result
+      .replace(/\{\{sender_name\}\}/gi, sender.name || '')
+      .replace(/\{\{sender_email\}\}/gi, sender.email || '')
+      .replace(/\{\{sender_phone\}\}/gi, sender.phone || '')
+      .replace(/\{\{sender_position\}\}/gi, sender.position || '')
+      .replace(/\{\{sender_company\}\}/gi, sender.company || '')
+  }
+
+  return result
+}
+
+export function generateEmailSignature(sender: SenderData): string {
+  if (!sender.name) return ''
+
+  let signature = `<div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+    <p style="margin: 0; font-weight: 600; color: #111827;">${sender.name}</p>`
+
+  if (sender.position) {
+    signature += `<p style="margin: 4px 0 0 0; color: #6b7280;">${sender.position}</p>`
+  }
+
+  if (sender.company) {
+    signature += `<p style="margin: 4px 0 0 0; font-weight: 500; color: #374151;">${sender.company}</p>`
+  }
+
+  signature += `<div style="margin-top: 8px;">`
+
+  if (sender.email) {
+    signature += `<p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">Email: ${sender.email}</p>`
+  }
+
+  if (sender.phone) {
+    signature += `<p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">Phone: ${sender.phone}</p>`
+  }
+
+  signature += `</div></div>`
+
+  return signature
 }
 
 export function sanitizeHtml(html: string): string {

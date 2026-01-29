@@ -39,6 +39,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Template not found' }, { status: 404 })
     }
 
+    // Get user profile for email signature
+    const { data: userProfile } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    const senderData = userProfile ? {
+      name: userProfile.full_name || '',
+      email: userProfile.email || user.email || '',
+      phone: userProfile.phone || '',
+      position: userProfile.position || '',
+      company: userProfile.company || '',
+    } : undefined
+
     // Get pending recipients
     const { data: recipients, error: recipientsError } = await supabase
       .from('email_campaign_recipients')
@@ -84,6 +99,7 @@ export async function POST(request: NextRequest) {
           subject: campaign.template.subject,
           htmlBody: campaign.template.html_body,
           recipientData,
+          senderData,
         })
 
         // Update recipient status

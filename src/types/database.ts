@@ -9,6 +9,41 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      user_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string
+          email: string
+          phone: string
+          position: string
+          company: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name: string
+          email: string
+          phone?: string
+          position?: string
+          company?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string
+          email?: string
+          phone?: string
+          position?: string
+          company?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
       leads: {
         Row: {
           id: string
@@ -195,6 +230,10 @@ export interface Database {
     }
   }
 }
+
+export type UserProfile = Database['public']['Tables']['user_profiles']['Row']
+export type UserProfileInsert = Database['public']['Tables']['user_profiles']['Insert']
+export type UserProfileUpdate = Database['public']['Tables']['user_profiles']['Update']
 
 export type Lead = Database['public']['Tables']['leads']['Row']
 export type LeadInsert = Database['public']['Tables']['leads']['Insert']

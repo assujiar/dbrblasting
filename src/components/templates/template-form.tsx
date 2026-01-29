@@ -135,9 +135,11 @@ export function TemplateForm({ open, onOpenChange, template, onSuccess }: Templa
               disabled={isLoading}
               className="min-h-[200px] font-mono text-sm"
             />
-            <p className="text-xs text-gray-500">
-              Available placeholders: {"{{name}}"}, {"{{company}}"}, {"{{email}}"}, {"{{phone}}"}
-            </p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p><strong>Recipient placeholders:</strong> {"{{name}}"}, {"{{company}}"}, {"{{email}}"}, {"{{phone}}"}</p>
+              <p><strong>Sender placeholders:</strong> {"{{sender_name}}"}, {"{{sender_position}}"}, {"{{sender_company}}"}, {"{{sender_email}}"}, {"{{sender_phone}}"}</p>
+              <p className="text-gray-400">Note: Signature will be auto-appended based on your profile settings.</p>
+            </div>
           </div>
 
           <DialogFooter>
