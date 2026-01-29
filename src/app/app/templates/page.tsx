@@ -99,16 +99,16 @@ export default function TemplatesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Email Templates</h1>
-          <p className="text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Email Templates</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             Create and manage your email templates
           </p>
         </div>
-        <Button onClick={() => setFormOpen(true)}>
+        <Button onClick={() => setFormOpen(true)} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           New Template
         </Button>
@@ -140,20 +140,20 @@ export default function TemplatesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((template) => (
             <Card key={template.id} className="overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 mr-2">
-                    <CardTitle className="text-lg truncate">{template.name}</CardTitle>
-                    <CardDescription className="truncate mt-1">
+              <CardHeader className="pb-2 sm:pb-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base sm:text-lg truncate">{template.name}</CardTitle>
+                    <CardDescription className="truncate mt-1 text-xs sm:text-sm">
                       {template.subject}
                     </CardDescription>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon-sm">
+                      <Button variant="ghost" size="icon-sm" className="shrink-0">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -181,20 +181,21 @@ export default function TemplatesPage() {
                   </DropdownMenu>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-sm text-neutral-500 line-clamp-2 mb-4">
+              <CardContent className="pt-0">
+                <div className="text-xs sm:text-sm text-neutral-500 line-clamp-2 mb-3 sm:mb-4">
                   {truncate(template.html_body.replace(/<[^>]*>/g, ''), 100)}
                 </div>
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <Badge variant="outline" className="text-xs shrink-0">
                     {formatDateShort(template.created_at)}
                   </Badge>
                   <Button
                     size="sm"
                     onClick={() => setSendTemplate(template)}
+                    className="shrink-0"
                   >
                     <Send className="h-3.5 w-3.5" />
-                    Send
+                    <span className="hidden xs:inline">Send</span>
                   </Button>
                 </div>
               </CardContent>
@@ -239,15 +240,15 @@ export default function TemplatesPage() {
 
       {/* Preview Dialog */}
       <Dialog open={!!previewTemplate} onOpenChange={(open) => !open && setPreviewTemplate(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>{previewTemplate?.name}</DialogTitle>
-            <DialogDescription>Subject: {previewTemplate?.subject}</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">{previewTemplate?.name}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">Subject: {previewTemplate?.subject}</DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-auto border rounded-lg bg-white p-4">
+          <div className="flex-1 overflow-auto border rounded-lg bg-white p-2 sm:p-4">
             <iframe
               srcDoc={sanitizeHtml(previewTemplate?.html_body || '')}
-              className="w-full min-h-[400px] border-0"
+              className="w-full min-h-[300px] sm:min-h-[400px] border-0"
               title="Email Preview"
               sandbox="allow-same-origin"
             />
