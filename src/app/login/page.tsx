@@ -5,38 +5,35 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/components/ui/use-toast'
-import { Mail, Lock, User, ArrowRight } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react'
 import { isValidEmail } from '@/lib/utils'
 
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
   const [isLoading, setIsLoading] = useState(false)
+  const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!isValidEmail(email)) {
       toast({ title: 'Invalid email', description: 'Please enter a valid email address.', variant: 'error' })
       return
     }
-    
+
     if (password.length < 6) {
       toast({ title: 'Invalid password', description: 'Password must be at least 6 characters.', variant: 'error' })
       return
     }
 
     setIsLoading(true)
-    
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -55,24 +52,24 @@ export default function LoginPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!name.trim()) {
       toast({ title: 'Name required', description: 'Please enter your name.', variant: 'error' })
       return
     }
-    
+
     if (!isValidEmail(email)) {
       toast({ title: 'Invalid email', description: 'Please enter a valid email address.', variant: 'error' })
       return
     }
-    
+
     if (password.length < 6) {
       toast({ title: 'Invalid password', description: 'Password must be at least 6 characters.', variant: 'error' })
       return
     }
 
     setIsLoading(true)
-    
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -89,146 +86,145 @@ export default function LoginPage() {
       return
     }
 
-    toast({ 
-      title: 'Account created!', 
-      description: 'Please check your email to verify your account.', 
-      variant: 'success' 
+    toast({
+      title: 'Account created!',
+      description: 'Please check your email to verify your account.',
+      variant: 'success'
     })
     setIsLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 app-background">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Background decoration */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl" />
+      </div>
+
+      <div className="w-full max-w-[400px] relative z-10">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg">
-            <Mail className="h-6 w-6 text-white" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-3 sm:mb-4">
+            <Mail className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-              BlastMail
-            </h1>
-            <p className="text-xs text-neutral-500">Email Marketing Platform</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">BlastMail</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">Email Marketing Platform</p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl shadow-gray-900/5 border border-gray-100 overflow-hidden">
+          {/* Tab Switcher */}
+          <div className="flex border-b border-gray-100">
+            <button
+              type="button"
+              onClick={() => setMode('login')}
+              className={`flex-1 py-3.5 sm:py-4 text-sm font-semibold transition-all relative ${
+                mode === 'login'
+                  ? 'text-blue-600'
+                  : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Sign In
+              {mode === 'login' && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('signup')}
+              className={`flex-1 py-3.5 sm:py-4 text-sm font-semibold transition-all relative ${
+                mode === 'signup'
+                  ? 'text-blue-600'
+                  : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Sign Up
+              {mode === 'signup' && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+              )}
+            </button>
+          </div>
+
+          {/* Form */}
+          <div className="p-5 sm:p-6">
+            <form onSubmit={mode === 'login' ? handleLogin : handleSignUp} className="space-y-4">
+              {mode === 'signup' && (
+                <div>
+                  <Label htmlFor="name" className="text-gray-700 text-sm font-medium block mb-1.5">
+                    Full Name
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400" />
+                    <input
+                      id="name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full h-12 pl-11 pr-4 text-[15px] bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="email" className="text-gray-700 text-sm font-medium block mb-1.5">
+                  Email Address
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400" />
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full h-12 pl-11 pr-4 text-[15px] bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="password" className="text-gray-700 text-sm font-medium block mb-1.5">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400" />
+                  <input
+                    id="password"
+                    type="password"
+                    placeholder={mode === 'signup' ? 'Min. 6 characters' : 'Enter your password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full h-12 pl-11 pr-4 text-[15px] bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-12 mt-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 transition-all flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    {mode === 'login' ? 'Sign In' : 'Create Account'}
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            </form>
           </div>
         </div>
 
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle>Welcome</CardTitle>
-            <CardDescription>
-              Sign in to your account or create a new one
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                      <Input
-                        id="login-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                      <Input
-                        id="login-password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full" loading={isLoading}>
-                    Sign In
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                      <Input
-                        id="signup-name"
-                        type="text"
-                        placeholder="Your name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Create a password (min. 6 characters)"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full" loading={isLoading}>
-                    Create Account
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-        
-        <p className="text-center text-xs text-neutral-500 mt-4">
+        {/* Footer */}
+        <p className="text-center text-[11px] sm:text-xs text-gray-400 mt-5 sm:mt-6 px-4">
           By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
