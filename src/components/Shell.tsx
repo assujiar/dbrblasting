@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Users, FileText, Send, LogOut, Menu, X, Mail } from 'lucide-react'
+import { User, Users, FileText, Send, LogOut, Menu, X, Mail, Settings } from 'lucide-react'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
@@ -13,6 +13,11 @@ const menu = [
   { name: 'Groups', href: '/app/groups', icon: User },
   { name: 'Templates', href: '/app/templates', icon: FileText },
   { name: 'Campaigns', href: '/app/campaigns', icon: Send },
+]
+
+const allRoutes = [
+  ...menu,
+  { name: 'Profile', href: '/app/profile', icon: Settings },
 ]
 
 export default function Shell({ children }: { children: React.ReactNode }) {
@@ -143,7 +148,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               <Menu className="h-5 w-5 text-gray-600" />
             </button>
             <h1 className="text-lg font-semibold text-gray-800">
-              {menu.find((m) => pathname.startsWith(m.href))?.name ?? 'Dashboard'}
+              {allRoutes.find((m) => pathname.startsWith(m.href))?.name ?? 'Dashboard'}
             </h1>
           </div>
           <DropdownMenu>
@@ -155,8 +160,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem disabled className="text-gray-500 text-sm">
-                My Account
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/app/profile">
+                  <Settings className="h-4 w-4 mr-2" /> Profile
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
