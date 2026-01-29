@@ -172,7 +172,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto pb-20 md:pb-6">
+        <main className="flex-1 px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-6 overflow-y-auto pb-24 md:pb-6">
           {children}
         </main>
       </div>

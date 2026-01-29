@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
 import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react'
 import { isValidEmail } from '@/lib/utils'
@@ -95,14 +94,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen flex items-center justify-center px-6 py-8 sm:p-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Background decoration */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="w-full max-w-[400px] relative z-10">
+      <div className="w-full max-w-[380px] sm:max-w-[400px] relative z-10">
         {/* Logo */}
         <div className="text-center mb-6 sm:mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-3 sm:mb-4">
@@ -147,59 +146,59 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <div className="p-5 sm:p-6">
+          <div className="px-5 py-5 sm:p-6">
             <form onSubmit={mode === 'login' ? handleLogin : handleSignUp} className="space-y-4">
               {mode === 'signup' && (
-                <div>
-                  <Label htmlFor="name" className="text-gray-700 text-sm font-medium block mb-1.5">
+                <div className="space-y-1.5">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                     Full Name
-                  </Label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400" />
+                  </label>
+                  <div className="relative flex items-center">
+                    <User className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
                     <input
                       id="name"
                       type="text"
                       placeholder="John Doe"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full h-12 pl-11 pr-4 text-[15px] bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
+                      className="block w-full h-11 pl-10 pr-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
                       disabled={isLoading}
                     />
                   </div>
                 </div>
               )}
 
-              <div>
-                <Label htmlFor="email" className="text-gray-700 text-sm font-medium block mb-1.5">
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email Address
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400" />
+                </label>
+                <div className="relative flex items-center">
+                  <Mail className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
                   <input
                     id="email"
                     type="email"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-12 pl-11 pr-4 text-[15px] bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
+                    className="block w-full h-11 pl-10 pr-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
                     disabled={isLoading}
                   />
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="password" className="text-gray-700 text-sm font-medium block mb-1.5">
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-gray-400" />
+                </label>
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
                   <input
                     id="password"
                     type="password"
                     placeholder={mode === 'signup' ? 'Min. 6 characters' : 'Enter your password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-12 pl-11 pr-4 text-[15px] bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
+                    className="block w-full h-11 pl-10 pr-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all placeholder:text-gray-400"
                     disabled={isLoading}
                   />
                 </div>
@@ -208,7 +207,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 mt-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 transition-all flex items-center justify-center gap-2"
+                className="w-full h-11 mt-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 transition-all flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
