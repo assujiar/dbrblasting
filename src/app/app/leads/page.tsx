@@ -73,16 +73,16 @@ export default function LeadsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Leads</h1>
-          <p className="text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Leads</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             Manage your contact database
           </p>
         </div>
-        <Button onClick={() => setFormOpen(true)}>
+        <Button onClick={() => setFormOpen(true)} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           Add Lead
         </Button>
@@ -90,9 +90,9 @@ export default function LeadsPage() {
 
       {/* Search & Filter */}
       <Card>
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+        <CardContent className="py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
               <Input
                 placeholder="Search leads..."
@@ -101,7 +101,7 @@ export default function LeadsPage() {
                 className="pl-10"
               />
             </div>
-            <div className="text-sm text-neutral-500">
+            <div className="text-xs sm:text-sm text-neutral-500">
               {pagination.total} {pagination.total === 1 ? 'lead' : 'leads'} total
             </div>
           </div>
@@ -150,14 +150,14 @@ export default function LeadsPage() {
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <Card>
-              <CardContent className="py-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-neutral-500">
+              <CardContent className="py-3 sm:py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <p className="text-xs sm:text-sm text-neutral-500 text-center sm:text-left">
                     Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                    {pagination.total} leads
+                    {pagination.total}
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -167,7 +167,7 @@ export default function LeadsPage() {
                       disabled={pagination.page === 1}
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Previous
+                      <span className="hidden sm:inline">Previous</span>
                     </Button>
                     <div className="flex items-center gap-1">
                       {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
@@ -177,10 +177,11 @@ export default function LeadsPage() {
                             page === pagination.totalPages ||
                             Math.abs(page - pagination.page) <= 1
                         )
+                        .slice(0, 5) // Limit visible pages on mobile
                         .map((page, index, array) => (
                           <span key={page}>
                             {index > 0 && array[index - 1] !== page - 1 && (
-                              <span className="px-2 text-neutral-400">...</span>
+                              <span className="px-1 sm:px-2 text-neutral-400">...</span>
                             )}
                             <Button
                               variant={pagination.page === page ? 'default' : 'ghost'}
@@ -202,7 +203,7 @@ export default function LeadsPage() {
                       }
                       disabled={pagination.page === pagination.totalPages}
                     >
-                      Next
+                      <span className="hidden sm:inline">Next</span>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>

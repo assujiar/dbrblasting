@@ -57,16 +57,16 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Contact Groups</h1>
-          <p className="text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Contact Groups</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             Organize your leads into targeted groups
           </p>
         </div>
-        <Button onClick={() => setFormOpen(true)}>
+        <Button onClick={() => setFormOpen(true)} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           New Group
         </Button>
@@ -98,23 +98,23 @@ export default function GroupsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => (
             <Card
               key={group.id}
-              className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+              className="cursor-pointer hover:shadow-lg transition-all duration-200 active:scale-[0.98] sm:hover:scale-[1.02]"
               onClick={() => handleGroupClick(group)}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{group.name}</CardTitle>
-                  <Badge variant="neutral">
+              <CardHeader className="pb-2 sm:pb-3">
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-base sm:text-lg truncate">{group.name}</CardTitle>
+                  <Badge variant="neutral" className="shrink-0">
                     <Users className="h-3 w-3 mr-1" />
                     {group.members?.length || 0}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-sm text-neutral-500">
                   {group.members?.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
@@ -130,7 +130,7 @@ export default function GroupsPage() {
                       )}
                     </div>
                   ) : (
-                    <span className="text-neutral-400">No members yet</span>
+                    <span className="text-neutral-400 text-xs sm:text-sm">No members yet</span>
                   )}
                 </div>
               </CardContent>

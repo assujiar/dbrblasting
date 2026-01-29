@@ -93,28 +93,29 @@ function CampaignsContent() {
     switch (status) {
       case 'completed':
         return (
-          <Badge variant="success">
+          <Badge variant="success" className="text-xs">
             <CheckCircle2 className="h-3 w-3 mr-1" />
-            Completed
+            <span className="hidden xs:inline">Completed</span>
+            <span className="xs:hidden">Done</span>
           </Badge>
         )
       case 'failed':
         return (
-          <Badge variant="error">
+          <Badge variant="error" className="text-xs">
             <XCircle className="h-3 w-3 mr-1" />
             Failed
           </Badge>
         )
       case 'running':
         return (
-          <Badge variant="default">
+          <Badge variant="default" className="text-xs">
             <Play className="h-3 w-3 mr-1" />
-            Running ({counts.sent}/{counts.total})
+            {counts.sent}/{counts.total}
           </Badge>
         )
       default:
         return (
-          <Badge variant="neutral">
+          <Badge variant="neutral" className="text-xs">
             <Clock className="h-3 w-3 mr-1" />
             Draft
           </Badge>
@@ -123,12 +124,12 @@ function CampaignsContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Campaigns</h1>
-          <p className="text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Campaigns</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             View your email campaign history and status
           </p>
         </div>
@@ -154,7 +155,7 @@ function CampaignsContent() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {campaigns.map((campaign) => {
             const progress = campaign.recipientCounts.total > 0
               ? ((campaign.recipientCounts.sent + campaign.recipientCounts.failed) / campaign.recipientCounts.total) * 100
@@ -163,31 +164,36 @@ function CampaignsContent() {
             return (
               <Card
                 key={campaign.id}
-                className="cursor-pointer hover:shadow-lg transition-all duration-200"
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 active:scale-[0.99]"
                 onClick={() => setSelectedCampaignId(campaign.id)}
               >
-                <CardContent className="py-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h3 className="font-semibold text-neutral-900">{campaign.name}</h3>
-                      <p className="text-sm text-neutral-500">
-                        Template: {campaign.template?.name || 'Deleted'}
+                <CardContent className="py-3 sm:py-4">
+                  <div className="flex items-start sm:items-center justify-between gap-2 mb-2 sm:mb-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-neutral-900 text-sm sm:text-base truncate">{campaign.name}</h3>
+                      <p className="text-xs sm:text-sm text-neutral-500 truncate">
+                        {campaign.template?.name || 'Deleted'}
                       </p>
                     </div>
                     {getStatusBadge(campaign.status, campaign.recipientCounts)}
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
                       <span className="text-neutral-500">Progress</span>
                       <span className="font-medium">
-                        {campaign.recipientCounts.sent} sent, {campaign.recipientCounts.failed} failed
-                        {campaign.recipientCounts.pending > 0 && `, ${campaign.recipientCounts.pending} pending`}
+                        <span className="text-success-600">{campaign.recipientCounts.sent}</span>
+                        {campaign.recipientCounts.failed > 0 && (
+                          <span className="text-error-600"> / {campaign.recipientCounts.failed} failed</span>
+                        )}
+                        {campaign.recipientCounts.pending > 0 && (
+                          <span className="text-neutral-400"> / {campaign.recipientCounts.pending} pending</span>
+                        )}
                       </span>
                     </div>
                     <Progress
                       value={progress}
-                      className="h-2"
+                      className="h-1.5 sm:h-2"
                       indicatorClassName={
                         campaign.status === 'failed'
                           ? 'from-error-500 to-error-600'
@@ -198,15 +204,15 @@ function CampaignsContent() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between mt-3 text-xs text-neutral-400">
+                  <div className="flex items-center justify-between mt-2 sm:mt-3 text-[10px] sm:text-xs text-neutral-400">
                     <span>{formatDate(campaign.created_at)}</span>
-                    <span>{campaign.recipientCounts.total} total recipients</span>
+                    <span>{campaign.recipientCounts.total} recipients</span>
                   </div>
 
                   {processingCampaignId === campaign.id && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-primary-600">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Processing emails...
+                    <div className="mt-2 sm:mt-3 flex items-center gap-2 text-xs sm:text-sm text-primary-600">
+                      <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                      Processing...
                     </div>
                   )}
                 </CardContent>
