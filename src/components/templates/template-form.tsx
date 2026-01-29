@@ -135,7 +135,7 @@ export function TemplateForm({ open, onOpenChange, template, onSuccess }: Templa
               disabled={isLoading}
               className="min-h-[200px] font-mono text-sm"
             />
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-gray-500">
               Available placeholders: {"{{name}}"}, {"{{company}}"}, {"{{email}}"}, {"{{phone}}"}
             </p>
           </div>

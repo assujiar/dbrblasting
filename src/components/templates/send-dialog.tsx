@@ -160,7 +160,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
           </div>
         ) : (
           <>
@@ -178,7 +178,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
 
               <TabsContent value="leads" className="flex-1 overflow-auto mt-4">
                 {leads.length === 0 ? (
-                  <div className="text-center py-8 text-neutral-500">
+                  <div className="text-center py-8 text-gray-500">
                     No leads available
                   </div>
                 ) : (
@@ -186,7 +186,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
                     {leads.map((lead) => (
                       <div
                         key={lead.id}
-                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-50/50"
+                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
                       >
                         <Checkbox
                           id={`lead-${lead.id}`}
@@ -201,7 +201,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
                         />
                         <Label htmlFor={`lead-${lead.id}`} className="flex-1 cursor-pointer">
                           <div className="font-medium">{lead.name}</div>
-                          <div className="text-sm text-neutral-500">{lead.email}</div>
+                          <div className="text-sm text-gray-500">{lead.email}</div>
                         </Label>
                       </div>
                     ))}
@@ -211,7 +211,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
 
               <TabsContent value="groups" className="flex-1 overflow-auto mt-4">
                 {groups.length === 0 ? (
-                  <div className="text-center py-8 text-neutral-500">
+                  <div className="text-center py-8 text-gray-500">
                     No groups available
                   </div>
                 ) : (
@@ -219,7 +219,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
                     {groups.map((group) => (
                       <div
                         key={group.id}
-                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-50/50"
+                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
                       >
                         <Checkbox
                           id={`group-${group.id}`}
@@ -234,7 +234,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
                         />
                         <Label htmlFor={`group-${group.id}`} className="flex-1 cursor-pointer">
                           <div className="font-medium">{group.name}</div>
-                          <div className="text-sm text-neutral-500">
+                          <div className="text-sm text-gray-500">
                             {group.members?.length || 0} members
                           </div>
                         </Label>
@@ -248,7 +248,7 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
             {/* Summary */}
             <div className="border-t pt-4 mt-4">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-neutral-600">Recipients (deduplicated):</span>
+                <span className="text-sm text-gray-600">Recipients (deduplicated):</span>
                 <Badge variant={uniqueRecipients.length > 0 ? 'default' : 'outline'}>
                   {uniqueRecipients.length} recipients
                 </Badge>
