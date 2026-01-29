@@ -1,120 +1,233 @@
-# Email Blasting Promo App
+# BlastMail - Email Marketing Platform
 
-This repository contains a complete production‑ready web application for managing leads, building reusable email templates and sending promotional email blasts. It uses **Next.js App Router** (targeting Next .js 16.1.x) with **TypeScript**, **Supabase** (Postgres + Auth) and **TailwindCSS**/shadcn for the UI. The app is designed to be deployed to **Vercel** and ships with SQL migrations, row level security (RLS) policies, a clean glassmorphic UI and background email processing via Nodemailer.
+A professional email blasting and marketing platform built with Next.js 16, Supabase, and TailwindCSS featuring a beautiful glassmorphism UI.
+
+![BlastMail](https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-Ready-green?style=flat-square&logo=supabase)
+![Vercel](https://img.shields.io/badge/Vercel-Deployable-black?style=flat-square&logo=vercel)
 
 ## Features
 
-* **Authentication** – login and signup pages powered by Supabase Auth. Protected routes automatically redirect unauthenticated users to `/login`. Supabase sessions are stored in cookies using `@supabase/ssr`, following the recommendations from the Supabase Next.js guide【338567361119373†L230-L318】.
-* **Lead Management** – create, update, delete and list leads. Each lead stores a name, company, email and phone number. Data is scoped per user via RLS; policies restrict every operation to rows where `user_id = auth.uid()`【695454080474738†L180-L244】.
-* **Contact Groups** – users can organise leads into their own groups (many‑to‑many). Adding or removing a lead from a group updates a join table. Groups are private to each user.
-* **Email Templates** – maintain a library of templates with a friendly name, subject and HTML body. Templates use simple placeholders like `{{name}}`, `{{company}}`, `{{email}}` and `{{phone}}` that are replaced on the server when sending emails.
-* **Campaigns & Logs** – send a template to multiple recipients (leads or groups) and track the delivery status. The UI shows progress as messages are queued, sent or fail. Each campaign is a separate record with child recipient rows recording the result.
-* **Background email processing** – when you click **Send**, the system creates a campaign and enqueues recipient rows with status `pending`. A worker route (`/api/campaign/worker`) processes recipients in small batches (default 20). This pattern avoids hitting Vercel’s function timeouts by returning quickly and continuing work asynchronously【679579239636242†L94-L114】.
-* **Modern UI** – the interface uses a light glassmorphic theme with gradient backgrounds, blurred translucent panels and colourful accents. All components (buttons, inputs, tables, dialogs, dropdowns, tabs and toasts) live in `components/ui` for reusability. Icons from `lucide-react` enhance the navigation and action buttons.
+- **Authentication**: Secure login/signup with Supabase Auth
+- **Lead Management**: CRUD operations for contacts with search and pagination
+- **Contact Groups**: Organize leads into targeted groups (many-to-many)
+- **Email Templates**: Create and manage HTML email templates with personalization
+- **Email Campaigns**: Batch email sending with progress tracking
+- **Campaign Logs**: Detailed send logs with status per recipient
+- **Glassmorphism UI**: Modern, elegant design with blur effects and gradients
+
+## Tech Stack
+
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript
+- **Styling**: TailwindCSS v4, Radix UI primitives
+- **Database**: Supabase (PostgreSQL with RLS)
+- **Authentication**: Supabase Auth (cookie-based sessions)
+- **Email**: Nodemailer (SMTP)
+- **Icons**: Lucide React
+- **Deployment**: Vercel
+
+## Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Supabase account (free tier works)
+- SMTP server credentials (Gmail, SendGrid, etc.)
 
 ## Getting Started
 
-### Prerequisites
+### 1. Clone the repository
 
-* **Node.js ≥ 18** and **npm**
-* A **Supabase** project. You can create one for free at [supabase.com](https://supabase.com/).
-* A **SMTP** server for sending emails. Gmail, Mailgun, SendGrid and many others provide SMTP credentials. Keep credentials secure by loading them from environment variables instead of hardcoding them【549306875252446†L326-L364】.
+```bash
+git clone <repository-url>
+cd dbrblasting
+npm install
+```
 
-### Local Setup
+### 2. Set up Supabase
 
-1. Clone this repository and install dependencies:
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to SQL Editor and run the migration script:
 
-   ```sh
-   git clone https://github.com/your‑org/email-blasting-app.git
-   cd email-blasting-app
-   npm install
-   ```
+```sql
+-- Copy contents from supabase/migrations/00001_initial_schema.sql
+```
 
-2. Copy `.env.example` to `.env.local` and fill in your environment variables:
+3. Get your project credentials from Settings > API:
+   - Project URL
+   - anon public key
 
-   ```sh
-   cp .env.example .env.local
-   ```
+### 3. Configure environment variables
 
-   You need your Supabase URL and publishable key, plus SMTP settings and the default “from” name and email. Do **not** commit `.env.local` to version control.
+Copy `.env.example` to `.env.local`:
 
-3. Link the project to your Supabase instance and apply migrations:
+```bash
+cp .env.example .env.local
+```
 
-   ```sh
-   supabase link --project-ref <your-project-ref>
-   supabase db push
-   ```
+Fill in your credentials:
 
-   The SQL scripts under `supabase/migrations` create the required tables and RLS policies. RLS is enabled for every table and policies ensure users can only operate on rows where `user_id` matches `auth.uid()`【695454080474738†L180-L286】.
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-4. Run the development server:
+# SMTP Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+MAIL_FROM_NAME=BlastMail
+MAIL_FROM_EMAIL=your-email@gmail.com
+```
 
-   ```sh
-   npm run dev
-   ```
+#### Gmail SMTP Setup
 
-   Visit `http://localhost:3000` in your browser. You should see the login page. Sign up or log in to access the app.
+1. Enable 2-Step Verification in your Google Account
+2. Generate an App Password: Google Account > Security > App passwords
+3. Use the 16-character app password as `SMTP_PASS`
 
-### Deployment
+### 4. Run the development server
 
-This project is designed for **Vercel**. Push your code to a GitHub repository and import it into Vercel. Set the environment variables in the Vercel dashboard (same as `.env.example`). Vercel automatically deploys the Next.js app. The route handlers use the Edge Runtime by default, but the email worker may run longer; you can enable Fluid Compute or adjust the `maxDuration` if necessary【679579239636242†L94-L113】.
+```bash
+npm run dev
+```
 
-### Migrations
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-Supabase migrations live in `supabase/migrations`. They are numbered in chronological order. The initial migration (`001_create_tables.sql`) sets up all tables and unique constraints. The second migration (`002_rls_policies.sql`) enables RLS and defines policies restricting access to each user’s data. If you add new tables, create a new SQL file with a higher prefix and run `supabase db push` again.
+### 5. Create your account
 
-### Scripts
+1. Navigate to `/login`
+2. Click "Sign Up" tab
+3. Enter your details and create an account
+4. Check your email for verification (if enabled in Supabase)
 
-This project defines several npm scripts:
-
-| Command           | Description                                   |
-|-------------------|------------------------------------------------|
-| `npm run dev`     | Start the Next.js dev server on `localhost:3000`. |
-| `npm run build`   | Build the production version of the app.       |
-| `npm run start`   | Start the Next.js production server.            |
-| `npm run lint`    | Run ESLint over the codebase.                   |
-
-### File Tree
-
-The repository is organised as follows:
+## Project Structure
 
 ```
-email-blasting-app/
-├── app/                 # Next.js app directory (App Router)
-│   ├── layout.tsx       # Root layout with global styles
-│   ├── globals.css      # Tailwind and custom CSS (gradients, noise)
-│   ├── login/           # Public login/signup page
-│   └── app/             # Protected area under /app
-│       ├── layout.tsx   # Layout with sidebar and topbar
-│       ├── page.tsx     # Redirect to Leads by default
-│       ├── leads/       # Leads CRUD pages
-│       ├── groups/      # Contact groups pages
-│       ├── templates/   # Email template pages
-│       └── campaigns/   # Campaign list and details
+src/
+├── app/
+│   ├── api/              # API routes
+│   │   ├── leads/        # Lead CRUD
+│   │   ├── groups/       # Group management
+│   │   ├── templates/    # Template CRUD
+│   │   ├── campaigns/    # Campaign management
+│   │   └── worker/       # Email sending worker
+│   ├── app/              # Protected app pages
+│   │   ├── leads/
+│   │   ├── groups/
+│   │   ├── templates/
+│   │   └── campaigns/
+│   ├── login/            # Login page
+│   └── layout.tsx        # Root layout
 ├── components/
-│   ├── ui/              # Reusable UI components (Button, Input, Modal, Tabs, Table, Toast)
-│   └── Shell.tsx        # Sidebar + topbar container used in /app
+│   ├── ui/               # Reusable UI components
+│   ├── layout/           # Sidebar & Topbar
+│   ├── leads/            # Lead components
+│   ├── groups/           # Group components
+│   ├── templates/        # Template components
+│   └── campaigns/        # Campaign components
 ├── lib/
-│   ├── supabase/        # Supabase clients and helpers (browser & server)
-│   ├── email.ts         # Nodemailer setup and send logic
-│   └── utils.ts         # Helper functions (template parsing, etc.)
-├── middleware.ts        # Redirect middleware for protected routes
-├── tailwind.config.ts   # Tailwind theme and glassmorphism tokens
-├── postcss.config.js    # PostCSS configuration for Tailwind
-├── next.config.mjs      # Next.js configuration (ESM)
-├── package.json         # Dependencies and scripts
-├── tsconfig.json        # TypeScript configuration
-├── .env.example         # Example environment variables
-└── supabase/
-    └── migrations/      # Database migrations and RLS policies
+│   ├── supabase/         # Supabase clients
+│   ├── email/            # Email sender
+│   └── utils.ts          # Utility functions
+└── types/
+    └── database.ts       # TypeScript types
 ```
 
-## Security Considerations
+## Database Schema
 
-* The client uses the **publishable** Supabase key. Server‑side code always runs with the user’s session token and never uses the service role key directly. All secrets (Supabase keys, SMTP credentials) are loaded from environment variables and never exposed to the browser【549306875252446†L326-L364】.
-* Row Level Security is enabled on all tables and each policy checks that `auth.uid()` is not null and matches `user_id`【695454080474738†L180-L286】. An unauthenticated user cannot access any data.
-* The UI sanitises template previews to prevent injection; placeholders are replaced server‑side.
+### Tables
+
+- **leads**: Contact information (name, email, company, phone)
+- **contact_groups**: Group names
+- **contact_group_members**: Many-to-many join table
+- **email_templates**: Email templates (name, subject, html_body)
+- **email_campaigns**: Campaign records with status
+- **email_campaign_recipients**: Individual recipient status
+
+### Row Level Security (RLS)
+
+All tables have RLS policies ensuring users can only access their own data:
+
+```sql
+-- Example policy
+CREATE POLICY "Users can view their own leads"
+  ON public.leads FOR SELECT
+  USING (auth.uid() = user_id);
+```
+
+## Email Personalization
+
+Use these placeholders in your templates:
+
+- `{{name}}` - Recipient's name
+- `{{company}}` - Recipient's company
+- `{{email}}` - Recipient's email
+- `{{phone}}` - Recipient's phone
+
+Example:
+```html
+<p>Hello {{name}},</p>
+<p>Thank you for your interest in our product at {{company}}.</p>
+```
+
+## Deployment to Vercel
+
+1. Push your code to GitHub
+2. Connect your repo to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+### Environment Variables in Vercel
+
+Set the same variables from `.env.example` in your Vercel project settings.
+
+## Email Sending Architecture
+
+To avoid Vercel function timeouts, the app uses a worker pattern:
+
+1. **Create Campaign**: Enqueues all recipients with `pending` status
+2. **Worker Endpoint**: Processes 20 recipients per call
+3. **Auto-polling**: UI automatically calls worker until complete
+4. **Manual Continue**: Button to resume if needed
+
+## Development
+
+```bash
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run linting
+npm run lint
+```
+
+## Troubleshooting
+
+### SMTP Connection Issues
+
+- Verify SMTP credentials are correct
+- For Gmail, ensure you're using an App Password
+- Check if your SMTP provider requires specific port/security settings
+
+### Supabase Auth Issues
+
+- Ensure Site URL is configured in Supabase Auth settings
+- For local development, add `http://localhost:3000` to redirect URLs
+
+### RLS Errors
+
+- Make sure you're logged in
+- Check that `user_id` is being set correctly on inserts
+
+## License
+
+MIT License - feel free to use this project for your own purposes.
 
 ## Contributing
 
-Feel free to open issues or submit pull requests. This project aims to be a high‑quality reference implementation for building multi‑tenant email blasting applications with Next.js and Supabase.
+Contributions are welcome! Please open an issue or submit a pull request.
