@@ -176,7 +176,7 @@ export function CampaignDetail({ campaignId, onClose, onRefresh }: CampaignDetai
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
           </div>
         ) : (
           <>
@@ -189,28 +189,28 @@ export function CampaignDetail({ campaignId, onClose, onRefresh }: CampaignDetai
 
             {/* Stats */}
             <div className="grid grid-cols-4 gap-4 my-4">
-              <div className="text-center p-3 rounded-xl bg-neutral-50/80">
-                <div className="text-2xl font-bold text-neutral-900">{counts.total}</div>
-                <div className="text-xs text-neutral-500">Total</div>
+              <div className="text-center p-3 rounded-xl bg-gray-50">
+                <div className="text-2xl font-bold text-gray-900">{counts.total}</div>
+                <div className="text-xs text-gray-500">Total</div>
               </div>
-              <div className="text-center p-3 rounded-xl bg-success-50/80">
-                <div className="text-2xl font-bold text-success-700">{counts.sent}</div>
-                <div className="text-xs text-success-600">Sent</div>
+              <div className="text-center p-3 rounded-xl bg-green-50">
+                <div className="text-2xl font-bold text-green-700">{counts.sent}</div>
+                <div className="text-xs text-green-600">Sent</div>
               </div>
-              <div className="text-center p-3 rounded-xl bg-error-50/80">
-                <div className="text-2xl font-bold text-error-700">{counts.failed}</div>
-                <div className="text-xs text-error-600">Failed</div>
+              <div className="text-center p-3 rounded-xl bg-red-50">
+                <div className="text-2xl font-bold text-red-700">{counts.failed}</div>
+                <div className="text-xs text-red-600">Failed</div>
               </div>
-              <div className="text-center p-3 rounded-xl bg-warning-50/80">
-                <div className="text-2xl font-bold text-warning-700">{counts.pending}</div>
-                <div className="text-xs text-warning-600">Pending</div>
+              <div className="text-center p-3 rounded-xl bg-yellow-50">
+                <div className="text-2xl font-bold text-yellow-700">{counts.pending}</div>
+                <div className="text-xs text-yellow-600">Pending</div>
               </div>
             </div>
 
             {/* Progress */}
             <div className="space-y-2 mb-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-neutral-500">Progress</span>
+                <span className="text-gray-500">Progress</span>
                 <span className="font-medium">{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-2" />
@@ -234,10 +234,10 @@ export function CampaignDetail({ campaignId, onClose, onRefresh }: CampaignDetai
                       <TableCell className="font-medium">{recipient.to_name}</TableCell>
                       <TableCell>{recipient.to_email}</TableCell>
                       <TableCell>{getStatusBadge(recipient.status)}</TableCell>
-                      <TableCell className="text-sm text-neutral-500">
+                      <TableCell className="text-sm text-gray-500">
                         {recipient.sent_at ? formatDate(recipient.sent_at) : '-'}
                       </TableCell>
-                      <TableCell className="text-sm text-error-600 max-w-[200px] truncate">
+                      <TableCell className="text-sm text-red-600 max-w-[200px] truncate">
                         {recipient.error || '-'}
                       </TableCell>
                     </TableRow>

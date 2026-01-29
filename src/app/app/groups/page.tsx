@@ -61,8 +61,8 @@ export default function GroupsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Contact Groups</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Contact Groups</h1>
+          <p className="text-sm text-gray-500 mt-1">
             Organize your leads into targeted groups
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function GroupsPage() {
         <Card>
           <CardContent className="py-12">
             <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
             </div>
           </CardContent>
         </Card>
@@ -115,7 +115,7 @@ export default function GroupsPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="text-sm text-neutral-500">
+                <div className="text-sm text-gray-500">
                   {group.members?.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {group.members.slice(0, 3).map((m) => (
@@ -130,7 +130,7 @@ export default function GroupsPage() {
                       )}
                     </div>
                   ) : (
-                    <span className="text-neutral-400 text-xs sm:text-sm">No members yet</span>
+                    <span className="text-gray-400 text-xs sm:text-sm">No members yet</span>
                   )}
                 </div>
               </CardContent>

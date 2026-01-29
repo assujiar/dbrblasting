@@ -28,24 +28,24 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const closeMobileMenu = () => setMobileMenuOpen(false)
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
           onClick={closeMobileMenu}
         />
       )}
 
       {/* Sidebar - Desktop */}
-      <aside className="hidden md:flex md:flex-col w-64 p-4 space-y-6 border-r border-white/20 bg-white/70 backdrop-blur-xl">
+      <aside className="hidden md:flex md:flex-col w-64 p-4 space-y-6 border-r border-gray-200 bg-white">
         <div className="flex items-center gap-3 px-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-md">
             <Mail className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">BlastMail</h2>
-            <p className="text-[10px] text-neutral-500">Email Platform</p>
+            <h2 className="text-lg font-bold text-gray-900">BlastMail</h2>
+            <p className="text-[10px] text-gray-500">Email Platform</p>
           </div>
         </div>
         <nav className="flex-1 space-y-1">
@@ -57,8 +57,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 href={href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
                   active
-                    ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-md'
-                    : 'text-neutral-600 hover:bg-white/80 hover:shadow-sm'
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -67,10 +67,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             )
           })}
         </nav>
-        <div className="border-t border-neutral-200 pt-4">
+        <div className="border-t border-gray-200 pt-4">
           <button
             onClick={signOut}
-            className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-neutral-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+            className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
           >
             <LogOut className="h-5 w-5" />
             <span className="font-medium">Sign Out</span>
@@ -79,24 +79,24 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 p-4 space-y-6 bg-white/95 backdrop-blur-xl shadow-2xl transform transition-transform duration-300 ease-in-out md:hidden ${
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 p-4 space-y-6 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out md:hidden ${
         mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-md">
               <Mail className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">BlastMail</h2>
-              <p className="text-[10px] text-neutral-500">Email Platform</p>
+              <h2 className="text-lg font-bold text-gray-900">BlastMail</h2>
+              <p className="text-[10px] text-gray-500">Email Platform</p>
             </div>
           </div>
           <button
             onClick={closeMobileMenu}
-            className="p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <X className="h-5 w-5 text-neutral-600" />
+            <X className="h-5 w-5 text-gray-600" />
           </button>
         </div>
         <nav className="flex-1 space-y-1">
@@ -109,8 +109,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 onClick={closeMobileMenu}
                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
                   active
-                    ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-md'
-                    : 'text-neutral-600 hover:bg-neutral-100'
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -119,10 +119,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             )
           })}
         </nav>
-        <div className="border-t border-neutral-200 pt-4">
+        <div className="border-t border-gray-200 pt-4">
           <button
             onClick={signOut}
-            className="flex items-center gap-3 px-3 py-3 w-full rounded-xl text-neutral-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+            className="flex items-center gap-3 px-3 py-3 w-full rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
           >
             <LogOut className="h-5 w-5" />
             <span className="font-medium">Sign Out</span>
@@ -133,29 +133,29 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-white/20 bg-white/70 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
           <div className="flex items-center gap-3">
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 rounded-lg hover:bg-neutral-100 transition-colors md:hidden"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
             >
-              <Menu className="h-5 w-5 text-neutral-600" />
+              <Menu className="h-5 w-5 text-gray-600" />
             </button>
-            <h1 className="text-lg font-semibold text-neutral-800">
+            <h1 className="text-lg font-semibold text-gray-800">
               {menu.find((m) => pathname.startsWith(m.href))?.name ?? 'Dashboard'}
             </h1>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="flex items-center gap-2 rounded-xl">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <User className="h-4 w-4 text-white" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem disabled className="text-neutral-500 text-sm">
+              <DropdownMenuItem disabled className="text-gray-500 text-sm">
                 My Account
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -165,13 +165,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto pb-20 md:pb-6">
           {children}
         </main>
       </div>
 
       {/* Mobile bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-white/90 backdrop-blur-xl border-t border-neutral-200 safe-area-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-white border-t border-gray-200 safe-area-bottom">
         <div className="flex items-center justify-around py-2">
           {menu.map(({ name, href, icon: Icon }) => {
             const active = pathname === href || pathname.startsWith(href + '/')
@@ -181,8 +181,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 href={href}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 min-w-[60px] ${
                   active
-                    ? 'text-primary-600'
-                    : 'text-neutral-500'
+                    ? 'text-blue-600'
+                    : 'text-gray-500'
                 }`}
               >
                 <Icon className={`h-5 w-5 ${active ? 'scale-110' : ''} transition-transform`} />

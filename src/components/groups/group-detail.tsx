@@ -213,7 +213,7 @@ export function GroupDetail({ group, onClose, onEdit, onRefresh }: GroupDetailPr
                             {removingMemberId === member.lead?.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              <X className="h-4 w-4 text-neutral-400 hover:text-error-500" />
+                              <X className="h-4 w-4 text-gray-400 hover:text-red-500" />
                             )}
                           </Button>
                         </TableCell>
@@ -223,7 +223,7 @@ export function GroupDetail({ group, onClose, onEdit, onRefresh }: GroupDetailPr
                 </Table>
               </div>
             ) : (
-              <div className="text-center py-8 text-neutral-500">
+              <div className="text-center py-8 text-gray-500">
                 No members in this group yet
               </div>
             )}
@@ -258,10 +258,10 @@ export function GroupDetail({ group, onClose, onEdit, onRefresh }: GroupDetailPr
 
           {isLoadingLeads ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
             </div>
           ) : availableLeads.length === 0 ? (
-            <div className="text-center py-8 text-neutral-500">
+            <div className="text-center py-8 text-gray-500">
               No available leads to add
             </div>
           ) : (
@@ -269,7 +269,7 @@ export function GroupDetail({ group, onClose, onEdit, onRefresh }: GroupDetailPr
               {availableLeads.map((lead) => (
                 <div
                   key={lead.id}
-                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-50/50"
+                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
                 >
                   <Checkbox
                     id={lead.id}
@@ -284,7 +284,7 @@ export function GroupDetail({ group, onClose, onEdit, onRefresh }: GroupDetailPr
                   />
                   <Label htmlFor={lead.id} className="flex-1 cursor-pointer">
                     <div className="font-medium">{lead.name}</div>
-                    <div className="text-sm text-neutral-500">{lead.email}</div>
+                    <div className="text-sm text-gray-500">{lead.email}</div>
                   </Label>
                 </div>
               ))}

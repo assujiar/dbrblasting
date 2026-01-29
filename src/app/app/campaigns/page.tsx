@@ -128,8 +128,8 @@ function CampaignsContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Campaigns</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Campaigns</h1>
+          <p className="text-sm text-gray-500 mt-1">
             View your email campaign history and status
           </p>
         </div>
@@ -140,7 +140,7 @@ function CampaignsContent() {
         <Card>
           <CardContent className="py-12">
             <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
             </div>
           </CardContent>
         </Card>
@@ -170,8 +170,8 @@ function CampaignsContent() {
                 <CardContent className="py-3 sm:py-4">
                   <div className="flex items-start sm:items-center justify-between gap-2 mb-2 sm:mb-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-neutral-900 text-sm sm:text-base truncate">{campaign.name}</h3>
-                      <p className="text-xs sm:text-sm text-neutral-500 truncate">
+                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{campaign.name}</h3>
+                      <p className="text-xs sm:text-sm text-gray-500 truncate">
                         {campaign.template?.name || 'Deleted'}
                       </p>
                     </div>
@@ -180,14 +180,14 @@ function CampaignsContent() {
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <span className="text-neutral-500">Progress</span>
+                      <span className="text-gray-500">Progress</span>
                       <span className="font-medium">
-                        <span className="text-success-600">{campaign.recipientCounts.sent}</span>
+                        <span className="text-green-600">{campaign.recipientCounts.sent}</span>
                         {campaign.recipientCounts.failed > 0 && (
-                          <span className="text-error-600"> / {campaign.recipientCounts.failed} failed</span>
+                          <span className="text-red-600"> / {campaign.recipientCounts.failed} failed</span>
                         )}
                         {campaign.recipientCounts.pending > 0 && (
-                          <span className="text-neutral-400"> / {campaign.recipientCounts.pending} pending</span>
+                          <span className="text-gray-400"> / {campaign.recipientCounts.pending} pending</span>
                         )}
                       </span>
                     </div>
@@ -196,21 +196,21 @@ function CampaignsContent() {
                       className="h-1.5 sm:h-2"
                       indicatorClassName={
                         campaign.status === 'failed'
-                          ? 'from-error-500 to-error-600'
+                          ? 'from-red-500 to-red-600'
                           : campaign.status === 'completed'
-                          ? 'from-success-500 to-success-600'
+                          ? 'from-green-500 to-green-600'
                           : undefined
                       }
                     />
                   </div>
 
-                  <div className="flex items-center justify-between mt-2 sm:mt-3 text-[10px] sm:text-xs text-neutral-400">
+                  <div className="flex items-center justify-between mt-2 sm:mt-3 text-[10px] sm:text-xs text-gray-400">
                     <span>{formatDate(campaign.created_at)}</span>
                     <span>{campaign.recipientCounts.total} recipients</span>
                   </div>
 
                   {processingCampaignId === campaign.id && (
-                    <div className="mt-2 sm:mt-3 flex items-center gap-2 text-xs sm:text-sm text-primary-600">
+                    <div className="mt-2 sm:mt-3 flex items-center gap-2 text-xs sm:text-sm text-blue-600">
                       <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
                       Processing...
                     </div>
@@ -238,7 +238,7 @@ export default function CampaignsPage() {
       <Card>
         <CardContent className="py-12">
           <div className="flex items-center justify-center">
-            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
           </div>
         </CardContent>
       </Card>

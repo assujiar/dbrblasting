@@ -92,32 +92,32 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
                 <TableRow key={lead.id}>
                   <TableCell className="font-medium">{lead.name}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2 text-neutral-600">
-                      <Mail className="h-3.5 w-3.5 text-neutral-400" />
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Mail className="h-3.5 w-3.5 text-gray-400" />
                       {lead.email}
                     </div>
                   </TableCell>
                   <TableCell>
                     {lead.company ? (
-                      <div className="flex items-center gap-2 text-neutral-600">
-                        <Building2 className="h-3.5 w-3.5 text-neutral-400" />
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Building2 className="h-3.5 w-3.5 text-gray-400" />
                         {lead.company}
                       </div>
                     ) : (
-                      <span className="text-neutral-400">-</span>
+                      <span className="text-gray-400">-</span>
                     )}
                   </TableCell>
                   <TableCell>
                     {lead.phone ? (
-                      <div className="flex items-center gap-2 text-neutral-600">
-                        <Phone className="h-3.5 w-3.5 text-neutral-400" />
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Phone className="h-3.5 w-3.5 text-gray-400" />
                         {lead.phone}
                       </div>
                     ) : (
-                      <span className="text-neutral-400">-</span>
+                      <span className="text-gray-400">-</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-neutral-500">
+                  <TableCell className="text-gray-500">
                     {formatDateShort(lead.created_at)}
                   </TableCell>
                   <TableCell>
@@ -134,7 +134,7 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => setDeleteId(lead.id)}
-                          className="text-error-600 focus:text-error-600"
+                          className="text-red-600 focus:text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete

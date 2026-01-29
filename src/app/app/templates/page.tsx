@@ -103,8 +103,8 @@ export default function TemplatesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Email Templates</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Email Templates</h1>
+          <p className="text-sm text-gray-500 mt-1">
             Create and manage your email templates
           </p>
         </div>
@@ -119,7 +119,7 @@ export default function TemplatesPage() {
         <Card>
           <CardContent className="py-12">
             <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
             </div>
           </CardContent>
         </Card>
@@ -172,7 +172,7 @@ export default function TemplatesPage() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setDeleteId(template.id)}
-                        className="text-error-600 focus:text-error-600"
+                        className="text-red-600 focus:text-red-600"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -182,7 +182,7 @@ export default function TemplatesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="text-xs sm:text-sm text-neutral-500 line-clamp-2 mb-3 sm:mb-4">
+                <div className="text-xs sm:text-sm text-gray-500 line-clamp-2 mb-3 sm:mb-4">
                   {truncate(template.html_body.replace(/<[^>]*>/g, ''), 100)}
                 </div>
                 <div className="flex items-center justify-between gap-2">

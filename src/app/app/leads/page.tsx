@@ -77,8 +77,8 @@ export default function LeadsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Leads</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Leads</h1>
+          <p className="text-sm text-gray-500 mt-1">
             Manage your contact database
           </p>
         </div>
@@ -93,7 +93,7 @@ export default function LeadsPage() {
         <CardContent className="py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search leads..."
                 value={search}
@@ -101,7 +101,7 @@ export default function LeadsPage() {
                 className="pl-10"
               />
             </div>
-            <div className="text-xs sm:text-sm text-neutral-500">
+            <div className="text-xs sm:text-sm text-gray-500">
               {pagination.total} {pagination.total === 1 ? 'lead' : 'leads'} total
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function LeadsPage() {
         <Card>
           <CardContent className="py-12">
             <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
             </div>
           </CardContent>
         </Card>
@@ -152,7 +152,7 @@ export default function LeadsPage() {
             <Card>
               <CardContent className="py-3 sm:py-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <p className="text-xs sm:text-sm text-neutral-500 text-center sm:text-left">
+                  <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
                     Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                     {pagination.total}
@@ -181,7 +181,7 @@ export default function LeadsPage() {
                         .map((page, index, array) => (
                           <span key={page}>
                             {index > 0 && array[index - 1] !== page - 1 && (
-                              <span className="px-1 sm:px-2 text-neutral-400">...</span>
+                              <span className="px-1 sm:px-2 text-gray-400">...</span>
                             )}
                             <Button
                               variant={pagination.page === page ? 'default' : 'ghost'}
