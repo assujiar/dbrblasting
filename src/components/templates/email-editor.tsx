@@ -27,6 +27,7 @@ import {
   Minus,
   Quote,
   ArrowLeftRight,
+  MoreHorizontal,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -49,6 +50,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -96,13 +104,25 @@ const BG_COLORS = [
   { label: 'Pink', value: '#fed7e2' },
 ]
 
+const MODE_ICONS = {
+  code: Code,
+  visual: Eye,
+  split: ArrowLeftRight,
+}
+
+const MODE_LABELS = {
+  code: 'HTML',
+  visual: 'Visual',
+  split: 'Split',
+}
+
 export function EmailEditor({
   value,
   onChange,
   placeholder = 'Start writing your email...',
   height = 500,
 }: EmailEditorProps) {
-  const [mode, setMode] = useState<EditorMode>('split')
+  const [mode, setMode] = useState<EditorMode>('visual')
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [imageDialogOpen, setImageDialogOpen] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
@@ -112,6 +132,9 @@ export function EmailEditor({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const visualEditorRef = useRef<HTMLDivElement>(null)
   const [isVisualFocused, setIsVisualFocused] = useState(false)
+
+  // Responsive height
+  const mobileHeight = Math.min(height, 350)
 
   // Sync visual editor content when value changes externally
   useEffect(() => {
@@ -185,12 +208,14 @@ export function EmailEditor({
     onClick,
     icon: Icon,
     tooltip,
-    active = false
+    active = false,
+    className = '',
   }: {
     onClick: () => void
     icon: React.ElementType
     tooltip: string
     active?: boolean
+    className?: string
   }) => (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
@@ -199,11 +224,12 @@ export function EmailEditor({
             type="button"
             onClick={onClick}
             className={cn(
-              'p-2 rounded-md hover:bg-neutral-100 transition-colors',
-              active && 'bg-neutral-100 text-primary-600'
+              'p-1.5 sm:p-2 rounded-md hover:bg-neutral-100 transition-colors flex-shrink-0',
+              active && 'bg-neutral-100 text-primary-600',
+              className
             )}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
         </TooltipTrigger>
         <TooltipContent>
@@ -213,16 +239,19 @@ export function EmailEditor({
     </TooltipProvider>
   )
 
-  // Divider component
+  // Divider component - hidden on mobile
   const Divider = () => (
-    <div className="w-px h-6 bg-neutral-200 mx-1" />
+    <div className="hidden sm:block w-px h-5 sm:h-6 bg-neutral-200 mx-0.5 sm:mx-1 flex-shrink-0" />
   )
 
+  const ModeIcon = MODE_ICONS[mode]
+
   return (
-    <div className="space-y-4">
-      {/* Mode Selector */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 bg-neutral-100 p-1 rounded-lg">
+    <div className="space-y-3 sm:space-y-4">
+      {/* Mode Selector - Mobile Optimized */}
+      <div className="flex items-center justify-between gap-2">
+        {/* Desktop Mode Buttons */}
+        <div className="hidden sm:flex items-center gap-1 bg-neutral-100 p-1 rounded-lg">
           <button
             type="button"
             onClick={() => setMode('code')}
@@ -247,7 +276,7 @@ export function EmailEditor({
             )}
           >
             <Eye className="h-4 w-4" />
-            Visual Editor
+            Visual
           </button>
           <button
             type="button"
@@ -260,26 +289,59 @@ export function EmailEditor({
             )}
           >
             <ArrowLeftRight className="h-4 w-4" />
-            Split View
+            Split
           </button>
+        </div>
+
+        {/* Mobile Mode Dropdown */}
+        <div className="sm:hidden flex-1">
+          <Select value={mode} onValueChange={(v) => setMode(v as EditorMode)}>
+            <SelectTrigger className="w-full h-9">
+              <SelectValue>
+                <span className="flex items-center gap-2">
+                  <ModeIcon className="h-4 w-4" />
+                  {MODE_LABELS[mode]} Mode
+                </span>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="visual">
+                <span className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Visual Editor
+                </span>
+              </SelectItem>
+              <SelectItem value="code">
+                <span className="flex items-center gap-2">
+                  <Code className="h-4 w-4" />
+                  Raw HTML
+                </span>
+              </SelectItem>
+              <SelectItem value="split">
+                <span className="flex items-center gap-2">
+                  <ArrowLeftRight className="h-4 w-4" />
+                  Split View
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Visual Editor Toolbar - Only show when in visual or split mode */}
+      {/* Visual Editor Toolbar - Mobile Optimized */}
       {(mode === 'visual' || mode === 'split') && (
-        <div className="flex flex-wrap items-center gap-1 p-2 bg-neutral-50 border border-neutral-200 rounded-lg">
+        <div className="flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 bg-neutral-50 border border-neutral-200 rounded-lg overflow-x-auto">
           {/* Undo/Redo */}
           <ToolbarButton onClick={() => execCommand('undo')} icon={Undo2} tooltip="Undo" />
           <ToolbarButton onClick={() => execCommand('redo')} icon={Redo2} tooltip="Redo" />
 
           <Divider />
 
-          {/* Headings */}
+          {/* Headings Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-neutral-100 text-sm">
-                <Type className="h-4 w-4" />
-                <span className="hidden sm:inline">Heading</span>
+              <button className="flex items-center gap-1 p-1.5 sm:px-2 sm:py-1.5 rounded-md hover:bg-neutral-100 text-sm flex-shrink-0">
+                <Type className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -299,64 +361,41 @@ export function EmailEditor({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Font Size */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-neutral-100 text-sm">
-                <span className="text-xs font-mono">A</span>
-                <span className="hidden sm:inline">Size</span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {FONT_SIZES.map((size) => (
-                <DropdownMenuItem
-                  key={size.value}
-                  onClick={() => execCommand('fontSize', '7')}
-                  style={{ fontSize: size.value }}
-                >
-                  {size.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Divider />
-
           {/* Basic Formatting */}
-          <ToolbarButton onClick={() => execCommand('bold')} icon={Bold} tooltip="Bold (Ctrl+B)" />
-          <ToolbarButton onClick={() => execCommand('italic')} icon={Italic} tooltip="Italic (Ctrl+I)" />
-          <ToolbarButton onClick={() => execCommand('underline')} icon={Underline} tooltip="Underline (Ctrl+U)" />
+          <ToolbarButton onClick={() => execCommand('bold')} icon={Bold} tooltip="Bold" />
+          <ToolbarButton onClick={() => execCommand('italic')} icon={Italic} tooltip="Italic" />
+          <ToolbarButton onClick={() => execCommand('underline')} icon={Underline} tooltip="Underline" />
 
           <Divider />
 
           {/* Text Color */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-neutral-100">
-                <Palette className="h-4 w-4" />
+              <button className="flex items-center gap-1 p-1.5 sm:px-2 sm:py-1.5 rounded-md hover:bg-neutral-100 flex-shrink-0">
+                <Palette className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuLabel>Text Color</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs">Text Color</DropdownMenuLabel>
               <div className="grid grid-cols-6 gap-1 p-2">
                 {TEXT_COLORS.map((color) => (
                   <button
                     key={color.value}
                     onClick={() => execCommand('foreColor', color.value)}
-                    className="w-6 h-6 rounded border border-neutral-200 hover:scale-110 transition-transform"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-neutral-200 hover:scale-110 transition-transform"
                     style={{ backgroundColor: color.value }}
                     title={color.label}
                   />
                 ))}
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Background Color</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs">Background</DropdownMenuLabel>
               <div className="grid grid-cols-4 gap-1 p-2">
                 {BG_COLORS.map((color) => (
                   <button
                     key={color.value}
                     onClick={() => execCommand('hiliteColor', color.value)}
-                    className="w-6 h-6 rounded border border-neutral-200 hover:scale-110 transition-transform"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded border border-neutral-200 hover:scale-110 transition-transform"
                     style={{ backgroundColor: color.value }}
                     title={color.label}
                   />
@@ -365,41 +404,75 @@ export function EmailEditor({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Divider />
-
-          {/* Alignment */}
-          <ToolbarButton onClick={() => execCommand('justifyLeft')} icon={AlignLeft} tooltip="Align Left" />
-          <ToolbarButton onClick={() => execCommand('justifyCenter')} icon={AlignCenter} tooltip="Align Center" />
-          <ToolbarButton onClick={() => execCommand('justifyRight')} icon={AlignRight} tooltip="Align Right" />
+          {/* Alignment - Hidden on very small screens, in dropdown */}
+          <div className="hidden xs:flex items-center">
+            <ToolbarButton onClick={() => execCommand('justifyLeft')} icon={AlignLeft} tooltip="Left" />
+            <ToolbarButton onClick={() => execCommand('justifyCenter')} icon={AlignCenter} tooltip="Center" />
+            <ToolbarButton onClick={() => execCommand('justifyRight')} icon={AlignRight} tooltip="Right" />
+          </div>
 
           <Divider />
 
           {/* Lists */}
           <ToolbarButton onClick={() => execCommand('insertUnorderedList')} icon={List} tooltip="Bullet List" />
-          <ToolbarButton onClick={() => execCommand('insertOrderedList')} icon={ListOrdered} tooltip="Numbered List" />
+          <ToolbarButton onClick={() => execCommand('insertOrderedList')} icon={ListOrdered} tooltip="Number List" />
 
           <Divider />
 
-          {/* Insert */}
+          {/* Insert - Some hidden on mobile in dropdown */}
           <ToolbarButton onClick={() => setLinkDialogOpen(true)} icon={LinkIcon} tooltip="Insert Link" />
-          <ToolbarButton onClick={() => setImageDialogOpen(true)} icon={Image} tooltip="Insert Image" />
-          <ToolbarButton onClick={insertHR} icon={Minus} tooltip="Horizontal Line" />
-          <ToolbarButton onClick={insertQuote} icon={Quote} tooltip="Block Quote" />
+          <ToolbarButton onClick={() => setImageDialogOpen(true)} icon={Image} tooltip="Insert Image" className="hidden sm:flex" />
+
+          {/* More options dropdown for mobile */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex sm:hidden items-center p-1.5 rounded-md hover:bg-neutral-100 flex-shrink-0">
+                <MoreHorizontal className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => execCommand('justifyLeft')}>
+                <AlignLeft className="h-4 w-4 mr-2" /> Align Left
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => execCommand('justifyCenter')}>
+                <AlignCenter className="h-4 w-4 mr-2" /> Align Center
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => execCommand('justifyRight')}>
+                <AlignRight className="h-4 w-4 mr-2" /> Align Right
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setImageDialogOpen(true)}>
+                <Image className="h-4 w-4 mr-2" /> Insert Image
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={insertHR}>
+                <Minus className="h-4 w-4 mr-2" /> Horizontal Line
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={insertQuote}>
+                <Quote className="h-4 w-4 mr-2" /> Block Quote
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Desktop only insert buttons */}
+          <div className="hidden sm:flex items-center">
+            <ToolbarButton onClick={insertHR} icon={Minus} tooltip="Horizontal Line" />
+            <ToolbarButton onClick={insertQuote} icon={Quote} tooltip="Block Quote" />
+          </div>
         </div>
       )}
 
       {/* Editor Area */}
       <div className={cn(
-        'grid gap-4',
+        'grid gap-3 sm:gap-4',
         mode === 'split' && 'lg:grid-cols-2'
       )}>
         {/* Code Editor */}
         {(mode === 'code' || mode === 'split') && (
           <Card className="overflow-hidden">
-            <CardHeader className="py-3 bg-gradient-to-r from-neutral-800 to-neutral-900 border-b">
-              <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
-                <Code className="h-4 w-4" />
-                HTML Source
+            <CardHeader className="py-2 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-neutral-800 to-neutral-900 border-b">
+              <CardTitle className="text-xs sm:text-sm font-medium flex items-center gap-2 text-white">
+                <Code className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">HTML Source</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -408,12 +481,12 @@ export function EmailEditor({
                 value={value}
                 onChange={handleCodeChange}
                 className={cn(
-                  'w-full p-4 font-mono text-sm',
+                  'w-full p-3 sm:p-4 font-mono text-xs sm:text-sm',
                   'bg-neutral-900 text-neutral-100',
                   'border-0 focus:outline-none focus:ring-0',
                   'resize-none'
                 )}
-                style={{ height: `${height}px` }}
+                style={{ height: `${mode === 'split' ? mobileHeight : height}px` }}
                 placeholder={placeholder}
                 spellCheck={false}
               />
@@ -424,17 +497,17 @@ export function EmailEditor({
         {/* Visual Editor */}
         {(mode === 'visual' || mode === 'split') && (
           <Card className="overflow-hidden">
-            <CardHeader className="py-3 bg-gradient-to-r from-primary-50 to-accent-50 border-b">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Eye className="h-4 w-4 text-primary-500" />
-                Visual Editor
-                <span className="ml-auto text-xs font-normal text-neutral-500">
-                  Click to edit directly
+            <CardHeader className="py-2 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-primary-50 to-accent-50 border-b">
+              <CardTitle className="text-xs sm:text-sm font-medium flex items-center gap-2">
+                <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-500 flex-shrink-0" />
+                <span className="truncate">Visual Editor</span>
+                <span className="ml-auto text-[10px] sm:text-xs font-normal text-neutral-500 hidden sm:block">
+                  Click to edit
                 </span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-auto bg-white" style={{ height: `${height}px` }}>
+              <div className="overflow-auto bg-white" style={{ height: `${mode === 'split' ? mobileHeight : height}px` }}>
                 <div
                   ref={visualEditorRef}
                   contentEditable
@@ -442,13 +515,14 @@ export function EmailEditor({
                   onFocus={() => setIsVisualFocused(true)}
                   onBlur={() => setIsVisualFocused(false)}
                   className={cn(
-                    'min-h-full p-4 focus:outline-none',
+                    'min-h-full p-3 sm:p-4 focus:outline-none',
                     'prose prose-sm max-w-none',
                     '[&_*]:outline-none'
                   )}
                   style={{
                     fontFamily: 'Arial, sans-serif',
                     lineHeight: '1.6',
+                    fontSize: '14px',
                   }}
                   dangerouslySetInnerHTML={{ __html: value }}
                   suppressContentEditableWarning
@@ -462,14 +536,14 @@ export function EmailEditor({
       {/* Preview (only in code mode) */}
       {mode === 'code' && (
         <Card className="overflow-hidden">
-          <CardHeader className="py-3 bg-gradient-to-r from-accent-50 to-success-50 border-b">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Eye className="h-4 w-4 text-accent-500" />
-              Live Preview
+          <CardHeader className="py-2 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-accent-50 to-success-50 border-b">
+            <CardTitle className="text-xs sm:text-sm font-medium flex items-center gap-2">
+              <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent-500 flex-shrink-0" />
+              <span className="truncate">Live Preview</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-auto bg-neutral-100" style={{ height: `${height}px` }}>
+            <div className="overflow-auto bg-neutral-100" style={{ height: `${mobileHeight}px` }}>
               <iframe
                 srcDoc={sanitizeHtml(value)}
                 className="w-full h-full border-0 bg-white"
@@ -481,75 +555,79 @@ export function EmailEditor({
         </Card>
       )}
 
-      {/* Link Dialog */}
+      {/* Link Dialog - Mobile Optimized */}
       <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Insert Link</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">Insert Link</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="link-url">URL</Label>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="link-url" className="text-sm">URL</Label>
               <Input
                 id="link-url"
                 type="url"
                 placeholder="https://example.com"
                 value={linkUrl}
                 onChange={(e) => setLinkUrl(e.target.value)}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="link-text">Display Text (optional)</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="link-text" className="text-sm">Display Text (optional)</Label>
               <Input
                 id="link-text"
                 placeholder="Click here"
                 value={linkText}
                 onChange={(e) => setLinkText(e.target.value)}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2 mt-4">
+            <Button variant="outline" onClick={() => setLinkDialogOpen(false)} className="w-full sm:w-auto" size="sm">
               Cancel
             </Button>
-            <Button onClick={handleInsertLink}>Insert Link</Button>
+            <Button onClick={handleInsertLink} className="w-full sm:w-auto" size="sm">Insert Link</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Image Dialog */}
+      {/* Image Dialog - Mobile Optimized */}
       <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Insert Image</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">Insert Image</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="image-url">Image URL</Label>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="image-url" className="text-sm">Image URL</Label>
               <Input
                 id="image-url"
                 type="url"
                 placeholder="https://example.com/image.jpg"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="image-alt">Alt Text (optional)</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="image-alt" className="text-sm">Alt Text (optional)</Label>
               <Input
                 id="image-alt"
                 placeholder="Image description"
                 value={imageAlt}
                 onChange={(e) => setImageAlt(e.target.value)}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
             {imageUrl && (
-              <div className="p-4 bg-neutral-100 rounded-lg">
+              <div className="p-3 sm:p-4 bg-neutral-100 rounded-lg">
                 <p className="text-xs text-neutral-500 mb-2">Preview:</p>
                 <img
                   src={imageUrl}
                   alt={imageAlt || 'Preview'}
-                  className="max-w-full max-h-40 object-contain mx-auto"
+                  className="max-w-full max-h-32 sm:max-h-40 object-contain mx-auto"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none'
                   }}
@@ -557,11 +635,11 @@ export function EmailEditor({
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setImageDialogOpen(false)}>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2 mt-4">
+            <Button variant="outline" onClick={() => setImageDialogOpen(false)} className="w-full sm:w-auto" size="sm">
               Cancel
             </Button>
-            <Button onClick={handleInsertImage}>Insert Image</Button>
+            <Button onClick={handleInsertImage} className="w-full sm:w-auto" size="sm">Insert Image</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

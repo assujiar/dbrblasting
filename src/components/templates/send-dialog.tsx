@@ -150,43 +150,43 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
 
   return (
     <Dialog open={!!template} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>Send Email Campaign</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-base sm:text-lg">Send Email Campaign</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm truncate">
             Select recipients for &quot;{template.name}&quot;
           </DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
           </div>
         ) : (
           <>
             <Tabs defaultValue="leads" className="flex-1 overflow-hidden flex flex-col">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="leads">
-                  <Users className="h-4 w-4 mr-2" />
-                  Select Leads ({selectedLeads.length})
+              <TabsList className="grid w-full grid-cols-2 h-auto">
+                <TabsTrigger value="leads" className="text-xs sm:text-sm py-2">
+                  <Users className="h-4 w-4 mr-1 sm:mr-2 shrink-0" />
+                  <span className="hidden sm:inline">Select </span>Leads ({selectedLeads.length})
                 </TabsTrigger>
-                <TabsTrigger value="groups">
-                  <FolderKanban className="h-4 w-4 mr-2" />
-                  Select Groups ({selectedGroups.length})
+                <TabsTrigger value="groups" className="text-xs sm:text-sm py-2">
+                  <FolderKanban className="h-4 w-4 mr-1 sm:mr-2 shrink-0" />
+                  <span className="hidden sm:inline">Select </span>Groups ({selectedGroups.length})
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="leads" className="flex-1 overflow-auto mt-4">
+              <TabsContent value="leads" className="flex-1 overflow-auto mt-3 sm:mt-4">
                 {leads.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-neutral-500">
                     No leads available
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     {leads.map((lead) => (
                       <div
                         key={lead.id}
-                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-50"
                       >
                         <Checkbox
                           id={`lead-${lead.id}`}
@@ -199,9 +199,9 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
                             }
                           }}
                         />
-                        <Label htmlFor={`lead-${lead.id}`} className="flex-1 cursor-pointer">
-                          <div className="font-medium">{lead.name}</div>
-                          <div className="text-sm text-gray-500">{lead.email}</div>
+                        <Label htmlFor={`lead-${lead.id}`} className="flex-1 cursor-pointer min-w-0">
+                          <div className="font-medium text-sm truncate">{lead.name}</div>
+                          <div className="text-xs text-neutral-500 truncate">{lead.email}</div>
                         </Label>
                       </div>
                     ))}
@@ -209,17 +209,17 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
                 )}
               </TabsContent>
 
-              <TabsContent value="groups" className="flex-1 overflow-auto mt-4">
+              <TabsContent value="groups" className="flex-1 overflow-auto mt-3 sm:mt-4">
                 {groups.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-neutral-500">
                     No groups available
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     {groups.map((group) => (
                       <div
                         key={group.id}
-                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-50"
                       >
                         <Checkbox
                           id={`group-${group.id}`}
@@ -232,9 +232,9 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
                             }
                           }}
                         />
-                        <Label htmlFor={`group-${group.id}`} className="flex-1 cursor-pointer">
-                          <div className="font-medium">{group.name}</div>
-                          <div className="text-sm text-gray-500">
+                        <Label htmlFor={`group-${group.id}`} className="flex-1 cursor-pointer min-w-0">
+                          <div className="font-medium text-sm truncate">{group.name}</div>
+                          <div className="text-xs text-neutral-500">
                             {group.members?.length || 0} members
                           </div>
                         </Label>
@@ -246,24 +246,24 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
             </Tabs>
 
             {/* Summary */}
-            <div className="border-t pt-4 mt-4">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-gray-600">Recipients (deduplicated):</span>
+            <div className="border-t pt-3 sm:pt-4 mt-3 sm:mt-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs sm:text-sm text-neutral-600">Recipients:</span>
                 <Badge variant={uniqueRecipients.length > 0 ? 'default' : 'outline'}>
-                  {uniqueRecipients.length} recipients
+                  {uniqueRecipients.length}
                 </Badge>
               </div>
 
               {uniqueRecipients.length > 0 && (
-                <div className="flex flex-wrap gap-1 max-h-[60px] overflow-y-auto">
-                  {uniqueRecipients.slice(0, 10).map((r) => (
-                    <Badge key={r.email} variant="outline" className="text-xs">
+                <div className="flex flex-wrap gap-1 max-h-[50px] sm:max-h-[60px] overflow-y-auto">
+                  {uniqueRecipients.slice(0, 6).map((r) => (
+                    <Badge key={r.email} variant="outline" className="text-xs truncate max-w-[100px]">
                       {r.name}
                     </Badge>
                   ))}
-                  {uniqueRecipients.length > 10 && (
+                  {uniqueRecipients.length > 6 && (
                     <Badge variant="outline" className="text-xs">
-                      +{uniqueRecipients.length - 10} more
+                      +{uniqueRecipients.length - 6} more
                     </Badge>
                   )}
                 </div>
@@ -272,17 +272,20 @@ export function SendDialog({ template, onClose }: SendDialogProps) {
           </>
         )}
 
-        <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter className="mt-3 sm:mt-4 flex-col-reverse sm:flex-row gap-2">
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto" size="sm">
             Cancel
           </Button>
           <Button
             onClick={handleSend}
             loading={isSending}
             disabled={uniqueRecipients.length === 0 || isLoading}
+            className="w-full sm:w-auto"
+            size="sm"
           >
             <Send className="h-4 w-4" />
-            Send to {uniqueRecipients.length} Recipients
+            <span className="hidden sm:inline">Send to {uniqueRecipients.length} Recipients</span>
+            <span className="sm:hidden">Send ({uniqueRecipients.length})</span>
           </Button>
         </DialogFooter>
       </DialogContent>

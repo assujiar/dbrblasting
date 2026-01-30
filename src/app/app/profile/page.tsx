@@ -316,31 +316,33 @@ export default function ProfilePage() {
                     Your role and organization assignment (managed by administrators)
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-neutral-50 border border-neutral-200">
-                    <div>
+                <CardContent className="space-y-3 sm:space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-neutral-700">Role</p>
                       <p className="text-xs text-neutral-500 mt-0.5">Your access level in the system</p>
                     </div>
-                    {getRoleBadge(profile.role)}
+                    <div className="self-start sm:self-auto shrink-0">
+                      {getRoleBadge(profile.role)}
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-neutral-50 border border-neutral-200">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-neutral-700">Organization</p>
                       <p className="text-xs text-neutral-500 mt-0.5">Your assigned organization</p>
                     </div>
                     {profile.organization ? (
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-neutral-900">{profile.organization.name}</p>
+                      <div className="text-left sm:text-right min-w-0">
+                        <p className="text-sm font-medium text-neutral-900 truncate">{profile.organization.name}</p>
                         <p className="text-xs text-neutral-500">@{profile.organization.slug}</p>
                       </div>
                     ) : (
-                      <Badge variant="neutral">No Organization</Badge>
+                      <Badge variant="neutral" className="self-start sm:self-auto">No Organization</Badge>
                     )}
                   </div>
 
-                  <p className="text-xs text-neutral-500 text-center">
+                  <p className="text-xs text-neutral-500 text-center px-2">
                     Contact your Super Admin to change your role or organization assignment.
                     SMTP settings are managed at the organization level.
                   </p>
@@ -350,8 +352,8 @@ export default function ProfilePage() {
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-end pt-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <Button type="submit" loading={isSaving} size="lg">
+          <div className="flex justify-center sm:justify-end pt-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <Button type="submit" loading={isSaving} size="lg" className="w-full sm:w-auto">
               <Save className="h-4 w-4" />
               Save Profile
             </Button>
