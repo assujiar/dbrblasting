@@ -9,9 +9,11 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogContent,
+  DialogPortal,
+  DialogOverlay,
   DialogTitle,
 } from '@/components/ui/dialog'
+import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -144,19 +146,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile Drawer */}
       <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DialogContent className="fixed inset-y-0 left-0 h-full w-72 max-w-[85vw] p-0 rounded-none rounded-r-2xl border-r border-white/20 glass-strong data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left duration-300">
-          <VisuallyHidden>
-            <DialogTitle>Navigation Menu</DialogTitle>
-          </VisuallyHidden>
-          {/* Close button */}
-          <button
-            onClick={() => setDrawerOpen(false)}
-            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-10"
+        <DialogPortal>
+          <DialogOverlay />
+          <DialogPrimitive.Content
+            className="fixed inset-y-0 left-0 z-50 h-full w-72 max-w-[85vw] p-0 rounded-r-2xl glass-strong data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left duration-300 focus:outline-none"
           >
-            <X className="h-5 w-5 text-gray-500" />
-          </button>
-          <SidebarContent onNavigate={() => setDrawerOpen(false)} />
-        </DialogContent>
+            <VisuallyHidden>
+              <DialogTitle>Navigation Menu</DialogTitle>
+            </VisuallyHidden>
+            {/* Close button */}
+            <button
+              onClick={() => setDrawerOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-10"
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+            <SidebarContent onNavigate={() => setDrawerOpen(false)} />
+          </DialogPrimitive.Content>
+        </DialogPortal>
       </Dialog>
 
       {/* Topbar */}
