@@ -177,31 +177,31 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 animate-slide-up">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link href={`/app/templates/${id}`}>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="shrink-0">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Edit Template</h1>
-            <p className="text-sm text-neutral-500 mt-1">
-              Update your email template with visual editor
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Edit Template</h1>
+            <p className="text-xs sm:text-sm text-neutral-500 mt-0.5 sm:mt-1 truncate">
+              Update your email template
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setGalleryOpen(true)}>
+        <div className="flex items-center gap-2 pl-11 sm:pl-0">
+          <Button variant="outline" size="sm" onClick={() => setGalleryOpen(true)} className="flex-1 sm:flex-initial">
             <LayoutTemplate className="h-4 w-4" />
-            Replace with Template
+            <span className="hidden xs:inline sm:inline">Replace</span>
           </Button>
-          <Button variant="outline" onClick={() => router.push(`/app/templates/${id}`)}>
+          <Button variant="outline" size="sm" onClick={() => router.push(`/app/templates/${id}`)} className="flex-1 sm:flex-initial">
             Cancel
           </Button>
-          <Button onClick={handleSave} loading={isSaving}>
+          <Button size="sm" onClick={handleSave} loading={isSaving} className="flex-1 sm:flex-initial">
             <Save className="h-4 w-4" />
-            Save Changes
+            <span className="hidden xs:inline sm:inline">Save</span>
           </Button>
         </div>
       </div>
