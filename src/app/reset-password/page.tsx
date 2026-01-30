@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
             </h1>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/60 p-5 sm:p-6 text-center">
+          <div className="glass-strong rounded-2xl p-5 sm:p-6 text-center">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Invalid or Expired Link</h2>
             <p className="text-sm text-gray-500 mb-4">
               This reset link is invalid or has expired.
@@ -114,7 +114,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/60 p-5 sm:p-6">
+        <div className="glass-strong rounded-2xl p-5 sm:p-6">
           {resetComplete ? (
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">

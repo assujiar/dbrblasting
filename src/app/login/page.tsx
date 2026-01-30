@@ -88,7 +88,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden">
+        <div className="glass-strong rounded-2xl overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-gray-200">
             <button
