@@ -230,7 +230,7 @@ export interface Database {
           id: string
           user_id: string
           organization_id: string | null
-          template_id: string
+          template_id: string | null  // Nullable due to ON DELETE SET NULL
           name: string
           status: 'draft' | 'running' | 'completed' | 'failed'
           created_at: string
@@ -240,7 +240,7 @@ export interface Database {
           id?: string
           user_id: string
           organization_id?: string | null
-          template_id: string
+          template_id: string  // Required on insert
           name: string
           status?: 'draft' | 'running' | 'completed' | 'failed'
           created_at?: string
@@ -250,7 +250,7 @@ export interface Database {
           id?: string
           user_id?: string
           organization_id?: string | null
-          template_id?: string
+          template_id?: string | null
           name?: string
           status?: 'draft' | 'running' | 'completed' | 'failed'
           created_at?: string
@@ -303,7 +303,35 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      campaigns_with_counts: {
+        Args: Record<string, never>
+        Returns: {
+          id: string
+          user_id: string
+          organization_id: string | null
+          template_id: string | null
+          name: string
+          status: string
+          created_at: string
+          updated_at: string
+          total_count: number
+          sent_count: number
+          failed_count: number
+          pending_count: number
+        }[]
+      }
+      is_super_admin: {
+        Args: Record<string, never>
+        Returns: boolean
+      }
+      get_user_organization_id: {
+        Args: Record<string, never>
+        Returns: string | null
+      }
+      get_user_role: {
+        Args: { user_uuid: string }
+        Returns: UserRole
+      }
     }
     Enums: {
       user_role: UserRole
@@ -330,6 +358,7 @@ export type ContactGroupUpdate = Database['public']['Tables']['contact_groups'][
 
 export type ContactGroupMember = Database['public']['Tables']['contact_group_members']['Row']
 export type ContactGroupMemberInsert = Database['public']['Tables']['contact_group_members']['Insert']
+export type ContactGroupMemberUpdate = Database['public']['Tables']['contact_group_members']['Update']
 
 export type EmailTemplate = Database['public']['Tables']['email_templates']['Row']
 export type EmailTemplateInsert = Database['public']['Tables']['email_templates']['Insert']
@@ -359,3 +388,6 @@ export interface UserProfileWithOrganization extends UserProfile {
 export interface OrganizationWithUsers extends Organization {
   users: UserProfile[]
 }
+
+// Function result types
+export type CampaignWithCounts = Database['public']['Functions']['campaigns_with_counts']['Returns'][number]
