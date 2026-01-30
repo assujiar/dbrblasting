@@ -63,11 +63,13 @@ function SidebarContent({
   collapsed = false,
   onToggleCollapse,
   userRole,
+  debugError,
 }: {
   onNavigate?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
   userRole?: UserRole
+  debugError?: string | null
 }) {
   const pathname = usePathname()
   const isSuperAdmin = userRole === 'super_admin'
@@ -184,6 +186,13 @@ function SidebarContent({
 
               return linkContent
             })}
+
+            {/* DEBUG: Show role status */}
+            <div className="mt-4 p-2 bg-yellow-100 rounded text-xs text-yellow-800 break-all">
+              <div>role: {userRole || 'undefined'}</div>
+              <div>isSuperAdmin: {String(isSuperAdmin)}</div>
+              {debugError && <div className="text-red-600 mt-1">Error: {debugError}</div>}
+            </div>
 
             {/* Admin Link for Super Admins */}
             {isSuperAdmin && (
@@ -326,6 +335,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [userRole, setUserRole] = useState<UserRole | undefined>(undefined)
+  const [debugError, setDebugError] = useState<string | null>(null)
 
   // Load collapsed state from localStorage
   useEffect(() => {
@@ -365,11 +375,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         if (error) {
           console.error('Error fetching profile:', error)
+          setDebugError(error.message || JSON.stringify(error))
         }
 
         if (profile?.role) {
           console.log('Setting userRole to:', profile.role)
           setUserRole(profile.role as UserRole)
+        } else if (!error) {
+          setDebugError('No role in profile')
         }
       }
     }
@@ -412,7 +425,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <X className="w-5 h-5" />
             </button>
-            <SidebarContent onNavigate={() => setDrawerOpen(false)} userRole={userRole} />
+            <SidebarContent onNavigate={() => setDrawerOpen(false)} userRole={userRole} debugError={debugError} />
           </DialogPrimitive.Content>
         </DialogPortal>
       </Dialog>
@@ -426,7 +439,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
         style={{ width: sidebarWidth }}
       >
-        <SidebarContent collapsed={collapsed} onToggleCollapse={toggleCollapse} userRole={userRole} />
+        <SidebarContent collapsed={collapsed} onToggleCollapse={toggleCollapse} userRole={userRole} debugError={debugError} />
       </aside>
 
       {/* Main content wrapper - Offset by sidebar width on desktop */}
