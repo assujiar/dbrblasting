@@ -172,12 +172,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex min-h-screen min-w-0 flex-col">
           {/* Topbar */}
           <header className="sticky top-0 z-30 h-16 glass border-b border-white/20">
-            <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div className="flex h-full items-center justify-between px-4 sm:px-6">
               {/* Left: Hamburger on mobile */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setDrawerOpen(true)}
-                  className="md:hidden -ml-2 rounded-xl p-2 transition-colors hover:bg-gray-100"
+                  className="md:hidden -ml-2 rounded-lg p-2 transition-colors hover:bg-gray-100"
                   aria-label="Open menu"
                 >
                   <Menu className="h-5 w-5 text-gray-600" />
@@ -192,7 +192,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white font-medium text-sm shrink-0">
                         {user?.email?.charAt(0).toUpperCase() || 'U'}
                       </div>
-                      <span className="hidden sm:block text-sm text-gray-700 max-w-[160px] truncate">
+                      <span className="hidden sm:block text-sm text-gray-700 max-w-[150px] truncate">
                         {user?.email || 'User'}
                       </span>
                     </Button>
