@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { LeadForm } from '@/components/leads/lead-form'
+import { ImportDialog } from '@/components/leads/import-dialog'
 import { LeadTable } from '@/components/leads/lead-table'
-import { Plus, Search, Users, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { Plus, Search, Users, ChevronLeft, ChevronRight, Loader2, Upload, FileSpreadsheet, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Lead } from '@/types/database'
 
@@ -19,6 +21,7 @@ interface Pagination {
 }
 
 export default function LeadsPage() {
+  const router = useRouter()
   const [leads, setLeads] = useState<Lead[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -29,6 +32,7 @@ export default function LeadsPage() {
   const [search, setSearch] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [formOpen, setFormOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [editingLead, setEditingLead] = useState<Lead | null>(null)
 
   const fetchLeads = useCallback(async () => {
@@ -68,6 +72,10 @@ export default function LeadsPage() {
     setFormOpen(true)
   }
 
+  const handleViewDetail = (lead: Lead) => {
+    router.push(`/app/leads/${lead.id}`)
+  }
+
   const handleFormClose = (open: boolean) => {
     setFormOpen(open)
     if (!open) setEditingLead(null)
@@ -83,10 +91,16 @@ export default function LeadsPage() {
             Manage your contact database
           </p>
         </div>
-        <Button onClick={() => setFormOpen(true)} className="w-full sm:w-auto">
-          <Plus className="h-4 w-4" />
-          Add Lead
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4" />
+            Import Excel
+          </Button>
+          <Button onClick={() => setFormOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add Lead
+          </Button>
+        </div>
       </div>
 
       {/* Search & Filter */}
@@ -102,13 +116,42 @@ export default function LeadsPage() {
                 className="pl-10"
               />
             </div>
-            <div className="text-sm text-neutral-500">
-              <span className="font-semibold text-neutral-700">{pagination.total}</span>{' '}
-              {pagination.total === 1 ? 'lead' : 'leads'} total
+            <div className="flex items-center gap-2 text-sm text-neutral-500">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50">
+                <Users className="h-4 w-4 text-primary-600" />
+                <span className="font-semibold text-primary-700">{pagination.total}</span>
+              </div>
+              <span>{pagination.total === 1 ? 'lead' : 'leads'} total</span>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Quick Import Tip */}
+      {leads.length === 0 && !isLoading && !search && (
+        <Card className="animate-slide-up bg-gradient-to-br from-accent-50/50 to-primary-50/50 border-accent-200/50" style={{ animationDelay: '75ms' }}>
+          <CardContent className="py-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-white/80 shadow-sm">
+                <FileSpreadsheet className="h-6 w-6 text-accent-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-neutral-900 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-accent-500" />
+                  Quick Import Available
+                </p>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Import leads from Excel file. Download template, fill in data, and upload.
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+                <Upload className="h-4 w-4" />
+                Import
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Content */}
       {isLoading ? (
@@ -129,14 +172,20 @@ export default function LeadsPage() {
               description={
                 search
                   ? 'Try adjusting your search query'
-                  : 'Get started by adding your first lead to your database'
+                  : 'Get started by adding your first lead or importing from Excel'
               }
               action={
                 !search && (
-                  <Button onClick={() => setFormOpen(true)}>
-                    <Plus className="h-4 w-4" />
-                    Add Your First Lead
-                  </Button>
+                  <div className="flex flex-col sm:flex-row items-center gap-2">
+                    <Button variant="outline" onClick={() => setImportOpen(true)}>
+                      <Upload className="h-4 w-4" />
+                      Import from Excel
+                    </Button>
+                    <Button onClick={() => setFormOpen(true)}>
+                      <Plus className="h-4 w-4" />
+                      Add Manually
+                    </Button>
+                  </div>
                 )
               }
             />
@@ -148,6 +197,7 @@ export default function LeadsPage() {
             <LeadTable
               leads={leads}
               onEdit={handleEdit}
+              onViewDetail={handleViewDetail}
               onRefresh={fetchLeads}
             />
           </div>
@@ -234,6 +284,13 @@ export default function LeadsPage() {
         open={formOpen}
         onOpenChange={handleFormClose}
         lead={editingLead}
+        onSuccess={fetchLeads}
+      />
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
         onSuccess={fetchLeads}
       />
     </div>

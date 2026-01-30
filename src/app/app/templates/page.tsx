@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/ui/empty-state'
-import { TemplateForm } from '@/components/templates/template-form'
 import { SendDialog } from '@/components/templates/send-dialog'
 import {
   DropdownMenu,
@@ -22,19 +23,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
-import { Plus, FileText, MoreHorizontal, Pencil, Trash2, Send, Loader2, Eye } from 'lucide-react'
-import { formatDateShort, truncate, sanitizeHtml, cn } from '@/lib/utils'
+import { Plus, FileText, MoreHorizontal, Pencil, Trash2, Send, Loader2, Eye, Sparkles } from 'lucide-react'
+import { formatDateShort, truncate, cn } from '@/lib/utils'
 import type { EmailTemplate } from '@/types/database'
 
 export default function TemplatesPage() {
+  const router = useRouter()
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
   const [sendTemplate, setSendTemplate] = useState<EmailTemplate | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null)
 
   const fetchTemplates = useCallback(async () => {
     setIsLoading(true)
@@ -55,16 +54,6 @@ export default function TemplatesPage() {
   useEffect(() => {
     fetchTemplates()
   }, [fetchTemplates])
-
-  const handleEdit = (template: EmailTemplate) => {
-    setEditingTemplate(template)
-    setFormOpen(true)
-  }
-
-  const handleFormClose = (open: boolean) => {
-    setFormOpen(open)
-    if (!open) setEditingTemplate(null)
-  }
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -108,10 +97,12 @@ export default function TemplatesPage() {
             Create and manage your email templates
           </p>
         </div>
-        <Button onClick={() => setFormOpen(true)} className="w-full sm:w-auto">
-          <Plus className="h-4 w-4" />
-          New Template
-        </Button>
+        <Link href="/app/templates/new">
+          <Button className="w-full sm:w-auto">
+            <Plus className="h-4 w-4" />
+            New Template
+          </Button>
+        </Link>
       </div>
 
       {/* Content */}
@@ -132,10 +123,12 @@ export default function TemplatesPage() {
               title="No templates yet"
               description="Create email templates to start sending campaigns"
               action={
-                <Button onClick={() => setFormOpen(true)}>
-                  <Plus className="h-4 w-4" />
-                  Create Your First Template
-                </Button>
+                <Link href="/app/templates/new">
+                  <Button>
+                    <Plus className="h-4 w-4" />
+                    Create Your First Template
+                  </Button>
+                </Link>
               }
             />
           </CardContent>
@@ -143,36 +136,61 @@ export default function TemplatesPage() {
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
           {templates.map((template) => (
-            <Card key={template.id} className="overflow-hidden">
+            <Card
+              key={template.id}
+              className={cn(
+                'overflow-hidden cursor-pointer transition-all duration-200',
+                'hover:shadow-lg hover:-translate-y-1',
+                'bg-gradient-to-br from-white to-neutral-50/50'
+              )}
+              onClick={() => router.push(`/app/templates/${template.id}`)}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base truncate">{template.name}</CardTitle>
-                    <CardDescription className="truncate mt-1 text-xs">
-                      {template.subject}
-                    </CardDescription>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="p-2 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50">
+                      <FileText className="h-5 w-5 text-primary-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base truncate">{template.name}</CardTitle>
+                      <CardDescription className="truncate mt-0.5 text-xs">
+                        {template.subject}
+                      </CardDescription>
+                    </div>
                   </div>
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="icon-sm" className="shrink-0">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setPreviewTemplate(template)}>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation()
+                        router.push(`/app/templates/${template.id}`)
+                      }}>
                         <Eye className="mr-2 h-4 w-4" />
-                        Preview
+                        View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(template)}>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation()
+                        router.push(`/app/templates/${template.id}/edit`)
+                      }}>
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSendTemplate(template)}>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation()
+                        setSendTemplate(template)
+                      }}>
                         <Send className="mr-2 h-4 w-4" />
                         Send
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => setDeleteId(template.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDeleteId(template.id)
+                        }}
                         className="text-error-600 focus:text-error-600 focus:bg-error-50"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -192,7 +210,10 @@ export default function TemplatesPage() {
                   </Badge>
                   <Button
                     size="sm"
-                    onClick={() => setSendTemplate(template)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSendTemplate(template)
+                    }}
                     className="shrink-0"
                   >
                     <Send className="h-3.5 w-3.5" />
@@ -204,14 +225,6 @@ export default function TemplatesPage() {
           ))}
         </div>
       )}
-
-      {/* Template Form Dialog */}
-      <TemplateForm
-        open={formOpen}
-        onOpenChange={handleFormClose}
-        template={editingTemplate}
-        onSuccess={fetchTemplates}
-      />
 
       {/* Send Dialog */}
       <SendDialog
@@ -236,27 +249,6 @@ export default function TemplatesPage() {
               Delete
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Preview Dialog */}
-      <Dialog open={!!previewTemplate} onOpenChange={(open) => !open && setPreviewTemplate(null)}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>{previewTemplate?.name}</DialogTitle>
-            <DialogDescription>Subject: {previewTemplate?.subject}</DialogDescription>
-          </DialogHeader>
-          <div className={cn(
-            'flex-1 overflow-auto rounded-xl p-4',
-            'bg-white border border-neutral-200'
-          )}>
-            <iframe
-              srcDoc={sanitizeHtml(previewTemplate?.html_body || '')}
-              className="w-full min-h-[400px] border-0"
-              title="Email Preview"
-              sandbox="allow-same-origin"
-            />
-          </div>
         </DialogContent>
       </Dialog>
     </div>

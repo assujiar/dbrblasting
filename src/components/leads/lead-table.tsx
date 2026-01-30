@@ -16,6 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import {
   Dialog,
@@ -26,17 +27,18 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
-import { MoreHorizontal, Pencil, Trash2, Mail, Phone, Building2 } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2, Mail, Phone, Building2, Eye, ChevronRight } from 'lucide-react'
 import { formatDateShort, cn } from '@/lib/utils'
 import type { Lead } from '@/types/database'
 
 interface LeadTableProps {
   leads: Lead[]
   onEdit: (lead: Lead) => void
+  onViewDetail?: (lead: Lead) => void
   onRefresh: () => void
 }
 
-export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
+export function LeadTable({ leads, onEdit, onViewDetail, onRefresh }: LeadTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -77,7 +79,15 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
       {/* Mobile Card View */}
       <div className="space-y-3 md:hidden">
         {leads.map((lead) => (
-          <Card key={lead.id} hover className="p-4">
+          <Card
+            key={lead.id}
+            className={cn(
+              'p-4 cursor-pointer transition-all duration-200',
+              'hover:shadow-md hover:-translate-y-0.5',
+              'bg-gradient-to-br from-white to-neutral-50/50'
+            )}
+            onClick={() => onViewDetail?.(lead)}
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold text-neutral-900 truncate">{lead.name}</h3>
@@ -101,26 +111,43 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
                 </div>
                 <p className="text-xs text-neutral-400 mt-2">{formatDateShort(lead.created_at)}</p>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onEdit(lead)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setDeleteId(lead.id)}
-                    className="text-error-600 focus:text-error-600 focus:bg-error-50"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-1">
+                <ChevronRight className="h-4 w-4 text-neutral-300" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon-sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation()
+                      onViewDetail?.(lead)
+                    }}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      View Details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation()
+                      onEdit(lead)
+                    }}>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setDeleteId(lead.id)
+                      }}
+                      className="text-error-600 focus:text-error-600 focus:bg-error-50"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </Card>
         ))}
@@ -142,7 +169,11 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
             </TableHeader>
             <TableBody>
               {leads.map((lead) => (
-                <TableRow key={lead.id}>
+                <TableRow
+                  key={lead.id}
+                  className="cursor-pointer hover:bg-neutral-50"
+                  onClick={() => onViewDetail?.(lead)}
+                >
                   <TableCell className="font-medium text-neutral-900">{lead.name}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2 text-neutral-600">
@@ -175,18 +206,32 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="icon-sm">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(lead)}>
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation()
+                          onViewDetail?.(lead)
+                        }}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation()
+                          onEdit(lead)
+                        }}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => setDeleteId(lead.id)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDeleteId(lead.id)
+                          }}
                           className="text-error-600 focus:text-error-600 focus:bg-error-50"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />

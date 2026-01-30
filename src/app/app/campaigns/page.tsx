@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { EmptyState } from '@/components/ui/empty-state'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { CampaignDetail } from '@/components/campaigns/campaign-detail'
-import { Send, Loader2, CheckCircle2, XCircle, Clock, Play } from 'lucide-react'
+import { Send, Loader2, CheckCircle2, XCircle, Clock, Play, Filter, Calendar, X, Sparkles } from 'lucide-react'
 import { formatDate, cn } from '@/lib/utils'
 import type { EmailCampaign, EmailTemplate, EmailCampaignRecipient } from '@/types/database'
 
@@ -30,10 +32,17 @@ function CampaignsContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(initialCampaignId)
   const [processingCampaignId, setProcessingCampaignId] = useState<string | null>(null)
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
 
   const fetchCampaigns = useCallback(async () => {
+    setIsLoading(true)
     try {
-      const response = await fetch('/api/campaigns')
+      const params = new URLSearchParams()
+      if (dateFrom) params.set('date_from', dateFrom)
+      if (dateTo) params.set('date_to', dateTo)
+
+      const response = await fetch(`/api/campaigns?${params}`)
       const result = await response.json()
 
       if (response.ok) {
@@ -44,7 +53,7 @@ function CampaignsContent() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [dateFrom, dateTo])
 
   useEffect(() => {
     fetchCampaigns()
@@ -88,6 +97,13 @@ function CampaignsContent() {
     }
   }, [campaigns, processingCampaignId, processCampaign])
 
+  const clearFilters = () => {
+    setDateFrom('')
+    setDateTo('')
+  }
+
+  const hasFilters = dateFrom || dateTo
+
   const getStatusBadge = (status: string, counts: CampaignWithDetails['recipientCounts']) => {
     switch (status) {
       case 'completed':
@@ -121,6 +137,17 @@ function CampaignsContent() {
     }
   }
 
+  // Calculate summary stats
+  const stats = campaigns.reduce(
+    (acc, c) => ({
+      total: acc.total + 1,
+      sent: acc.sent + c.recipientCounts.sent,
+      failed: acc.failed + c.recipientCounts.failed,
+      recipients: acc.recipients + c.recipientCounts.total,
+    }),
+    { total: 0, sent: 0, failed: 0, recipients: 0 }
+  )
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -133,9 +160,105 @@ function CampaignsContent() {
         </div>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 animate-slide-up" style={{ animationDelay: '50ms' }}>
+        <Card className="bg-gradient-to-br from-primary-50/50 to-white">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-primary-100">
+                <Send className="h-5 w-5 text-primary-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-neutral-900">{stats.total}</p>
+                <p className="text-xs text-neutral-500">Total Campaigns</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-success-50/50 to-white">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-success-100">
+                <CheckCircle2 className="h-5 w-5 text-success-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-success-600">{stats.sent}</p>
+                <p className="text-xs text-neutral-500">Emails Sent</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-error-50/50 to-white">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-error-100">
+                <XCircle className="h-5 w-5 text-error-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-error-600">{stats.failed}</p>
+                <p className="text-xs text-neutral-500">Failed</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-accent-50/50 to-white">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-accent-100">
+                <Sparkles className="h-5 w-5 text-accent-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-neutral-900">{stats.recipients}</p>
+                <p className="text-xs text-neutral-500">Total Recipients</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Date Filter */}
+      <Card className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <CardContent className="py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-neutral-600">
+              <div className="p-2 rounded-lg bg-neutral-100">
+                <Filter className="h-4 w-4 text-neutral-500" />
+              </div>
+              <span className="font-medium">Filter by Date</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 flex-1">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-neutral-400" />
+                <Input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="w-auto h-9"
+                  placeholder="From"
+                />
+              </div>
+              <span className="text-neutral-400">to</span>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="w-auto h-9"
+                placeholder="To"
+              />
+              {hasFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-500">
+                  <X className="h-4 w-4" />
+                  Clear
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Content */}
       {isLoading ? (
-        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+        <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
           <CardContent className="py-16">
             <div className="flex flex-col items-center justify-center gap-3">
               <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
@@ -144,12 +267,20 @@ function CampaignsContent() {
           </CardContent>
         </Card>
       ) : campaigns.length === 0 ? (
-        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+        <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
           <CardContent className="py-4">
             <EmptyState
               icon={Send}
-              title="No campaigns yet"
-              description="Send your first email campaign from the Templates page"
+              title={hasFilters ? 'No campaigns found' : 'No campaigns yet'}
+              description={hasFilters
+                ? 'Try adjusting your date filters'
+                : 'Send your first email campaign from the Templates page'
+              }
+              action={hasFilters && (
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              )}
             />
           </CardContent>
         </Card>
@@ -163,8 +294,11 @@ function CampaignsContent() {
             return (
               <Card
                 key={campaign.id}
-                hover
-                className="cursor-pointer"
+                className={cn(
+                  'cursor-pointer transition-all duration-200',
+                  'hover:shadow-lg hover:-translate-y-0.5',
+                  'bg-gradient-to-br from-white to-neutral-50/50'
+                )}
                 onClick={() => setSelectedCampaignId(campaign.id)}
               >
                 <CardContent className="py-4">
