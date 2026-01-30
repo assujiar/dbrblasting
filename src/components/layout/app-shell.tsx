@@ -74,10 +74,10 @@ function SidebarContent({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Logo */}
         <div className={cn(
-          'flex items-center border-b border-neutral-100 transition-all duration-300',
+          'flex items-center border-b border-neutral-100 transition-all duration-300 shrink-0',
           collapsed ? 'h-[72px] justify-center px-2' : 'h-[72px] px-6'
         )}>
           <Link
@@ -105,7 +105,7 @@ function SidebarContent({
 
         {/* Navigation */}
         <nav className={cn(
-          'flex-1 transition-all duration-300',
+          'flex-1 overflow-y-auto transition-all duration-300',
           collapsed ? 'p-2' : 'p-6'
         )}>
           <div className="flex flex-col gap-2">
@@ -266,7 +266,7 @@ function SidebarContent({
         {/* Collapse Toggle Button (Desktop only) */}
         {onToggleCollapse && (
           <div className={cn(
-            'border-t border-neutral-100 transition-all duration-300',
+            'shrink-0 border-t border-neutral-100 transition-all duration-300',
             collapsed ? 'p-2' : 'p-4'
           )}>
             <Tooltip>
@@ -297,18 +297,18 @@ function SidebarContent({
           </div>
         )}
 
-        {/* Help card (only when expanded) */}
+        {/* Help card (only when expanded, mobile only) */}
         {!collapsed && !onToggleCollapse && (
-          <div className="p-4">
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100/50">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/80 shadow-sm mb-3">
-                <Mail className="w-5 h-5 text-primary-600" />
+          <div className="shrink-0 p-4">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100/50">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/80 shadow-sm mb-2">
+                <Mail className="w-4 h-4 text-primary-600" />
               </div>
               <p className="text-sm font-semibold text-neutral-900">
                 Need help?
               </p>
-              <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">
-                Check out our documentation for quick setup guides and tips.
+              <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                Check our docs for guides.
               </p>
             </div>
           </div>
