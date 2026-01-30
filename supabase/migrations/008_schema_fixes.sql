@@ -134,6 +134,9 @@ END $$;
 -- Now includes all relevant fields including organization_id
 -- =============================================================================
 
+-- Drop existing function first (return type is changing)
+DROP FUNCTION IF EXISTS public.campaigns_with_counts();
+
 CREATE OR REPLACE FUNCTION public.campaigns_with_counts()
 RETURNS TABLE(
   id UUID,
