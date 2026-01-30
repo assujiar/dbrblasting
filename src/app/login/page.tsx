@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react'
@@ -187,9 +188,19 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  {mode === 'login' && (
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Forgot password?
+                    </Link>
+                  )}
+                </div>
                 <div className="relative flex items-center">
                   <Lock className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
                   <input
