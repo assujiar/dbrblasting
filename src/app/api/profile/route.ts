@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+
+// Create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase admin credentials')
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false }
+  })
+}
 
 // GET - Get current user's profile
 export async function GET() {
@@ -11,8 +26,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Use admin client to bypass RLS (avoids infinite recursion)
+    const adminClient = getAdminClient()
+
     // Try to get existing profile with organization
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await adminClient
       .from('user_profiles')
       .select(`
         *,
@@ -23,6 +41,7 @@ export async function GET() {
 
     if (error && error.code !== 'PGRST116') {
       // PGRST116 = no rows found, which is okay for new users
+      console.error('Profile fetch error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 

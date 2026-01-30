@@ -363,26 +363,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       } = await supabase.auth.getUser()
       setUser(user)
 
-      // Fetch user profile to get role
+      // Fetch user profile to get role via API (server-side)
       if (user) {
-        const { data: profile, error } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single()
+        try {
+          const response = await fetch('/api/profile')
+          const result = await response.json()
 
-        console.log('Profile fetch:', { profile, error, userId: user.id })
+          console.log('Profile API response:', result)
 
-        if (error) {
-          console.error('Error fetching profile:', error)
-          setDebugError(error.message || JSON.stringify(error))
-        }
-
-        if (profile?.role) {
-          console.log('Setting userRole to:', profile.role)
-          setUserRole(profile.role as UserRole)
-        } else if (!error) {
-          setDebugError('No role in profile')
+          if (!response.ok) {
+            setDebugError(result.error || 'API error')
+          } else if (result.data?.role) {
+            console.log('Setting userRole to:', result.data.role)
+            setUserRole(result.data.role as UserRole)
+          } else {
+            setDebugError('No role in API response')
+          }
+        } catch (err) {
+          console.error('Profile fetch error:', err)
+          setDebugError(err instanceof Error ? err.message : 'Fetch error')
         }
       }
     }
