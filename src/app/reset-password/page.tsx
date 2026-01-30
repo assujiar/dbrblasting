@@ -51,8 +51,8 @@ export default function ResetPasswordPage() {
   // Loading state
   if (isValidSession === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
-        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#f8fafc' }}>
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#2563eb' }} />
       </div>
     )
   }
@@ -60,23 +60,24 @@ export default function ResetPasswordPage() {
   // Invalid session
   if (!isValidSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#f8fafc' }}>
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600 mb-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl mb-4" style={{ background: '#2563eb' }}>
               <Mail className="h-7 w-7 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BlastMail</h1>
+            <h1 className="text-2xl font-bold" style={{ color: '#111827' }}>BlastMail</h1>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Invalid or Expired Link</h2>
-            <p className="text-sm text-gray-500 mb-4">
+          <div className="rounded-xl p-6 text-center" style={{ background: '#ffffff', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1)' }}>
+            <h2 className="text-lg font-semibold mb-2" style={{ color: '#111827' }}>Invalid or Expired Link</h2>
+            <p className="text-sm mb-4" style={{ color: '#6b7280' }}>
               This reset link is invalid or has expired.
             </p>
             <Link
               href="/forgot-password"
-              className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              className="inline-flex items-center justify-center gap-2 h-11 px-6 text-white font-medium rounded-lg transition-colors hover:opacity-90"
+              style={{ background: '#2563eb' }}
             >
               Request New Link
               <ArrowRight className="h-4 w-4" />
@@ -85,7 +86,8 @@ export default function ResetPasswordPage() {
 
           <Link
             href="/login"
-            className="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-700 mt-6"
+            className="flex items-center justify-center gap-2 text-sm mt-6 hover:underline"
+            style={{ color: '#6b7280' }}
           >
             <ArrowLeft className="h-4 w-4" />
             Back to login
@@ -96,69 +98,71 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#f8fafc' }}>
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl mb-4" style={{ background: '#2563eb' }}>
             <Mail className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">BlastMail</h1>
-          <p className="text-sm text-gray-500 mt-1">Email Marketing Platform</p>
+          <h1 className="text-2xl font-bold" style={{ color: '#111827' }}>BlastMail</h1>
+          <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Email Marketing Platform</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="rounded-xl p-6" style={{ background: '#ffffff', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1)' }}>
           {resetComplete ? (
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4" style={{ background: '#dcfce7' }}>
+                <CheckCircle className="h-6 w-6" style={{ color: '#16a34a' }} />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Password Updated!</h2>
-              <p className="text-sm text-gray-500">
+              <h2 className="text-lg font-semibold mb-2" style={{ color: '#111827' }}>Password Updated!</h2>
+              <p className="text-sm" style={{ color: '#6b7280' }}>
                 Redirecting you to the app...
               </p>
             </div>
           ) : (
             <>
               <div className="text-center mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Set New Password</h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <h2 className="text-lg font-semibold" style={{ color: '#111827' }}>Set New Password</h2>
+                <p className="text-sm mt-1" style={{ color: '#6b7280' }}>
                   Enter your new password below
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: '#374151' }}>
                     New Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: '#9ca3af' }} />
                     <input
                       type="password"
                       placeholder="Min. 6 characters"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
-                      className="w-full h-11 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                      className="w-full h-11 pl-10 pr-4 rounded-lg focus:outline-none focus:ring-2 disabled:opacity-50"
+                      style={{ background: '#f9fafb', border: '1px solid #d1d5db', color: '#111827' }}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: '#374151' }}>
                     Confirm Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: '#9ca3af' }} />
                     <input
                       type="password"
                       placeholder="Confirm password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       disabled={isLoading}
-                      className="w-full h-11 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                      className="w-full h-11 pl-10 pr-4 rounded-lg focus:outline-none focus:ring-2 disabled:opacity-50"
+                      style={{ background: '#f9fafb', border: '1px solid #d1d5db', color: '#111827' }}
                     />
                   </div>
                 </div>
@@ -166,7 +170,8 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  className="w-full h-11 disabled:opacity-50 text-white font-medium rounded-lg flex items-center justify-center gap-2 transition-colors hover:opacity-90"
+                  style={{ background: '#2563eb' }}
                 >
                   {isLoading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -186,7 +191,8 @@ export default function ResetPasswordPage() {
         {!resetComplete && (
           <Link
             href="/login"
-            className="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-700 mt-6"
+            className="flex items-center justify-center gap-2 text-sm mt-6 hover:underline"
+            style={{ color: '#6b7280' }}
           >
             <ArrowLeft className="h-4 w-4" />
             Back to login
