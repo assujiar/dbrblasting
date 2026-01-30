@@ -3,6 +3,14 @@ import { createClient } from '@/lib/supabase/server'
 import { getAuthContext, requireSuperAdmin } from '@/lib/auth/rbac'
 import nodemailer from 'nodemailer'
 
+interface SmtpSettings {
+  smtp_host: string
+  smtp_port: number
+  smtp_user: string
+  smtp_pass: string
+  smtp_secure: boolean
+}
+
 // POST - Test SMTP connection for an organization
 export async function POST(
   request: NextRequest,
@@ -13,34 +21,62 @@ export async function POST(
     requireSuperAdmin(context)
 
     const { id } = await params
-    const supabase = await createClient()
 
-    // Get organization's SMTP settings
-    const { data: org, error } = await supabase
-      .from('organizations')
-      .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure')
-      .eq('id', id)
-      .single()
+    // Try to get SMTP settings from request body first (for testing before save)
+    let smtpSettings: SmtpSettings | null = null
 
-    if (error || !org) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
+    try {
+      const body = await request.json()
+      if (body.smtp_host && body.smtp_user && body.smtp_pass) {
+        smtpSettings = {
+          smtp_host: body.smtp_host,
+          smtp_port: body.smtp_port || 587,
+          smtp_user: body.smtp_user,
+          smtp_pass: body.smtp_pass,
+          smtp_secure: body.smtp_secure || false,
+        }
+      }
+    } catch {
+      // No body or invalid JSON, will fetch from database
     }
 
-    if (!org.smtp_host || !org.smtp_user || !org.smtp_pass) {
-      return NextResponse.json(
-        { error: 'SMTP settings are incomplete' },
-        { status: 400 }
-      )
+    // If no settings in request body, fetch from database
+    if (!smtpSettings) {
+      const supabase = await createClient()
+      const { data: org, error } = await supabase
+        .from('organizations')
+        .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure')
+        .eq('id', id)
+        .single()
+
+      if (error || !org) {
+        return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
+      }
+
+      if (!org.smtp_host || !org.smtp_user || !org.smtp_pass) {
+        return NextResponse.json(
+          { error: 'SMTP settings are incomplete. Please fill in host, username, and password.' },
+          { status: 400 }
+        )
+      }
+
+      smtpSettings = {
+        smtp_host: org.smtp_host,
+        smtp_port: org.smtp_port || 587,
+        smtp_user: org.smtp_user,
+        smtp_pass: org.smtp_pass,
+        smtp_secure: org.smtp_secure || false,
+      }
     }
 
-    // Create transporter with organization's SMTP settings
+    // Create transporter with SMTP settings
     const transporter = nodemailer.createTransport({
-      host: org.smtp_host,
-      port: org.smtp_port || 587,
-      secure: org.smtp_secure || false,
+      host: smtpSettings.smtp_host,
+      port: smtpSettings.smtp_port,
+      secure: smtpSettings.smtp_secure,
       auth: {
-        user: org.smtp_user,
-        pass: org.smtp_pass,
+        user: smtpSettings.smtp_user,
+        pass: smtpSettings.smtp_pass,
       },
       connectionTimeout: 10000,
     })
