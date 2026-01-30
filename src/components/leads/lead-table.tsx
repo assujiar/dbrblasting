@@ -74,7 +74,60 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
 
   return (
     <>
-      <Card>
+      {/* Mobile Card View */}
+      <div className="space-y-3 md:hidden">
+        {leads.map((lead) => (
+          <Card key={lead.id} className="p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-gray-900 truncate">{lead.name}</h3>
+                <div className="mt-2 space-y-1.5">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Mail className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                    <span className="truncate">{lead.email}</span>
+                  </div>
+                  {lead.company && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                      <span className="truncate">{lead.company}</span>
+                    </div>
+                  )}
+                  {lead.phone && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Phone className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                      <span>{lead.phone}</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-2">{formatDateShort(lead.created_at)}</p>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon-sm">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onEdit(lead)}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setDeleteId(lead.id)}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <Card className="hidden md:block">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
