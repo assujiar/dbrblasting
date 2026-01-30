@@ -6,7 +6,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/use-toast'
-import { Mail, ArrowLeft, ArrowRight, Loader2, CheckCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Mail, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
 import { isValidEmail } from '@/lib/utils'
 
 export default function ForgotPasswordPage() {
@@ -35,19 +38,21 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mb-4">
             <Mail className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">BlastMail</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            BlastMail
+          </h1>
           <p className="text-sm text-gray-500 mt-1">Email Marketing Platform</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/60 p-5 sm:p-6">
           {emailSent ? (
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
@@ -63,7 +68,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="button"
                 onClick={() => setEmailSent(false)}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
               >
                 Try another email
               </button>
@@ -78,37 +83,26 @@ export default function ForgotPasswordPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Email Address
-                  </label>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-700">Email Address</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="email"
                       type="email"
                       placeholder="you@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
-                      className="w-full h-11 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                      className="pl-10"
                     />
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-lg flex items-center justify-center gap-2 transition-colors"
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <>
-                      Send Reset Link
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
+                <Button type="submit" loading={isLoading} className="w-full">
+                  Send Reset Link
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
               </form>
             </>
           )}

@@ -100,7 +100,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0 max-w-2xl">
+    <div className="space-y-4 sm:space-y-6 max-w-2xl">
       {/* Header */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Profile</h1>
