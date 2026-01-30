@@ -248,34 +248,41 @@ function CampaignsContent() {
       {/* Date Filter */}
       <Card className="animate-slide-up" style={{ animationDelay: '100ms' }}>
         <CardContent className="py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-neutral-600">
-              <div className="p-2 rounded-lg bg-neutral-100">
-                <Filter className="h-4 w-4 text-neutral-500" />
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-neutral-600">
+                <div className="p-2 rounded-lg bg-neutral-100">
+                  <Filter className="h-4 w-4 text-neutral-500" />
+                </div>
+                <span className="font-medium">Filter by Date</span>
               </div>
-              <span className="font-medium">Filter by Date</span>
+              {hasFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-500 sm:hidden">
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
-            <div className="flex flex-wrap items-center gap-2 flex-1">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-neutral-400" />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <Calendar className="h-4 w-4 text-neutral-400 shrink-0" />
                 <Input
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-auto h-9"
+                  className="h-9 flex-1 min-w-0"
                   placeholder="From"
                 />
               </div>
-              <span className="text-neutral-400">to</span>
+              <span className="text-neutral-400 text-center sm:text-left">to</span>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="w-auto h-9"
+                className="h-9 flex-1 min-w-0"
                 placeholder="To"
               />
               {hasFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-500">
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-500 hidden sm:flex">
                   <X className="h-4 w-4" />
                   Clear
                 </Button>
@@ -289,14 +296,15 @@ function CampaignsContent() {
       {(statusFilter !== 'all' || hasFilters) && (
         <Card className="animate-slide-up border-primary-200 bg-primary-50/30" style={{ animationDelay: '125ms' }}>
           <CardContent className="py-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <p className="text-sm text-primary-700">
                 Showing {filteredCampaigns.length} of {campaigns.length} campaigns
                 {statusFilter !== 'all' && ` (${statusFilter})`}
               </p>
-              <Button variant="ghost" size="sm" onClick={() => { setStatusFilter('all'); clearFilters(); }}>
+              <Button variant="ghost" size="sm" onClick={() => { setStatusFilter('all'); clearFilters(); }} className="self-start sm:self-auto">
                 <X className="h-4 w-4" />
-                Clear All Filters
+                <span className="hidden sm:inline">Clear All Filters</span>
+                <span className="sm:hidden">Clear</span>
               </Button>
             </div>
           </CardContent>

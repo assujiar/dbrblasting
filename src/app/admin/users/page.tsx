@@ -293,7 +293,7 @@ export default function UsersPage() {
       {/* Filters */}
       <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
         <CardContent className="py-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
               <Input
@@ -305,9 +305,9 @@ export default function UsersPage() {
             </div>
             <div className="flex gap-2">
               <Select value={orgFilter} onValueChange={setOrgFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Building2 className="h-4 w-4 mr-2 text-neutral-400" />
-                  <SelectValue placeholder="Organization" />
+                <SelectTrigger className="flex-1 sm:flex-initial sm:w-[180px] min-w-0">
+                  <Building2 className="h-4 w-4 mr-2 text-neutral-400 shrink-0" />
+                  <SelectValue placeholder="Organization" className="truncate" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Organizations</SelectItem>
@@ -319,7 +319,7 @@ export default function UsersPage() {
                 </SelectContent>
               </Select>
               {hasFilters && (
-                <Button variant="ghost" size="icon" onClick={clearFilters}>
+                <Button variant="ghost" size="icon" onClick={clearFilters} className="shrink-0">
                   <X className="h-4 w-4" />
                 </Button>
               )}
@@ -332,14 +332,15 @@ export default function UsersPage() {
       {hasFilters && (
         <Card className="animate-slide-up border-primary-200 bg-primary-50/30" style={{ animationDelay: '75ms' }}>
           <CardContent className="py-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <p className="text-sm text-primary-700">
                 Showing {users.length} users
                 {roleFilter !== 'all' && ` (${roleFilter.replace('_', ' ')})`}
               </p>
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="self-start sm:self-auto">
                 <X className="h-4 w-4" />
-                Clear Filters
+                <span className="hidden sm:inline">Clear Filters</span>
+                <span className="sm:hidden">Clear</span>
               </Button>
             </div>
           </CardContent>
