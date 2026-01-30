@@ -182,16 +182,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setUser(user)
 
       if (user) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single()
+        // Use API to fetch profile (bypasses RLS issues)
+        try {
+          const response = await fetch('/api/profile')
+          const result = await response.json()
 
-        setProfile(profile)
+          if (response.ok && result.data) {
+            setProfile(result.data)
 
-        // Redirect if not super admin
-        if (profile?.role !== 'super_admin') {
+            // Redirect if not super admin
+            if (result.data.role !== 'super_admin') {
+              router.push('/app')
+              return
+            }
+          } else {
+            console.error('Profile fetch error:', result.error)
+            router.push('/app')
+            return
+          }
+        } catch (error) {
+          console.error('Profile fetch error:', error)
           router.push('/app')
           return
         }
