@@ -51,29 +51,26 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex h-18 items-center px-6 border-b border-neutral-100">
+      <div className="flex items-center h-[72px] px-6 border-b border-neutral-100">
         <Link
           href="/app"
           onClick={onNavigate}
-          className="flex items-center gap-3 group"
+          className="flex items-center gap-3"
         >
-          <div className={cn(
-            'flex h-10 w-10 items-center justify-center rounded-xl',
-            'bg-gradient-to-br from-primary-500 to-primary-700',
-            'shadow-lg shadow-primary-500/30',
-            'transition-transform duration-200 group-hover:scale-105'
-          )}>
-            <Mail className="h-5 w-5 text-white" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-500/30">
+            <Mail className="w-5 h-5 text-white" />
           </div>
-          <span className="text-lg font-bold text-neutral-900">BlastMail</span>
+          <span className="text-lg font-bold text-neutral-900">
+            BlastMail
+          </span>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6">
-        <div className="space-y-2">
+      <nav className="flex-1 p-6">
+        <div className="flex flex-col gap-2">
           {navigation.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -86,34 +83,29 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 href={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  'group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium',
-                  'transition-all duration-200',
+                  'group relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200',
                   isActive
-                    ? [
-                        'bg-primary-50',
-                        'text-primary-700',
-                      ]
-                    : [
-                        'text-neutral-600',
-                        'hover:bg-neutral-50 hover:text-neutral-900',
-                      ]
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
                 )}
               >
                 {/* Active indicator bar */}
                 {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-gradient-to-b from-primary-500 to-primary-600" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-sm bg-gradient-to-b from-primary-500 to-primary-600" />
                 )}
 
                 {/* Icon container */}
-                <div className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
-                  isActive
-                    ? 'bg-primary-100 shadow-sm'
-                    : 'bg-neutral-100/80 group-hover:bg-neutral-200/80'
-                )}>
+                <div
+                  className={cn(
+                    'flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200',
+                    isActive
+                      ? 'bg-primary-100'
+                      : 'bg-neutral-100 group-hover:bg-neutral-200'
+                  )}
+                >
                   <Icon
                     className={cn(
-                      'h-[18px] w-[18px] transition-colors',
+                      'w-[18px] h-[18px] transition-colors duration-200',
                       isActive
                         ? 'text-primary-600'
                         : 'text-neutral-500 group-hover:text-neutral-700'
@@ -126,10 +118,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 {/* Hover arrow indicator */}
                 <ChevronRight
                   className={cn(
-                    'h-4 w-4 transition-all duration-200',
+                    'w-4 h-4 transition-all duration-200',
                     isActive
                       ? 'text-primary-400 opacity-100'
-                      : 'text-neutral-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5'
+                      : 'text-neutral-300 opacity-0 group-hover:opacity-100'
                   )}
                 />
               </Link>
@@ -139,17 +131,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {/* Help card */}
-      <div className="p-4 mt-auto">
-        <div className={cn(
-          'rounded-2xl p-5',
-          'bg-gradient-to-br from-primary-50 via-primary-50/80 to-accent-50',
-          'border border-primary-100/60'
-        )}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/80 shadow-sm mb-3">
-            <Mail className="h-5 w-5 text-primary-600" />
+      <div className="p-4">
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100/50">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/80 shadow-sm mb-3">
+            <Mail className="w-5 h-5 text-primary-600" />
           </div>
-          <p className="text-sm font-semibold text-neutral-900">Need help?</p>
-          <p className="mt-1.5 text-xs text-neutral-500 leading-relaxed">
+          <p className="text-sm font-semibold text-neutral-900">
+            Need help?
+          </p>
+          <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">
             Check out our documentation for quick setup guides and tips.
           </p>
         </div>
@@ -196,15 +186,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              'fixed inset-y-0 left-0 z-[60] h-full w-72 max-w-[85vw] p-0',
-              'rounded-r-3xl',
-              'bg-white/98 backdrop-blur-xl',
-              'border-r border-neutral-200/50',
-              'shadow-2xl shadow-neutral-900/15',
+              'fixed top-0 left-0 bottom-0 w-[280px] max-w-[85vw] p-0 z-[60]',
+              'rounded-r-3xl bg-white/98 backdrop-blur-xl',
+              'border-r border-neutral-100 shadow-2xl',
               'data-[state=open]:animate-in data-[state=closed]:animate-out',
               'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
-              'duration-300',
-              'focus:outline-none'
+              'duration-300 focus:outline-none'
             )}
           >
             <VisuallyHidden>
@@ -212,16 +199,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </VisuallyHidden>
             <button
               onClick={() => setDrawerOpen(false)}
-              className={cn(
-                'absolute top-5 right-4 z-10',
-                'rounded-xl p-2.5',
-                'text-neutral-400 hover:text-neutral-700',
-                'hover:bg-neutral-100',
-                'transition-all duration-150',
-                'active:scale-95'
-              )}
+              className="absolute top-5 right-4 z-10 p-2.5 rounded-xl text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-all"
             >
-              <X className="h-5 w-5" />
+              <X className="w-5 h-5" />
             </button>
             <SidebarContent onNavigate={() => setDrawerOpen(false)} />
           </DialogPrimitive.Content>
@@ -229,53 +209,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Dialog>
 
       {/* Desktop sidebar - Fixed position */}
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-30',
-          'hidden md:flex md:w-72 md:flex-col',
-          'bg-white/95 backdrop-blur-xl',
-          'border-r border-neutral-200/50',
-          'shadow-xl shadow-neutral-900/5'
-        )}
-      >
+      <aside className="hidden md:flex fixed top-0 left-0 bottom-0 w-[280px] z-30 flex-col bg-white/95 backdrop-blur-xl border-r border-neutral-100 shadow-xl shadow-neutral-900/5">
         <SidebarContent />
       </aside>
 
-      {/* Main content wrapper - Offset by sidebar width */}
-      <div className="relative min-h-screen md:ml-72">
+      {/* Main content wrapper - Offset by sidebar width on desktop */}
+      <div className="relative min-h-screen md:ml-[280px]">
         {/* Top bar */}
-        <header
-          className={cn(
-            'sticky top-0 z-20 h-16',
-            'bg-white/80 backdrop-blur-xl',
-            'border-b border-neutral-200/50'
-          )}
-        >
-          <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-20 h-16 bg-white/80 backdrop-blur-xl border-b border-neutral-100">
+          <div className="flex items-center justify-between h-full px-4 sm:px-6 lg:px-8">
             {/* Left section */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setDrawerOpen(true)}
-                className={cn(
-                  'md:hidden -ml-1',
-                  'rounded-xl p-2.5',
-                  'text-neutral-500 hover:text-neutral-700',
-                  'hover:bg-neutral-100',
-                  'transition-all duration-150',
-                  'active:scale-95'
-                )}
+                className="md:hidden p-2.5 -ml-1 rounded-xl text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 transition-all"
                 aria-label="Open menu"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="w-5 h-5" />
               </button>
               {/* Mobile logo */}
-              <Link href="/app" className="md:hidden flex items-center gap-2.5">
-                <div className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg',
-                  'bg-gradient-to-br from-primary-500 to-primary-700',
-                  'shadow-md shadow-primary-500/25'
-                )}>
-                  <Mail className="h-4 w-4 text-white" />
+              <Link
+                href="/app"
+                className="flex items-center gap-2.5 md:hidden"
+              >
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25">
+                  <Mail className="w-4 h-4 text-white" />
                 </div>
                 <span className="font-bold text-neutral-900">BlastMail</span>
               </Link>
@@ -285,16 +243,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2.5 px-2 sm:px-3 h-10">
-                    <div
-                      className={cn(
-                        'flex h-8 w-8 items-center justify-center rounded-full shrink-0',
-                        'bg-gradient-to-br from-primary-500 to-primary-600',
-                        'text-white font-semibold text-sm',
-                        'shadow-md shadow-primary-500/25',
-                        'ring-2 ring-white'
-                      )}
-                    >
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2.5 pl-2 pr-3 h-10"
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white font-semibold text-sm shadow-md shadow-primary-500/25 ring-2 ring-white">
                       {user?.email?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <span className="hidden sm:block text-sm font-medium text-neutral-700 max-w-[150px] truncate">
@@ -304,11 +258,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1 py-1">
-                      <p className="text-sm font-semibold leading-none text-neutral-900">
+                    <div className="flex flex-col gap-1 py-1">
+                      <p className="text-sm font-semibold text-neutral-900">
                         Account
                       </p>
-                      <p className="text-xs leading-none text-neutral-500 truncate">
+                      <p className="text-xs text-neutral-500 truncate">
                         {user?.email}
                       </p>
                     </div>
@@ -316,7 +270,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/app/profile" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
+                      <User className="mr-2 w-4 h-4" />
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
@@ -325,7 +279,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     onClick={handleLogout}
                     className="text-error-600 focus:text-error-600 focus:bg-error-50"
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 w-4 h-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -335,8 +289,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content with proper padding */}
-        <main className="p-5 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-6xl">{children}</div>
+        <main className="p-6 lg:p-8">
+          <div className="max-w-5xl mx-auto">{children}</div>
         </main>
       </div>
     </div>
