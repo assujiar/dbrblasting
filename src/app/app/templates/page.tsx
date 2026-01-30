@@ -99,7 +99,7 @@ export default function TemplatesPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -195,7 +195,7 @@ export default function TemplatesPage() {
                     className="shrink-0"
                   >
                     <Send className="h-3.5 w-3.5" />
-                    <span className="hidden xs:inline">Send</span>
+                    <span className="hidden sm:inline">Send</span>
                   </Button>
                 </div>
               </CardContent>

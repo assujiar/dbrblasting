@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { toast } from '@/components/ui/use-toast'
-import { Trash2, Loader2, CheckCircle2, XCircle, Clock, Play } from 'lucide-react'
+import { Trash2, Loader2, CheckCircle2, XCircle, Clock, Play, Mail } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import type { EmailCampaign, EmailTemplate, EmailCampaignRecipient } from '@/types/database'
 
@@ -181,43 +181,72 @@ export function CampaignDetail({ campaignId, onClose, onRefresh }: CampaignDetai
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>{campaign.name}</DialogTitle>
-              <DialogDescription>
-                Template: {campaign.template?.name || 'Deleted'} | Subject: {campaign.template?.subject || 'N/A'}
+              <DialogTitle className="text-base sm:text-lg truncate pr-8">{campaign.name}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">
+                <span className="block truncate">Template: {campaign.template?.name || 'Deleted'}</span>
+                <span className="block truncate">Subject: {campaign.template?.subject || 'N/A'}</span>
               </DialogDescription>
             </DialogHeader>
 
-            {/* Stats */}
-            <div className="grid grid-cols-4 gap-4 my-4">
-              <div className="text-center p-3 rounded-xl bg-gray-50">
-                <div className="text-2xl font-bold text-gray-900">{counts.total}</div>
-                <div className="text-xs text-gray-500">Total</div>
+            {/* Stats - responsive grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 my-4">
+              <div className="text-center p-2 sm:p-3 rounded-xl bg-gray-50">
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">{counts.total}</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">Total</div>
               </div>
-              <div className="text-center p-3 rounded-xl bg-green-50">
-                <div className="text-2xl font-bold text-green-700">{counts.sent}</div>
-                <div className="text-xs text-green-600">Sent</div>
+              <div className="text-center p-2 sm:p-3 rounded-xl bg-green-50">
+                <div className="text-lg sm:text-2xl font-bold text-green-700">{counts.sent}</div>
+                <div className="text-[10px] sm:text-xs text-green-600">Sent</div>
               </div>
-              <div className="text-center p-3 rounded-xl bg-red-50">
-                <div className="text-2xl font-bold text-red-700">{counts.failed}</div>
-                <div className="text-xs text-red-600">Failed</div>
+              <div className="text-center p-2 sm:p-3 rounded-xl bg-red-50">
+                <div className="text-lg sm:text-2xl font-bold text-red-700">{counts.failed}</div>
+                <div className="text-[10px] sm:text-xs text-red-600">Failed</div>
               </div>
-              <div className="text-center p-3 rounded-xl bg-yellow-50">
-                <div className="text-2xl font-bold text-yellow-700">{counts.pending}</div>
-                <div className="text-xs text-yellow-600">Pending</div>
+              <div className="text-center p-2 sm:p-3 rounded-xl bg-yellow-50">
+                <div className="text-lg sm:text-2xl font-bold text-yellow-700">{counts.pending}</div>
+                <div className="text-[10px] sm:text-xs text-yellow-600">Pending</div>
               </div>
             </div>
 
             {/* Progress */}
             <div className="space-y-2 mb-4">
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
                 <span className="text-gray-500">Progress</span>
                 <span className="font-medium">{Math.round(progress)}%</span>
               </div>
-              <Progress value={progress} className="h-2" />
+              <Progress value={progress} className="h-1.5 sm:h-2" />
             </div>
 
-            {/* Recipients Table */}
-            <div className="flex-1 overflow-auto border rounded-xl">
+            {/* Recipients - Mobile Cards */}
+            <div className="flex-1 overflow-auto sm:hidden space-y-2">
+              {campaign.recipients.map((recipient) => (
+                <div key={recipient.id} className="p-3 rounded-lg bg-gray-50 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-gray-900 text-sm truncate">{recipient.to_name}</p>
+                      <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                        <Mail className="h-3 w-3 shrink-0" />
+                        {recipient.to_email}
+                      </p>
+                    </div>
+                    {getStatusBadge(recipient.status)}
+                  </div>
+                  {recipient.sent_at && (
+                    <p className="text-[10px] text-gray-400">
+                      Sent: {formatDate(recipient.sent_at)}
+                    </p>
+                  )}
+                  {recipient.error && (
+                    <p className="text-[10px] text-red-600 line-clamp-2">
+                      Error: {recipient.error}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Recipients Table - Desktop */}
+            <div className="flex-1 overflow-auto border rounded-xl hidden sm:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -232,12 +261,12 @@ export function CampaignDetail({ campaignId, onClose, onRefresh }: CampaignDetai
                   {campaign.recipients.map((recipient) => (
                     <TableRow key={recipient.id}>
                       <TableCell className="font-medium">{recipient.to_name}</TableCell>
-                      <TableCell>{recipient.to_email}</TableCell>
+                      <TableCell className="max-w-[150px] truncate">{recipient.to_email}</TableCell>
                       <TableCell>{getStatusBadge(recipient.status)}</TableCell>
                       <TableCell className="text-sm text-gray-500">
                         {recipient.sent_at ? formatDate(recipient.sent_at) : '-'}
                       </TableCell>
-                      <TableCell className="text-sm text-red-600 max-w-[200px] truncate">
+                      <TableCell className="text-sm text-red-600 max-w-[200px] truncate" title={recipient.error || undefined}>
                         {recipient.error || '-'}
                       </TableCell>
                     </TableRow>
@@ -246,16 +275,16 @@ export function CampaignDetail({ campaignId, onClose, onRefresh }: CampaignDetai
               </Table>
             </div>
 
-            <DialogFooter className="mt-4">
+            <DialogFooter className="mt-4 flex-col sm:flex-row gap-2">
               {counts.pending > 0 && (
-                <Button onClick={handleContinueSending} loading={isProcessing}>
+                <Button onClick={handleContinueSending} loading={isProcessing} className="w-full sm:w-auto">
                   <Play className="h-4 w-4" />
-                  Continue Sending ({counts.pending} remaining)
+                  <span className="truncate">Continue ({counts.pending} left)</span>
                 </Button>
               )}
-              <Button variant="destructive" onClick={handleDelete} loading={isDeleting}>
+              <Button variant="destructive" onClick={handleDelete} loading={isDeleting} className="w-full sm:w-auto">
                 <Trash2 className="h-4 w-4" />
-                Delete Campaign
+                Delete
               </Button>
             </DialogFooter>
           </>
