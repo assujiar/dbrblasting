@@ -30,25 +30,25 @@ export default async function DashboardPage() {
   const stats = await getStats()
 
   const statCards = [
-    { title: 'Leads', value: stats?.leads || 0, icon: Users, href: '/app/leads', color: 'blue' },
-    { title: 'Groups', value: stats?.groups || 0, icon: FolderKanban, href: '/app/groups', color: 'indigo' },
+    { title: 'Leads', value: stats?.leads || 0, icon: Users, href: '/app/leads', color: 'lavender' },
+    { title: 'Groups', value: stats?.groups || 0, icon: FolderKanban, href: '/app/groups', color: 'softBlue' },
     { title: 'Templates', value: stats?.templates || 0, icon: FileText, href: '/app/templates', color: 'purple' },
-    { title: 'Campaigns', value: stats?.campaigns || 0, icon: Send, href: '/app/campaigns', color: 'green' },
+    { title: 'Campaigns', value: stats?.campaigns || 0, icon: Send, href: '/app/campaigns', color: 'ink' },
   ]
 
   const colorMap: Record<string, { bg: string; text: string; iconBg: string }> = {
-    blue: { bg: 'bg-blue-50', text: 'text-blue-600', iconBg: 'bg-blue-100' },
-    indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600', iconBg: 'bg-indigo-100' },
-    purple: { bg: 'bg-purple-50', text: 'text-purple-600', iconBg: 'bg-purple-100' },
-    green: { bg: 'bg-green-50', text: 'text-green-600', iconBg: 'bg-green-100' },
+    lavender: { bg: 'bg-[#F7F4FE]', text: 'text-[#5B46FB]', iconBg: 'bg-[#E9E2FA]' },
+    softBlue: { bg: 'bg-[#F2F6FD]', text: 'text-[#4E4D5C]', iconBg: 'bg-[#E2ECF8]' },
+    purple: { bg: 'bg-[#F3EFFD]', text: 'text-[#977EF2]', iconBg: 'bg-[#E3D8F6]' },
+    ink: { bg: 'bg-[#F5F5F7]', text: 'text-[#040404]', iconBg: 'bg-[#E8E8EE]' },
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Overview of your email marketing</p>
+        <h1 className="text-xl font-bold text-[#040404]">Dashboard</h1>
+        <p className="text-sm text-[#4E4D5C] mt-1">Ringkasan performa tim dan campaign kamu.</p>
       </div>
 
       {/* Stats */}
@@ -57,13 +57,13 @@ export default async function DashboardPage() {
           const colors = colorMap[stat.color]
           return (
             <Link key={stat.title} href={stat.href}>
-              <Card className="h-full hover:shadow-md transition-shadow">
+              <Card className="h-full transition-shadow hover:shadow-md hover:shadow-black/5">
                 <CardContent className="p-4">
                   <div className={`w-10 h-10 rounded-lg ${colors.iconBg} flex items-center justify-center mb-3`}>
                     <stat.icon className={`h-5 w-5 ${colors.text}`} />
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                  <p className="text-sm text-gray-500">{stat.title}</p>
+                  <p className="text-2xl font-bold text-[#040404]">{stat.value}</p>
+                  <p className="text-sm text-[#4E4D5C]">{stat.title}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -76,10 +76,10 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <TrendingUp className="h-5 w-5 text-[#977EF2]" />
               Quick Start
             </CardTitle>
-            <CardDescription>Get started in a few steps</CardDescription>
+            <CardDescription>Mulai cepat tanpa ribet.</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <ol className="space-y-3">
@@ -90,12 +90,12 @@ export default async function DashboardPage() {
                 { step: '4', title: 'Send campaigns', desc: 'Launch your campaign' },
               ].map((item) => (
                 <li key={item.step} className="flex items-start gap-3">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 shrink-0">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#EEEAF7] text-xs font-semibold text-[#5B46FB] shrink-0">
                     {item.step}
                   </span>
                   <div className="min-w-0">
-                    <p className="font-medium text-gray-900 text-sm">{item.title}</p>
-                    <p className="text-xs text-gray-500">{item.desc}</p>
+                    <p className="font-medium text-[#040404] text-sm">{item.title}</p>
+                    <p className="text-xs text-[#4E4D5C]">{item.desc}</p>
                   </div>
                 </li>
               ))}
@@ -106,10 +106,10 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <Mail className="h-5 w-5 text-indigo-600" />
+              <Mail className="h-5 w-5 text-[#5B46FB]" />
               Template Tags
             </CardTitle>
-            <CardDescription>Use in your templates</CardDescription>
+            <CardDescription>Gunakan di template biar otomatis.</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2">
@@ -119,9 +119,9 @@ export default async function DashboardPage() {
                 { tag: '{{email}}', desc: 'Email' },
                 { tag: '{{phone}}', desc: 'Phone' },
               ].map((item) => (
-                <div key={item.tag} className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                  <code className="text-sm font-mono text-blue-600">{item.tag}</code>
-                  <span className="text-sm text-gray-500">{item.desc}</span>
+                <div key={item.tag} className="flex items-center justify-between p-2 rounded-lg bg-[#F7F6FB]">
+                  <code className="text-sm font-mono text-[#5B46FB]">{item.tag}</code>
+                  <span className="text-sm text-[#4E4D5C]">{item.desc}</span>
                 </div>
               ))}
             </div>

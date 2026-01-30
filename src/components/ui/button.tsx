@@ -5,22 +5,22 @@ import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#977EF2]/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default:
-          'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/20 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/30',
+          'bg-[#040404] text-white shadow-sm shadow-black/20 hover:bg-[#2b2b2b] hover:shadow-md',
         destructive:
           'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md shadow-red-500/20 hover:from-red-600 hover:to-red-700 hover:shadow-lg',
         outline:
-          'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900',
+          'border border-[#DDDCE1] bg-white text-[#4E4D5C] hover:border-[#977EF2]/60 hover:text-[#040404]',
         secondary:
-          'bg-gray-100 text-gray-900 hover:bg-gray-200',
+          'bg-[#977EF2] text-white shadow-sm shadow-[#977EF2]/30 hover:bg-[#8050db]',
         ghost:
-          'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+          'text-[#4E4D5C] hover:bg-[#EEEAF7] hover:text-[#040404]',
         link:
-          'text-blue-600 underline-offset-4 hover:underline',
+          'text-[#5B46FB] underline-offset-4 hover:underline',
         success:
           'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md shadow-green-500/20 hover:from-green-600 hover:to-green-700',
       },

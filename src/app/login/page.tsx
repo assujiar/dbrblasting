@@ -74,30 +74,30 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-[#F7F6FB]">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#040404] shadow-lg mb-4">
             <Mail className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            BlastMail
+          <h1 className="text-2xl font-bold text-[#040404]">
+            Meizon
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Email Marketing Platform</p>
+          <p className="text-sm text-[#4E4D5C] mt-1">HR & email ops, sekarang lebih human.</p>
         </div>
 
         {/* Card */}
-        <div className="glass-strong rounded-2xl overflow-hidden">
+        <div className="rounded-3xl border border-[#DDDCE1]/70 bg-white shadow-lg shadow-black/5 overflow-hidden">
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-[#EEEAF7]">
             <button
               type="button"
               onClick={() => setMode('login')}
               className={`flex-1 py-3.5 text-sm font-medium transition-colors border-b-2 ${
                 mode === 'login'
-                  ? 'text-blue-600 border-blue-600'
-                  : 'text-gray-500 border-transparent hover:text-gray-700'
+                  ? 'text-[#040404] border-[#040404]'
+                  : 'text-[#9A96A5] border-transparent hover:text-[#4E4D5C]'
               }`}
             >
               Sign In
@@ -107,8 +107,8 @@ export default function LoginPage() {
               onClick={() => setMode('signup')}
               className={`flex-1 py-3.5 text-sm font-medium transition-colors border-b-2 ${
                 mode === 'signup'
-                  ? 'text-blue-600 border-blue-600'
-                  : 'text-gray-500 border-transparent hover:text-gray-700'
+                  ? 'text-[#040404] border-[#040404]'
+                  : 'text-[#9A96A5] border-transparent hover:text-[#4E4D5C]'
               }`}
             >
               Sign Up
@@ -119,9 +119,9 @@ export default function LoginPage() {
           <form onSubmit={mode === 'login' ? handleLogin : handleSignUp} className="p-5 sm:p-6 space-y-4">
             {mode === 'signup' && (
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-700">Full Name</Label>
+                <Label htmlFor="name" className="text-[#4E4D5C]">Full Name</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AAA7B4]" />
                   <Input
                     id="name"
                     type="text"
@@ -136,9 +136,9 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700">Email Address</Label>
+              <Label htmlFor="email" className="text-[#4E4D5C]">Email Address</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AAA7B4]" />
                 <Input
                   id="email"
                   type="email"
@@ -153,15 +153,15 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-gray-700">Password</Label>
+                <Label htmlFor="password" className="text-[#4E4D5C]">Password</Label>
                 {mode === 'login' && (
-                  <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
+                  <Link href="/forgot-password" className="text-sm text-[#5B46FB] hover:text-[#7B66FF] hover:underline">
                     Forgot?
                   </Link>
                 )}
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AAA7B4]" />
                 <Input
                   id="password"
                   type="password"
@@ -182,7 +182,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-[#9A96A5] mt-6">
           By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
