@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
+import { User, Mail, Building2, Phone } from 'lucide-react'
 import type { Lead } from '@/types/database'
 
 interface LeadFormProps {
@@ -93,62 +94,78 @@ export function LeadForm({ open, onOpenChange, lead, onSuccess }: LeadFormProps)
           <DialogDescription>
             {lead
               ? 'Update the lead information below.'
-              : 'Fill in the details to add a new lead.'}
+              : 'Fill in the details to add a new lead to your database.'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
-            <Input
-              id="name"
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, name: e.target.value }))
-              }
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+              <Input
+                id="name"
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
+                disabled={isLoading}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john@example.com"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, email: e.target.value }))
-              }
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="john@example.com"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, email: e.target.value }))
+                }
+                disabled={isLoading}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="company">Company</Label>
-            <Input
-              id="company"
-              placeholder="Acme Inc."
-              value={formData.company}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, company: e.target.value }))
-              }
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+              <Input
+                id="company"
+                placeholder="Acme Inc."
+                value={formData.company}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, company: e.target.value }))
+                }
+                disabled={isLoading}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              placeholder="+1 234 567 890"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, phone: e.target.value }))
-              }
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+              <Input
+                id="phone"
+                placeholder="+1 234 567 890"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, phone: e.target.value }))
+                }
+                disabled={isLoading}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           <DialogFooter>

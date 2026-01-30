@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { EmptyState } from '@/components/ui/empty-state'
 import { CampaignDetail } from '@/components/campaigns/campaign-detail'
 import { Send, Loader2, CheckCircle2, XCircle, Clock, Play } from 'lucide-react'
-import { formatDate } from '@/lib/utils'
+import { formatDate, cn } from '@/lib/utils'
 import type { EmailCampaign, EmailTemplate, EmailCampaignRecipient } from '@/types/database'
 
 interface CampaignWithDetails extends EmailCampaign {
@@ -123,12 +122,12 @@ function CampaignsContent() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Campaigns</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-neutral-900">Campaigns</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             View your email campaign history and status
           </p>
         </div>
@@ -136,16 +135,17 @@ function CampaignsContent() {
 
       {/* Content */}
       {isLoading ? (
-        <Card>
-          <CardContent className="py-12">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardContent className="py-16">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <p className="text-sm text-neutral-500">Loading campaigns...</p>
             </div>
           </CardContent>
         </Card>
       ) : campaigns.length === 0 ? (
-        <Card>
-          <CardContent>
+        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardContent className="py-4">
             <EmptyState
               icon={Send}
               title="No campaigns yet"
@@ -154,7 +154,7 @@ function CampaignsContent() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-4 stagger-children">
           {campaigns.map((campaign) => {
             const progress = campaign.recipientCounts.total > 0
               ? ((campaign.recipientCounts.sent + campaign.recipientCounts.failed) / campaign.recipientCounts.total) * 100
@@ -163,55 +163,56 @@ function CampaignsContent() {
             return (
               <Card
                 key={campaign.id}
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 active:scale-[0.99]"
+                hover
+                className="cursor-pointer"
                 onClick={() => setSelectedCampaignId(campaign.id)}
               >
-                <CardContent className="py-3 sm:py-4">
-                  <div className="flex items-start sm:items-center justify-between gap-2 mb-2 sm:mb-3">
+                <CardContent className="py-4">
+                  <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{campaign.name}</h3>
-                      <p className="text-xs sm:text-sm text-gray-500 truncate">
-                        {campaign.template?.name || 'Deleted'}
+                      <h3 className="font-semibold text-neutral-900 truncate">{campaign.name}</h3>
+                      <p className="text-sm text-neutral-500 truncate">
+                        {campaign.template?.name || 'Deleted template'}
                       </p>
                     </div>
                     {getStatusBadge(campaign.status, campaign.recipientCounts)}
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <span className="text-gray-500">Progress</span>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-500">Progress</span>
                       <span className="font-medium">
-                        <span className="text-green-600">{campaign.recipientCounts.sent}</span>
+                        <span className="text-success-600">{campaign.recipientCounts.sent}</span>
                         {campaign.recipientCounts.failed > 0 && (
-                          <span className="text-red-600"> / {campaign.recipientCounts.failed} failed</span>
+                          <span className="text-error-600"> / {campaign.recipientCounts.failed} failed</span>
                         )}
                         {campaign.recipientCounts.pending > 0 && (
-                          <span className="text-gray-400"> / {campaign.recipientCounts.pending} pending</span>
+                          <span className="text-neutral-400"> / {campaign.recipientCounts.pending} pending</span>
                         )}
                       </span>
                     </div>
                     <Progress
                       value={progress}
-                      className="h-1.5 sm:h-2"
+                      className="h-2"
                       indicatorClassName={
                         campaign.status === 'failed'
-                          ? 'from-red-500 to-red-600'
+                          ? 'from-error-500 to-error-600'
                           : campaign.status === 'completed'
-                          ? 'from-green-500 to-green-600'
+                          ? 'from-success-500 to-success-600'
                           : undefined
                       }
                     />
                   </div>
 
-                  <div className="flex items-center justify-between mt-2 sm:mt-3 text-[10px] sm:text-xs text-gray-400">
+                  <div className="flex items-center justify-between mt-3 text-xs text-neutral-400">
                     <span>{formatDate(campaign.created_at)}</span>
                     <span>{campaign.recipientCounts.total} recipients</span>
                   </div>
 
                   {processingCampaignId === campaign.id && (
-                    <div className="mt-2 sm:mt-3 flex items-center gap-2 text-xs sm:text-sm text-blue-600">
-                      <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
-                      Processing...
+                    <div className="mt-3 flex items-center gap-2 text-sm text-primary-600">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Processing emails...
                     </div>
                   )}
                 </CardContent>
@@ -235,9 +236,10 @@ export default function CampaignsPage() {
   return (
     <Suspense fallback={
       <Card>
-        <CardContent className="py-12">
-          <div className="flex items-center justify-center">
-            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+        <CardContent className="py-16">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+            <p className="text-sm text-neutral-500">Loading campaigns...</p>
           </div>
         </CardContent>
       </Card>

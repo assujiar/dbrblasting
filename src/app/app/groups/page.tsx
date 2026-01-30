@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/ui/empty-state'
 import { GroupForm } from '@/components/groups/group-form'
 import { GroupDetail } from '@/components/groups/group-detail'
-import { Plus, FolderKanban, Users, Loader2 } from 'lucide-react'
+import { Plus, FolderOpen, Users, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { ContactGroup, Lead } from '@/types/database'
 
 interface GroupWithMembers extends ContactGroup {
@@ -57,12 +57,12 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Contact Groups</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-neutral-900">Contact Groups</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             Organize your leads into targeted groups
           </p>
         </div>
@@ -74,18 +74,19 @@ export default function GroupsPage() {
 
       {/* Content */}
       {isLoading ? (
-        <Card>
-          <CardContent className="py-12">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardContent className="py-16">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <p className="text-sm text-neutral-500">Loading groups...</p>
             </div>
           </CardContent>
         </Card>
       ) : groups.length === 0 ? (
-        <Card>
-          <CardContent>
+        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardContent className="py-4">
             <EmptyState
-              icon={FolderKanban}
+              icon={FolderOpen}
               title="No groups yet"
               description="Create groups to organize your leads for targeted campaigns"
               action={
@@ -98,39 +99,40 @@ export default function GroupsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
           {groups.map((group) => (
             <Card
               key={group.id}
-              className="cursor-pointer hover:shadow-lg transition-all duration-200 active:scale-[0.98] sm:hover:scale-[1.02]"
+              hover
+              className="cursor-pointer"
               onClick={() => handleGroupClick(group)}
             >
-              <CardHeader className="pb-2 sm:pb-3">
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2">
-                  <CardTitle className="text-base sm:text-lg truncate">{group.name}</CardTitle>
-                  <Badge variant="neutral" className="shrink-0">
+                  <CardTitle className="text-base truncate">{group.name}</CardTitle>
+                  <Badge variant="accent" className="shrink-0">
                     <Users className="h-3 w-3 mr-1" />
                     {group.members?.length || 0}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-neutral-500">
                   {group.members?.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1.5">
                       {group.members.slice(0, 3).map((m) => (
                         <Badge key={m.id} variant="outline" className="text-xs">
                           {m.lead?.name || 'Unknown'}
                         </Badge>
                       ))}
                       {group.members.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="neutral" className="text-xs">
                           +{group.members.length - 3} more
                         </Badge>
                       )}
                     </div>
                   ) : (
-                    <span className="text-gray-400 text-xs sm:text-sm">No members yet</span>
+                    <span className="text-neutral-400 text-xs">No members yet</span>
                   )}
                 </div>
               </CardContent>

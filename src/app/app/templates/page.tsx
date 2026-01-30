@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
 import { Plus, FileText, MoreHorizontal, Pencil, Trash2, Send, Loader2, Eye } from 'lucide-react'
-import { formatDateShort, truncate, sanitizeHtml } from '@/lib/utils'
+import { formatDateShort, truncate, sanitizeHtml, cn } from '@/lib/utils'
 import type { EmailTemplate } from '@/types/database'
 
 export default function TemplatesPage() {
@@ -99,12 +99,12 @@ export default function TemplatesPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Email Templates</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-neutral-900">Email Templates</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             Create and manage your email templates
           </p>
         </div>
@@ -116,16 +116,17 @@ export default function TemplatesPage() {
 
       {/* Content */}
       {isLoading ? (
-        <Card>
-          <CardContent className="py-12">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardContent className="py-16">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <p className="text-sm text-neutral-500">Loading templates...</p>
             </div>
           </CardContent>
         </Card>
       ) : templates.length === 0 ? (
-        <Card>
-          <CardContent>
+        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardContent className="py-4">
             <EmptyState
               icon={FileText}
               title="No templates yet"
@@ -140,14 +141,14 @@ export default function TemplatesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
           {templates.map((template) => (
             <Card key={template.id} className="overflow-hidden">
-              <CardHeader className="pb-2 sm:pb-3">
+              <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base sm:text-lg truncate">{template.name}</CardTitle>
-                    <CardDescription className="truncate mt-1 text-xs sm:text-sm">
+                    <CardTitle className="text-base truncate">{template.name}</CardTitle>
+                    <CardDescription className="truncate mt-1 text-xs">
                       {template.subject}
                     </CardDescription>
                   </div>
@@ -172,7 +173,7 @@ export default function TemplatesPage() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setDeleteId(template.id)}
-                        className="text-red-600 focus:text-red-600"
+                        className="text-error-600 focus:text-error-600 focus:bg-error-50"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -182,7 +183,7 @@ export default function TemplatesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="text-xs sm:text-sm text-gray-500 line-clamp-2 mb-3 sm:mb-4">
+                <div className="text-sm text-neutral-500 line-clamp-2 mb-4">
                   {truncate(template.html_body.replace(/<[^>]*>/g, ''), 100)}
                 </div>
                 <div className="flex items-center justify-between gap-2">
@@ -242,13 +243,16 @@ export default function TemplatesPage() {
       <Dialog open={!!previewTemplate} onOpenChange={(open) => !open && setPreviewTemplate(null)}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">{previewTemplate?.name}</DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm">Subject: {previewTemplate?.subject}</DialogDescription>
+            <DialogTitle>{previewTemplate?.name}</DialogTitle>
+            <DialogDescription>Subject: {previewTemplate?.subject}</DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-auto border rounded-lg bg-white p-2 sm:p-4">
+          <div className={cn(
+            'flex-1 overflow-auto rounded-xl p-4',
+            'bg-white border border-neutral-200'
+          )}>
             <iframe
               srcDoc={sanitizeHtml(previewTemplate?.html_body || '')}
-              className="w-full min-h-[300px] sm:min-h-[400px] border-0"
+              className="w-full min-h-[400px] border-0"
               title="Email Preview"
               sandbox="allow-same-origin"
             />
