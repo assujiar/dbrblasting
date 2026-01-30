@@ -42,6 +42,7 @@ import {
   XCircle,
   Clock,
   FileText,
+  ChevronRight,
 } from 'lucide-react'
 import type { Lead, ContactGroup, EmailCampaignRecipient } from '@/types/database'
 import { LeadForm } from '@/components/leads/lead-form'
@@ -267,13 +268,14 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
           ) : (
             <div className="flex flex-wrap gap-2">
               {lead.groups.map((group) => (
-                <Link key={group.id} href="/app/groups">
+                <Link key={group.id} href={`/app/groups/${group.id}`}>
                   <Badge
                     variant="outline"
-                    className="px-3 py-1.5 cursor-pointer hover:bg-primary-50 hover:border-primary-300 transition-colors"
+                    className="px-3 py-1.5 cursor-pointer hover:bg-primary-50 hover:border-primary-300 transition-all duration-200 hover:scale-105"
                   >
                     <FolderOpen className="h-3.5 w-3.5 mr-1.5 text-primary-500" />
                     {group.name}
+                    <ChevronRight className="h-3.5 w-3.5 ml-1 text-neutral-400" />
                   </Badge>
                 </Link>
               ))}
@@ -336,6 +338,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                     <TableHead>Template</TableHead>
                     <TableHead>Sent Date</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -346,7 +349,11 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                       return dateB - dateA
                     })
                     .map((item) => (
-                      <TableRow key={item.id}>
+                      <TableRow
+                        key={item.id}
+                        className="cursor-pointer transition-colors duration-150 hover:bg-primary-50/50"
+                        onClick={() => router.push(`/app/campaigns/${item.campaign_id}`)}
+                      >
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <div className="p-1.5 rounded-lg bg-primary-50">
@@ -373,6 +380,9 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                             {item.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
                             {item.status}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <ChevronRight className="h-4 w-4 text-neutral-400" />
                         </TableCell>
                       </TableRow>
                     ))}

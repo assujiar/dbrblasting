@@ -1,15 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { CampaignDetail } from '@/components/campaigns/campaign-detail'
-import { Send, Loader2, CheckCircle2, XCircle, Clock, Play, Filter, Calendar, X, Sparkles } from 'lucide-react'
+import { Send, Loader2, CheckCircle2, XCircle, Clock, Play, Filter, Calendar, X, Sparkles, ChevronRight, Users } from 'lucide-react'
 import { formatDate, cn } from '@/lib/utils'
 import type { EmailCampaign, EmailTemplate, EmailCampaignRecipient } from '@/types/database'
 
@@ -26,14 +25,14 @@ interface CampaignWithDetails extends EmailCampaign {
 
 function CampaignsContent() {
   const searchParams = useSearchParams()
-  const initialCampaignId = searchParams.get('id')
+  const router = useRouter()
 
   const [campaigns, setCampaigns] = useState<CampaignWithDetails[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(initialCampaignId)
   const [processingCampaignId, setProcessingCampaignId] = useState<string | null>(null)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'failed' | 'running'>('all')
 
   const fetchCampaigns = useCallback(async () => {
     setIsLoading(true)
@@ -148,6 +147,12 @@ function CampaignsContent() {
     { total: 0, sent: 0, failed: 0, recipients: 0 }
   )
 
+  // Filter campaigns by status
+  const filteredCampaigns = campaigns.filter((campaign) => {
+    if (statusFilter === 'all') return true
+    return campaign.status === statusFilter
+  })
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -160,9 +165,15 @@ function CampaignsContent() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Clickable to filter */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 animate-slide-up" style={{ animationDelay: '50ms' }}>
-        <Card className="bg-gradient-to-br from-primary-50/50 to-white">
+        <Card
+          className={cn(
+            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-primary-50/50 to-white',
+            statusFilter === 'all' && 'ring-2 ring-primary-500 shadow-md'
+          )}
+          onClick={() => setStatusFilter('all')}
+        >
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-primary-100">
@@ -175,7 +186,13 @@ function CampaignsContent() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-success-50/50 to-white">
+        <Card
+          className={cn(
+            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-success-50/50 to-white',
+            statusFilter === 'completed' && 'ring-2 ring-success-500 shadow-md'
+          )}
+          onClick={() => setStatusFilter('completed')}
+        >
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-success-100">
@@ -188,7 +205,13 @@ function CampaignsContent() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-error-50/50 to-white">
+        <Card
+          className={cn(
+            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-error-50/50 to-white',
+            statusFilter === 'failed' && 'ring-2 ring-error-500 shadow-md'
+          )}
+          onClick={() => setStatusFilter('failed')}
+        >
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-error-100">
@@ -201,11 +224,17 @@ function CampaignsContent() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-accent-50/50 to-white">
+        <Card
+          className={cn(
+            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-accent-50/50 to-white',
+            statusFilter === 'running' && 'ring-2 ring-accent-500 shadow-md'
+          )}
+          onClick={() => setStatusFilter('running')}
+        >
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-accent-100">
-                <Sparkles className="h-5 w-5 text-accent-600" />
+                <Users className="h-5 w-5 text-accent-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-neutral-900">{stats.recipients}</p>
@@ -256,6 +285,24 @@ function CampaignsContent() {
         </CardContent>
       </Card>
 
+      {/* Filter indicator */}
+      {(statusFilter !== 'all' || hasFilters) && (
+        <Card className="animate-slide-up border-primary-200 bg-primary-50/30" style={{ animationDelay: '125ms' }}>
+          <CardContent className="py-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-primary-700">
+                Showing {filteredCampaigns.length} of {campaigns.length} campaigns
+                {statusFilter !== 'all' && ` (${statusFilter})`}
+              </p>
+              <Button variant="ghost" size="sm" onClick={() => { setStatusFilter('all'); clearFilters(); }}>
+                <X className="h-4 w-4" />
+                Clear All Filters
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Content */}
       {isLoading ? (
         <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
@@ -266,18 +313,18 @@ function CampaignsContent() {
             </div>
           </CardContent>
         </Card>
-      ) : campaigns.length === 0 ? (
+      ) : filteredCampaigns.length === 0 ? (
         <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
           <CardContent className="py-4">
             <EmptyState
               icon={Send}
-              title={hasFilters ? 'No campaigns found' : 'No campaigns yet'}
-              description={hasFilters
-                ? 'Try adjusting your date filters'
+              title={hasFilters || statusFilter !== 'all' ? 'No campaigns found' : 'No campaigns yet'}
+              description={hasFilters || statusFilter !== 'all'
+                ? 'Try adjusting your filters'
                 : 'Send your first email campaign from the Templates page'
               }
-              action={hasFilters && (
-                <Button variant="outline" onClick={clearFilters}>
+              action={(hasFilters || statusFilter !== 'all') && (
+                <Button variant="outline" onClick={() => { setStatusFilter('all'); clearFilters(); }}>
                   Clear Filters
                 </Button>
               )}
@@ -286,7 +333,7 @@ function CampaignsContent() {
         </Card>
       ) : (
         <div className="space-y-4 stagger-children">
-          {campaigns.map((campaign) => {
+          {filteredCampaigns.map((campaign) => {
             const progress = campaign.recipientCounts.total > 0
               ? ((campaign.recipientCounts.sent + campaign.recipientCounts.failed) / campaign.recipientCounts.total) * 100
               : 0
@@ -299,7 +346,7 @@ function CampaignsContent() {
                   'hover:shadow-lg hover:-translate-y-0.5',
                   'bg-gradient-to-br from-white to-neutral-50/50'
                 )}
-                onClick={() => setSelectedCampaignId(campaign.id)}
+                onClick={() => router.push(`/app/campaigns/${campaign.id}`)}
               >
                 <CardContent className="py-4">
                   <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
@@ -309,7 +356,10 @@ function CampaignsContent() {
                         {campaign.template?.name || 'Deleted template'}
                       </p>
                     </div>
-                    {getStatusBadge(campaign.status, campaign.recipientCounts)}
+                    <div className="flex items-center gap-2">
+                      {getStatusBadge(campaign.status, campaign.recipientCounts)}
+                      <ChevronRight className="h-4 w-4 text-neutral-300 hidden sm:block" />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -355,13 +405,6 @@ function CampaignsContent() {
           })}
         </div>
       )}
-
-      {/* Campaign Detail Dialog */}
-      <CampaignDetail
-        campaignId={selectedCampaignId}
-        onClose={() => setSelectedCampaignId(null)}
-        onRefresh={fetchCampaigns}
-      />
     </div>
   )
 }
