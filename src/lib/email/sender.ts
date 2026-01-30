@@ -19,6 +19,17 @@ interface SenderData {
   company: string
 }
 
+// Organization SMTP config
+export interface OrganizationSmtpConfig {
+  smtp_host: string | null
+  smtp_port: number | null
+  smtp_user: string | null
+  smtp_pass: string | null
+  smtp_secure: boolean
+  smtp_from_name: string | null
+  smtp_from_email: string | null
+}
+
 interface EmailOptions {
   to: string
   toName: string
@@ -31,23 +42,50 @@ interface EmailOptions {
     phone: string
   }
   senderData?: SenderData
+  smtpConfig?: OrganizationSmtpConfig // Optional user SMTP config
 }
 
-function getEmailConfig(): EmailConfig {
-  return {
-    host: process.env.SMTP_HOST!,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER!,
-      pass: process.env.SMTP_PASS!,
-    },
+function getEmailConfig(userConfig?: OrganizationSmtpConfig): EmailConfig | null {
+  // Use user's SMTP config if available
+  if (userConfig?.smtp_host && userConfig?.smtp_user && userConfig?.smtp_pass) {
+    return {
+      host: userConfig.smtp_host,
+      port: userConfig.smtp_port || 587,
+      secure: userConfig.smtp_secure || false,
+      auth: {
+        user: userConfig.smtp_user,
+        pass: userConfig.smtp_pass,
+      },
+    }
   }
+
+  // Fallback to environment variables
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    return {
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    }
+  }
+
+  return null
 }
 
 export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
   try {
-    const config = getEmailConfig()
+    const config = getEmailConfig(options.smtpConfig)
+
+    if (!config) {
+      return {
+        success: false,
+        error: 'SMTP not configured. Please configure SMTP settings in your profile or environment variables.'
+      }
+    }
+
     const transporter = nodemailer.createTransport(config)
 
     // Replace placeholders in subject and body
@@ -68,16 +106,24 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
       personalizedBody += signature
     }
 
-    // Use sender data for from name/email if available, otherwise use env vars
-    const fromName = options.senderData?.name || process.env.MAIL_FROM_NAME || 'Email Blasting'
-    const fromEmail = process.env.MAIL_FROM_EMAIL || 'noreply@example.com'
+    // Determine from name and email
+    // Priority: User SMTP config > Sender data > Environment vars
+    const fromName = options.smtpConfig?.smtp_from_name
+      || options.senderData?.name
+      || process.env.MAIL_FROM_NAME
+      || 'Email Blasting'
+
+    const fromEmail = options.smtpConfig?.smtp_from_email
+      || options.senderData?.email
+      || process.env.MAIL_FROM_EMAIL
+      || config.auth.user // Use SMTP username as fallback
 
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
       to: options.toName ? `"${options.toName}" <${options.to}>` : options.to,
       subject: personalizedSubject,
       html: personalizedBody,
-      replyTo: options.senderData?.email || undefined,
+      replyTo: options.senderData?.email || fromEmail,
     })
 
     return { success: true }
@@ -88,9 +134,17 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
   }
 }
 
-export async function testSmtpConnection(): Promise<{ success: boolean; error?: string }> {
+export async function testSmtpConnection(userConfig?: OrganizationSmtpConfig): Promise<{ success: boolean; error?: string }> {
   try {
-    const config = getEmailConfig()
+    const config = getEmailConfig(userConfig)
+
+    if (!config) {
+      return {
+        success: false,
+        error: 'SMTP not configured'
+      }
+    }
+
     const transporter = nodemailer.createTransport(config)
     await transporter.verify()
     return { success: true }

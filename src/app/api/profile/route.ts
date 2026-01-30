@@ -11,10 +11,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Try to get existing profile
+    // Try to get existing profile with organization
     const { data: profile, error } = await supabase
       .from('user_profiles')
-      .select('*')
+      .select(`
+        *,
+        organization:organizations(id, name, slug, is_active)
+      `)
       .eq('user_id', user.id)
       .single()
 
@@ -33,6 +36,8 @@ export async function GET() {
           phone: '',
           position: '',
           company: '',
+          role: 'user',
+          organization: null,
         }
       })
     }
@@ -55,7 +60,13 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { full_name, email, phone, position, company } = body
+    const {
+      full_name,
+      email,
+      phone,
+      position,
+      company,
+    } = body
 
     if (!full_name || !email) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 })
@@ -70,20 +81,27 @@ export async function PUT(request: NextRequest) {
 
     let result
 
+    const profileData = {
+      full_name,
+      email,
+      phone: phone || '',
+      position: position || '',
+      company: company || '',
+    }
+
     if (existingProfile) {
       // Update existing profile
       result = await supabase
         .from('user_profiles')
         .update({
-          full_name,
-          email,
-          phone: phone || '',
-          position: position || '',
-          company: company || '',
+          ...profileData,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id)
-        .select()
+        .select(`
+          *,
+          organization:organizations(id, name, slug, is_active)
+        `)
         .single()
     } else {
       // Create new profile
@@ -91,13 +109,12 @@ export async function PUT(request: NextRequest) {
         .from('user_profiles')
         .insert({
           user_id: user.id,
-          full_name,
-          email,
-          phone: phone || '',
-          position: position || '',
-          company: company || '',
+          ...profileData,
         })
-        .select()
+        .select(`
+          *,
+          organization:organizations(id, name, slug, is_active)
+        `)
         .single()
     }
 

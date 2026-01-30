@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { sendEmail } from '@/lib/email/sender'
+import { sendEmail, OrganizationSmtpConfig } from '@/lib/email/sender'
 
 const BATCH_SIZE = 20
 const CONCURRENCY = 3
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Template not found' }, { status: 404 })
     }
 
-    // Get user profile for email signature
+    // Get user profile with organization
     const { data: userProfile } = await supabase
       .from('user_profiles')
       .select('*')
@@ -53,6 +53,30 @@ export async function POST(request: NextRequest) {
       position: userProfile.position || '',
       company: userProfile.company || '',
     } : undefined
+
+    // Get SMTP config from user's organization
+    let smtpConfig: OrganizationSmtpConfig | undefined = undefined
+
+    if (userProfile?.organization_id) {
+      const { data: organization } = await supabase
+        .from('organizations')
+        .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure, smtp_from_name, smtp_from_email')
+        .eq('id', userProfile.organization_id)
+        .eq('is_active', true)
+        .single()
+
+      if (organization && organization.smtp_host) {
+        smtpConfig = {
+          smtp_host: organization.smtp_host,
+          smtp_port: organization.smtp_port,
+          smtp_user: organization.smtp_user,
+          smtp_pass: organization.smtp_pass,
+          smtp_secure: organization.smtp_secure || false,
+          smtp_from_name: organization.smtp_from_name,
+          smtp_from_email: organization.smtp_from_email,
+        }
+      }
+    }
 
     // Get pending recipients
     const { data: recipients, error: recipientsError } = await supabase
@@ -100,6 +124,7 @@ export async function POST(request: NextRequest) {
           htmlBody: campaign.template.html_body,
           recipientData,
           senderData,
+          smtpConfig,
         })
 
         // Update recipient status
