@@ -30,153 +30,98 @@ export default async function DashboardPage() {
   const stats = await getStats()
 
   const statCards = [
-    {
-      title: 'Total Leads',
-      value: stats?.leads || 0,
-      description: 'Contacts in your database',
-      icon: Users,
-      href: '/app/leads',
-      iconColor: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      title: 'Contact Groups',
-      value: stats?.groups || 0,
-      description: 'Organized lead groups',
-      icon: FolderKanban,
-      href: '/app/groups',
-      iconColor: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
-    },
-    {
-      title: 'Email Templates',
-      value: stats?.templates || 0,
-      description: 'Ready-to-use templates',
-      icon: FileText,
-      href: '/app/templates',
-      iconColor: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-    },
-    {
-      title: 'Campaigns Sent',
-      value: stats?.campaigns || 0,
-      description: 'Total email campaigns',
-      icon: Send,
-      href: '/app/campaigns',
-      iconColor: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
+    { title: 'Leads', value: stats?.leads || 0, icon: Users, href: '/app/leads', color: 'blue' },
+    { title: 'Groups', value: stats?.groups || 0, icon: FolderKanban, href: '/app/groups', color: 'indigo' },
+    { title: 'Templates', value: stats?.templates || 0, icon: FileText, href: '/app/templates', color: 'purple' },
+    { title: 'Campaigns', value: stats?.campaigns || 0, icon: Send, href: '/app/campaigns', color: 'green' },
   ]
 
+  const colorMap: Record<string, { bg: string; text: string; iconBg: string }> = {
+    blue: { bg: 'bg-blue-50', text: 'text-blue-600', iconBg: 'bg-blue-100' },
+    indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600', iconBg: 'bg-indigo-100' },
+    purple: { bg: 'bg-purple-50', text: 'text-purple-600', iconBg: 'bg-purple-100' },
+    green: { bg: 'bg-green-50', text: 'text-green-600', iconBg: 'bg-green-100' },
+  }
+
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
-      {/* Welcome Header */}
+    <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Welcome back! Here&apos;s an overview of your email marketing.
-        </p>
+        <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">Overview of your email marketing</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 stagger-children">
-        {statCards.map((stat) => (
-          <Link key={stat.title} href={stat.href}>
-            <Card className="card-hover cursor-pointer h-full border-gray-200/60 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div className="order-2 sm:order-1">
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">{stat.title}</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-0.5 sm:mt-1">{stat.value}</p>
-                    <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1 hidden sm:block">{stat.description}</p>
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {statCards.map((stat) => {
+          const colors = colorMap[stat.color]
+          return (
+            <Link key={stat.title} href={stat.href}>
+              <Card className="h-full hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className={`w-10 h-10 rounded-lg ${colors.iconBg} flex items-center justify-center mb-3`}>
+                    <stat.icon className={`h-5 w-5 ${colors.text}`} />
                   </div>
-                  <div className={`order-1 sm:order-2 p-2.5 sm:p-3 rounded-xl ${stat.bgColor} self-start transition-transform duration-300 group-hover:scale-110`}>
-                    <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.iconColor}`} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-sm text-gray-500">{stat.title}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          )
+        })}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+      {/* Quick Start & Tags */}
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader className="pb-3 sm:pb-4">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-              Quick Start Guide
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <TrendingUp className="h-5 w-5 text-blue-600" />
+              Quick Start
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Get started with email marketing in a few steps
-            </CardDescription>
+            <CardDescription>Get started in a few steps</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <ol className="space-y-3">
-              <li className="flex items-start gap-3">
-                <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-blue-100 text-[10px] sm:text-xs font-semibold text-blue-700 shrink-0">
-                  1
-                </span>
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-800 text-sm">Add your leads</p>
-                  <p className="text-xs sm:text-sm text-gray-500">Import or manually add contacts</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-blue-100 text-[10px] sm:text-xs font-semibold text-blue-700 shrink-0">
-                  2
-                </span>
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-800 text-sm">Create groups</p>
-                  <p className="text-xs sm:text-sm text-gray-500">Organize into targeted segments</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-blue-100 text-[10px] sm:text-xs font-semibold text-blue-700 shrink-0">
-                  3
-                </span>
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-800 text-sm">Design templates</p>
-                  <p className="text-xs sm:text-sm text-gray-500">Create personalized templates</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-blue-100 text-[10px] sm:text-xs font-semibold text-blue-700 shrink-0">
-                  4
-                </span>
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-800 text-sm">Send campaigns</p>
-                  <p className="text-xs sm:text-sm text-gray-500">Launch email campaigns</p>
-                </div>
-              </li>
+              {[
+                { step: '1', title: 'Add leads', desc: 'Import your contacts' },
+                { step: '2', title: 'Create groups', desc: 'Organize into segments' },
+                { step: '3', title: 'Design templates', desc: 'Create email templates' },
+                { step: '4', title: 'Send campaigns', desc: 'Launch your campaign' },
+              ].map((item) => (
+                <li key={item.step} className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 shrink-0">
+                    {item.step}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-900 text-sm">{item.title}</p>
+                    <p className="text-xs text-gray-500">{item.desc}</p>
+                  </div>
+                </li>
+              ))}
             </ol>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3 sm:pb-4">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
-              Personalization Tags
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Mail className="h-5 w-5 text-indigo-600" />
+              Template Tags
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Use these placeholders in your templates
-            </CardDescription>
+            <CardDescription>Use in your templates</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2">
               {[
-                { tag: '{{name}}', desc: "Recipient's name" },
-                { tag: '{{company}}', desc: "Company name" },
-                { tag: '{{email}}', desc: "Email address" },
-                { tag: '{{phone}}', desc: "Phone number" },
+                { tag: '{{name}}', desc: 'Name' },
+                { tag: '{{company}}', desc: 'Company' },
+                { tag: '{{email}}', desc: 'Email' },
+                { tag: '{{phone}}', desc: 'Phone' },
               ].map((item) => (
-                <div key={item.tag} className="flex items-center justify-between gap-2 p-2 rounded-lg bg-gray-50">
-                  <code className="text-xs sm:text-sm font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded shrink-0">
-                    {item.tag}
-                  </code>
-                  <span className="text-xs sm:text-sm text-gray-500 text-right">{item.desc}</span>
+                <div key={item.tag} className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                  <code className="text-sm font-mono text-blue-600">{item.tag}</code>
+                  <span className="text-sm text-gray-500">{item.desc}</span>
                 </div>
               ))}
             </div>
