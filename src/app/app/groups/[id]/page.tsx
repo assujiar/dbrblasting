@@ -210,11 +210,11 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-primary-100">
-                <FolderOpen className="h-5 w-5 text-primary-600" />
+                <Send className="h-5 w-5 text-primary-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-neutral-900">{group.name.length}</p>
-                <p className="text-xs text-neutral-500">Group Name Length</p>
+                <p className="text-2xl font-bold text-neutral-900">{campaigns.length}</p>
+                <p className="text-xs text-neutral-500">Recent Campaigns</p>
               </div>
             </div>
           </CardContent>

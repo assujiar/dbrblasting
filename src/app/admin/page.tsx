@@ -82,7 +82,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 text-error-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
           <p className="text-sm text-neutral-500">Loading dashboard...</p>
         </div>
       </div>
