@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { sendEmail, OrganizationSmtpConfig } from '@/lib/email/sender'
 
 const BATCH_SIZE = 20
 const CONCURRENCY = 3
+
+// Create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase admin credentials')
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false }
+  })
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,8 +54,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Template not found' }, { status: 404 })
     }
 
-    // Get user profile with organization
-    const { data: userProfile } = await supabase
+    // Get user profile with organization (use admin client to bypass RLS)
+    const adminClient = getAdminClient()
+    const { data: userProfile } = await adminClient
       .from('user_profiles')
       .select('*')
       .eq('user_id', user.id)
@@ -58,7 +74,7 @@ export async function POST(request: NextRequest) {
     let smtpConfig: OrganizationSmtpConfig | undefined = undefined
 
     if (userProfile?.organization_id) {
-      const { data: organization } = await supabase
+      const { data: organization } = await adminClient
         .from('organizations')
         .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure, smtp_from_name, smtp_from_email, smtp_reply_to')
         .eq('id', userProfile.organization_id)

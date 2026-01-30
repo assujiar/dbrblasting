@@ -1,5 +1,20 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import type { UserRole, UserProfile, Organization } from '@/types/database'
+
+// Create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase admin credentials')
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false }
+  })
+}
 
 export interface AuthContext {
   user: {
@@ -15,6 +30,7 @@ export interface AuthContext {
 
 /**
  * Get the current user's authentication context including their role and organization
+ * Uses admin client to bypass RLS and avoid infinite recursion
  */
 export async function getAuthContext(): Promise<AuthContext | null> {
   const supabase = await createClient()
@@ -24,8 +40,11 @@ export async function getAuthContext(): Promise<AuthContext | null> {
     return null
   }
 
+  // Use admin client to bypass RLS (avoids infinite recursion)
+  const adminClient = getAdminClient()
+
   // Get user profile with organization
-  const { data: profile } = await supabase
+  const { data: profile } = await adminClient
     .from('user_profiles')
     .select('*')
     .eq('user_id', user.id)
@@ -34,7 +53,7 @@ export async function getAuthContext(): Promise<AuthContext | null> {
   // Get organization if user has one
   let organization: Organization | null = null
   if (profile?.organization_id) {
-    const { data: org } = await supabase
+    const { data: org } = await adminClient
       .from('organizations')
       .select('*')
       .eq('id', profile.organization_id)
