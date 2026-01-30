@@ -119,7 +119,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
           <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
             <Card className="w-full max-w-2xl">
               <CardHeader>
@@ -128,7 +128,7 @@ export default function ProfilePage() {
                   This information will appear in your email signature and CTA buttons.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 sm:space-y-5">
+              <CardContent className="space-y-5 sm:space-y-6">
                 <div className="space-y-2.5">
                   <Label htmlFor="full_name" className="flex items-center gap-2">
                     <User className="h-4 w-4 text-gray-400" />
@@ -231,7 +231,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 {profile.full_name ? (
-                  <div className="glass-light rounded-xl p-4">
+                  <div className="glass-light rounded-2xl p-5">
                     <p className="text-sm text-gray-500 mb-2">Signature:</p>
                     {signaturePreview()}
                   </div>
