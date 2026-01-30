@@ -33,6 +33,7 @@ import {
   FileText,
   Send,
   Mail,
+  ChevronRight,
 } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -52,13 +53,18 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-16 items-center px-5">
+      <div className="flex h-18 items-center px-6 border-b border-neutral-100">
         <Link
           href="/app"
           onClick={onNavigate}
-          className="flex items-center gap-3"
+          className="flex items-center gap-3 group"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-600 to-primary-700 shadow-md shadow-primary-500/25">
+          <div className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-xl',
+            'bg-gradient-to-br from-primary-500 to-primary-700',
+            'shadow-lg shadow-primary-500/30',
+            'transition-transform duration-200 group-hover:scale-105'
+          )}>
             <Mail className="h-5 w-5 text-white" />
           </div>
           <span className="text-lg font-bold text-neutral-900">BlastMail</span>
@@ -66,53 +72,85 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {navigation.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== '/app' && pathname.startsWith(item.href))
-          const Icon = item.icon
+      <nav className="flex-1 px-4 py-6">
+        <div className="space-y-2">
+          {navigation.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/app' && pathname.startsWith(item.href))
+            const Icon = item.icon
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={onNavigate}
-              className={cn(
-                'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium',
-                'transition-all duration-200',
-                isActive
-                  ? [
-                      'bg-gradient-to-r from-primary-500/10 to-primary-500/5',
-                      'text-primary-700',
-                      'shadow-sm',
-                    ]
-                  : [
-                      'text-neutral-600',
-                      'hover:bg-neutral-100/80 hover:text-neutral-900',
-                    ]
-              )}
-            >
-              <Icon
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={onNavigate}
                 className={cn(
-                  'h-5 w-5 transition-colors',
+                  'group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium',
+                  'transition-all duration-200',
                   isActive
-                    ? 'text-primary-600'
-                    : 'text-neutral-400 group-hover:text-neutral-600'
+                    ? [
+                        'bg-primary-50',
+                        'text-primary-700',
+                      ]
+                    : [
+                        'text-neutral-600',
+                        'hover:bg-neutral-50 hover:text-neutral-900',
+                      ]
                 )}
-              />
-              {item.name}
-            </Link>
-          )
-        })}
+              >
+                {/* Active indicator bar */}
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-gradient-to-b from-primary-500 to-primary-600" />
+                )}
+
+                {/* Icon container */}
+                <div className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
+                  isActive
+                    ? 'bg-primary-100 shadow-sm'
+                    : 'bg-neutral-100/80 group-hover:bg-neutral-200/80'
+                )}>
+                  <Icon
+                    className={cn(
+                      'h-[18px] w-[18px] transition-colors',
+                      isActive
+                        ? 'text-primary-600'
+                        : 'text-neutral-500 group-hover:text-neutral-700'
+                    )}
+                  />
+                </div>
+
+                <span className="flex-1">{item.name}</span>
+
+                {/* Hover arrow indicator */}
+                <ChevronRight
+                  className={cn(
+                    'h-4 w-4 transition-all duration-200',
+                    isActive
+                      ? 'text-primary-400 opacity-100'
+                      : 'text-neutral-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5'
+                  )}
+                />
+              </Link>
+            )
+          })}
+        </div>
       </nav>
 
       {/* Help card */}
-      <div className="p-3">
-        <div className="rounded-xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100/50 p-4">
+      <div className="p-4 mt-auto">
+        <div className={cn(
+          'rounded-2xl p-5',
+          'bg-gradient-to-br from-primary-50 via-primary-50/80 to-accent-50',
+          'border border-primary-100/60'
+        )}>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/80 shadow-sm mb-3">
+            <Mail className="h-5 w-5 text-primary-600" />
+          </div>
           <p className="text-sm font-semibold text-neutral-900">Need help?</p>
-          <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
-            Check out our documentation for quick setup guides.
+          <p className="mt-1.5 text-xs text-neutral-500 leading-relaxed">
+            Check out our documentation for quick setup guides and tips.
           </p>
         </div>
       </div>
@@ -148,7 +186,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       {/* Animated background */}
       <div className="app-background" />
 
@@ -158,13 +196,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              'fixed inset-y-0 left-0 z-[60] h-full w-[17rem] max-w-[85vw] p-0',
-              // Glass styling
-              'rounded-r-2xl',
-              'bg-white/95 backdrop-blur-xl',
-              'border-r border-white/60',
-              'shadow-2xl shadow-neutral-900/10',
-              // Animation
+              'fixed inset-y-0 left-0 z-[60] h-full w-72 max-w-[85vw] p-0',
+              'rounded-r-3xl',
+              'bg-white/98 backdrop-blur-xl',
+              'border-r border-neutral-200/50',
+              'shadow-2xl shadow-neutral-900/15',
               'data-[state=open]:animate-in data-[state=closed]:animate-out',
               'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
               'duration-300',
@@ -177,11 +213,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setDrawerOpen(false)}
               className={cn(
-                'absolute top-4 right-4 z-10',
-                'rounded-lg p-2',
-                'text-neutral-400 hover:text-neutral-600',
-                'hover:bg-neutral-100/80',
-                'transition-colors duration-150'
+                'absolute top-5 right-4 z-10',
+                'rounded-xl p-2.5',
+                'text-neutral-400 hover:text-neutral-700',
+                'hover:bg-neutral-100',
+                'transition-all duration-150',
+                'active:scale-95'
               )}
             >
               <X className="h-5 w-5" />
@@ -191,49 +228,53 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </DialogPortal>
       </Dialog>
 
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar - Fixed position */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-30 hidden md:flex md:w-64 md:flex-col',
-          // Glass styling
-          'bg-white/80 backdrop-blur-xl',
-          'border-r border-white/60',
-          'shadow-lg shadow-neutral-900/5'
+          'fixed inset-y-0 left-0 z-30',
+          'hidden md:flex md:w-72 md:flex-col',
+          'bg-white/95 backdrop-blur-xl',
+          'border-r border-neutral-200/50',
+          'shadow-xl shadow-neutral-900/5'
         )}
       >
         <SidebarContent />
       </aside>
 
-      {/* Main content area */}
-      <div className="md:pl-64">
+      {/* Main content wrapper - Offset by sidebar width */}
+      <div className="relative min-h-screen md:ml-72">
         {/* Top bar */}
         <header
           className={cn(
             'sticky top-0 z-20 h-16',
-            // Glass styling
-            'bg-white/70 backdrop-blur-xl',
-            'border-b border-white/40'
+            'bg-white/80 backdrop-blur-xl',
+            'border-b border-neutral-200/50'
           )}
         >
-          <div className="flex h-full items-center justify-between px-4 sm:px-6">
+          <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
             {/* Left section */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setDrawerOpen(true)}
                 className={cn(
-                  'md:hidden -ml-2',
-                  'rounded-lg p-2',
+                  'md:hidden -ml-1',
+                  'rounded-xl p-2.5',
                   'text-neutral-500 hover:text-neutral-700',
-                  'hover:bg-neutral-100/80',
-                  'transition-colors duration-150'
+                  'hover:bg-neutral-100',
+                  'transition-all duration-150',
+                  'active:scale-95'
                 )}
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
               </button>
               {/* Mobile logo */}
-              <Link href="/app" className="md:hidden flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-600 to-primary-700 shadow-sm">
+              <Link href="/app" className="md:hidden flex items-center gap-2.5">
+                <div className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg',
+                  'bg-gradient-to-br from-primary-500 to-primary-700',
+                  'shadow-md shadow-primary-500/25'
+                )}>
                   <Mail className="h-4 w-4 text-white" />
                 </div>
                 <span className="font-bold text-neutral-900">BlastMail</span>
@@ -241,28 +282,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Right section - User menu */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 px-2 sm:px-3">
+                  <Button variant="ghost" size="sm" className="gap-2.5 px-2 sm:px-3 h-10">
                     <div
                       className={cn(
                         'flex h-8 w-8 items-center justify-center rounded-full shrink-0',
                         'bg-gradient-to-br from-primary-500 to-primary-600',
                         'text-white font-semibold text-sm',
-                        'shadow-md shadow-primary-500/25'
+                        'shadow-md shadow-primary-500/25',
+                        'ring-2 ring-white'
                       )}
                     >
                       {user?.email?.charAt(0).toUpperCase() || 'U'}
                     </div>
-                    <span className="hidden sm:block text-sm text-neutral-600 max-w-[150px] truncate">
+                    <span className="hidden sm:block text-sm font-medium text-neutral-700 max-w-[150px] truncate">
                       {user?.email || 'User'}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
+                    <div className="flex flex-col space-y-1 py-1">
                       <p className="text-sm font-semibold leading-none text-neutral-900">
                         Account
                       </p>
@@ -292,8 +334,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8">
+        {/* Page content with proper padding */}
+        <main className="p-5 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-6xl">{children}</div>
         </main>
       </div>
