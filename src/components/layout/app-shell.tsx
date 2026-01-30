@@ -355,13 +355,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       // Fetch user profile to get role
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from('user_profiles')
           .select('role')
           .eq('user_id', user.id)
           .single()
 
+        console.log('Profile fetch:', { profile, error, userId: user.id })
+
+        if (error) {
+          console.error('Error fetching profile:', error)
+        }
+
         if (profile?.role) {
+          console.log('Setting userRole to:', profile.role)
           setUserRole(profile.role as UserRole)
         }
       }
