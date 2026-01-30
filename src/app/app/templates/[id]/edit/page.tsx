@@ -12,16 +12,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu'
 import { toast } from '@/components/ui/use-toast'
-import { cn, sanitizeHtml } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+import { EmailEditor } from '@/components/templates/email-editor'
+import { TemplateGallery } from '@/components/templates/template-gallery'
+import type { DefaultTemplate } from '@/lib/email/default-templates'
 import {
   ArrowLeft,
   Save,
-  Eye,
-  Code,
   Plus,
   User,
   Building2,
@@ -33,10 +33,9 @@ import {
   Smartphone,
   Sparkles,
   FileText,
-  Palette,
   Loader2,
+  LayoutTemplate,
 } from 'lucide-react'
-import type { EmailTemplate } from '@/types/database'
 
 const RECIPIENT_PLACEHOLDERS = [
   { label: 'Recipient Name', value: '{{name}}', icon: User, color: 'text-primary-600', bg: 'bg-primary-50' },
@@ -56,12 +55,13 @@ const SENDER_PLACEHOLDERS = [
 export default function EditTemplatePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const subjectInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [name, setName] = useState('')
   const [subject, setSubject] = useState('')
   const [htmlBody, setHtmlBody] = useState('')
+  const [galleryOpen, setGalleryOpen] = useState(false)
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -88,20 +88,30 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
     fetchTemplate()
   }, [id, router])
 
-  const insertPlaceholder = useCallback((placeholder: string) => {
-    const textarea = textareaRef.current
-    if (!textarea) return
+  const insertPlaceholderToSubject = useCallback((placeholder: string) => {
+    const input = subjectInputRef.current
+    if (!input) return
 
-    const start = textarea.selectionStart
-    const end = textarea.selectionEnd
-    const newValue = htmlBody.substring(0, start) + placeholder + htmlBody.substring(end)
-    setHtmlBody(newValue)
+    const start = input.selectionStart || 0
+    const end = input.selectionEnd || 0
+    const newValue = subject.substring(0, start) + placeholder + subject.substring(end)
+    setSubject(newValue)
 
     setTimeout(() => {
-      textarea.focus()
-      textarea.setSelectionRange(start + placeholder.length, start + placeholder.length)
+      input.focus()
+      input.setSelectionRange(start + placeholder.length, start + placeholder.length)
     }, 0)
-  }, [htmlBody])
+  }, [subject])
+
+  const handleSelectTemplate = useCallback((template: DefaultTemplate) => {
+    // Only replace HTML body, keep the name as is
+    setHtmlBody(template.html_body)
+    toast({
+      title: 'Template content loaded',
+      description: `Content from "${template.name}" has been loaded. You can now customize it.`,
+      variant: 'success',
+    })
+  }, [])
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -177,11 +187,15 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
           <div>
             <h1 className="text-2xl font-bold text-neutral-900">Edit Template</h1>
             <p className="text-sm text-neutral-500 mt-1">
-              Update your email template
+              Update your email template with visual editor
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setGalleryOpen(true)}>
+            <LayoutTemplate className="h-4 w-4" />
+            Replace with Template
+          </Button>
           <Button variant="outline" onClick={() => router.push(`/app/templates/${id}`)}>
             Cancel
           </Button>
@@ -218,6 +232,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                 Email Subject
               </Label>
               <Input
+                ref={subjectInputRef}
                 id="subject"
                 placeholder="e.g., Welcome to {{company}}!"
                 value={subject}
@@ -234,6 +249,9 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary-500" />
             Quick Insert Placeholders
+            <span className="text-xs font-normal text-neutral-500 ml-2">
+              (Insert into subject or email body)
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0 pb-4">
@@ -246,15 +264,14 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                   <Plus className="h-3.5 w-3.5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-56">
                 <DropdownMenuLabel className="text-xs text-neutral-500">
-                  Insert recipient placeholder
+                  Insert into Subject
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 {RECIPIENT_PLACEHOLDERS.map((p) => (
                   <DropdownMenuItem
-                    key={p.value}
-                    onClick={() => insertPlaceholder(p.value)}
+                    key={`subject-${p.value}`}
+                    onClick={() => insertPlaceholderToSubject(p.value)}
                     className="gap-2"
                   >
                     <div className={cn('p-1 rounded', p.bg)}>
@@ -275,15 +292,14 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                   <Plus className="h-3.5 w-3.5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52">
+              <DropdownMenuContent align="start" className="w-56">
                 <DropdownMenuLabel className="text-xs text-neutral-500">
-                  Insert sender placeholder
+                  Insert into Subject
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 {SENDER_PLACEHOLDERS.map((p) => (
                   <DropdownMenuItem
-                    key={p.value}
-                    onClick={() => insertPlaceholder(p.value)}
+                    key={`subject-${p.value}`}
+                    onClick={() => insertPlaceholderToSubject(p.value)}
                     className="gap-2"
                   >
                     <div className={cn('p-1 rounded', p.bg)}>
@@ -295,61 +311,38 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div className="flex-1" />
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setGalleryOpen(true)}
+              className="gap-2"
+            >
+              <LayoutTemplate className="h-4 w-4" />
+              Browse Templates
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Editor & Preview */}
-      <div className="grid gap-6 lg:grid-cols-2 animate-slide-up" style={{ animationDelay: '150ms' }}>
-        {/* Editor */}
-        <Card className="overflow-hidden">
-          <CardHeader className="py-3 bg-gradient-to-r from-neutral-50 to-neutral-100 border-b">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Code className="h-4 w-4 text-primary-500" />
-              HTML Editor
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <textarea
-              ref={textareaRef}
-              value={htmlBody}
-              onChange={(e) => setHtmlBody(e.target.value)}
-              className={cn(
-                'w-full h-[500px] p-4 font-mono text-sm',
-                'bg-neutral-900 text-neutral-100',
-                'border-0 focus:outline-none focus:ring-0',
-                'resize-none'
-              )}
-              placeholder="Enter your HTML email template here..."
-              spellCheck={false}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Preview */}
-        <Card className="overflow-hidden">
-          <CardHeader className="py-3 bg-gradient-to-r from-primary-50 to-accent-50 border-b">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Eye className="h-4 w-4 text-primary-500" />
-              Live Preview
-              <span className="ml-auto text-xs font-normal text-neutral-500 flex items-center gap-1">
-                <Palette className="h-3.5 w-3.5" />
-                Updates in real-time
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-[500px] overflow-auto bg-neutral-100">
-              <iframe
-                srcDoc={sanitizeHtml(htmlBody)}
-                className="w-full h-full border-0 bg-white"
-                title="Email Preview"
-                sandbox="allow-same-origin"
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Email Editor */}
+      <div className="animate-slide-up" style={{ animationDelay: '150ms' }}>
+        <EmailEditor
+          value={htmlBody}
+          onChange={setHtmlBody}
+          placeholder="Enter your HTML email template here..."
+          height={500}
+        />
       </div>
+
+      {/* Template Gallery */}
+      <TemplateGallery
+        open={galleryOpen}
+        onOpenChange={setGalleryOpen}
+        onSelectTemplate={handleSelectTemplate}
+      />
     </div>
   )
 }
