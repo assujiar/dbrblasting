@@ -28,6 +28,7 @@ export interface OrganizationSmtpConfig {
   smtp_secure: boolean
   smtp_from_name: string | null
   smtp_from_email: string | null
+  smtp_reply_to: string | null
 }
 
 interface EmailOptions {
@@ -118,12 +119,18 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
       || process.env.MAIL_FROM_EMAIL
       || config.auth.user // Use SMTP username as fallback
 
+    // Determine Reply-To address
+    // Priority: Organization smtp_reply_to > Sender email > From email
+    const replyTo = options.smtpConfig?.smtp_reply_to
+      || options.senderData?.email
+      || fromEmail
+
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
       to: options.toName ? `"${options.toName}" <${options.to}>` : options.to,
       subject: personalizedSubject,
       html: personalizedBody,
-      replyTo: options.senderData?.email || fromEmail,
+      replyTo: replyTo,
     })
 
     return { success: true }
