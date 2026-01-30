@@ -165,7 +165,11 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
       })
 
       const result = await response.json()
-      if (!response.ok) throw new Error(result.error || 'SMTP test failed')
+      if (!response.ok) {
+        const errorMsg = result.error || 'SMTP test failed'
+        const suggestion = result.suggestion || ''
+        throw new Error(suggestion ? `${errorMsg}. ${suggestion}` : errorMsg)
+      }
 
       setSmtpTestResult('success')
       toast({
@@ -179,6 +183,7 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
         title: 'SMTP Test Failed',
         description: error instanceof Error ? error.message : 'Failed to connect',
         variant: 'error',
+        duration: 8000, // Show longer for reading suggestion
       })
     } finally {
       setIsTesting(false)

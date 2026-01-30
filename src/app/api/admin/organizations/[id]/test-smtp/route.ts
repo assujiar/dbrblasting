@@ -78,7 +78,13 @@ export async function POST(
         user: smtpSettings.smtp_user,
         pass: smtpSettings.smtp_pass,
       },
-      connectionTimeout: 10000,
+      connectionTimeout: 15000, // 15 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+      // For TLS issues
+      tls: {
+        rejectUnauthorized: false, // Allow self-signed certificates
+      },
     })
 
     // Verify connection
@@ -92,22 +98,37 @@ export async function POST(
     console.error('SMTP test error:', error)
 
     let errorMessage = 'Failed to connect to SMTP server'
+    let suggestion = ''
+
     if (error instanceof Error) {
-      if (error.message.includes('ECONNREFUSED')) {
-        errorMessage = 'Connection refused. Check host and port.'
-      } else if (error.message.includes('ENOTFOUND')) {
-        errorMessage = 'SMTP host not found. Check the hostname.'
-      } else if (error.message.includes('ETIMEDOUT')) {
-        errorMessage = 'Connection timed out. Check firewall settings.'
-      } else if (error.message.includes('Invalid login')) {
-        errorMessage = 'Invalid username or password.'
-      } else if (error.message.includes('authentication')) {
-        errorMessage = 'Authentication failed. Check credentials.'
+      const msg = error.message.toLowerCase()
+
+      if (msg.includes('econnrefused')) {
+        errorMessage = 'Connection refused'
+        suggestion = 'The server rejected the connection. Check host and port are correct.'
+      } else if (msg.includes('enotfound') || msg.includes('getaddrinfo')) {
+        errorMessage = 'Host not found'
+        suggestion = 'DNS cannot resolve the hostname. Verify the SMTP host is correct.'
+      } else if (msg.includes('etimedout') || msg.includes('timeout') || msg.includes('ebusy')) {
+        errorMessage = 'Connection timeout'
+        suggestion = 'Server not responding. This may be a firewall issue or the server is only accessible from internal network.'
+      } else if (msg.includes('invalid login') || msg.includes('authentication') || msg.includes('auth')) {
+        errorMessage = 'Authentication failed'
+        suggestion = 'Invalid username or password. For Gmail, use App Password instead of regular password.'
+      } else if (msg.includes('certificate') || msg.includes('ssl') || msg.includes('tls')) {
+        errorMessage = 'SSL/TLS error'
+        suggestion = 'Certificate verification failed. Try toggling the SSL/TLS option.'
+      } else if (msg.includes('greeting')) {
+        errorMessage = 'Server greeting timeout'
+        suggestion = 'Server connected but did not respond. Check if the port is correct (465 for SSL, 587 for TLS).'
       } else {
         errorMessage = error.message
       }
     }
 
-    return NextResponse.json({ error: errorMessage }, { status: 500 })
+    return NextResponse.json({
+      error: errorMessage,
+      suggestion: suggestion || 'Check your SMTP settings and try again.',
+    }, { status: 500 })
   }
 }
