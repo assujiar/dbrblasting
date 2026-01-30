@@ -52,11 +52,12 @@ export async function GET(request: NextRequest) {
     const campaignsWithCounts = (data as Array<{
       id: string
       user_id: string
-      template_id: string | null
+      template_id: string
       name: string
       status: string
       created_at: string
       updated_at: string
+      organization_id: string | null
       template: { id: string; name: string; subject: string } | null
       recipients: { id: string; status: string }[] | null
     }>).map((campaign) => ({

@@ -174,6 +174,7 @@ export interface Database {
           group_id: string
           lead_id: string
           created_at: string
+          updated_at: string
         }
         Insert: {
           id?: string
@@ -181,6 +182,7 @@ export interface Database {
           group_id: string
           lead_id: string
           created_at?: string
+          updated_at?: string
         }
         Update: {
           id?: string
@@ -188,6 +190,7 @@ export interface Database {
           group_id?: string
           lead_id?: string
           created_at?: string
+          updated_at?: string
         }
       }
       email_templates: {
@@ -227,7 +230,7 @@ export interface Database {
           id: string
           user_id: string
           organization_id: string | null
-          template_id: string | null
+          template_id: string
           name: string
           status: 'draft' | 'running' | 'completed' | 'failed'
           created_at: string
@@ -237,7 +240,7 @@ export interface Database {
           id?: string
           user_id: string
           organization_id?: string | null
-          template_id?: string | null
+          template_id: string
           name: string
           status?: 'draft' | 'running' | 'completed' | 'failed'
           created_at?: string
@@ -247,7 +250,7 @@ export interface Database {
           id?: string
           user_id?: string
           organization_id?: string | null
-          template_id?: string | null
+          template_id?: string
           name?: string
           status?: 'draft' | 'running' | 'completed' | 'failed'
           created_at?: string
@@ -266,6 +269,7 @@ export interface Database {
           error: string | null
           sent_at: string | null
           created_at: string
+          updated_at: string
         }
         Insert: {
           id?: string
@@ -278,6 +282,7 @@ export interface Database {
           error?: string | null
           sent_at?: string | null
           created_at?: string
+          updated_at?: string
         }
         Update: {
           id?: string
@@ -290,6 +295,7 @@ export interface Database {
           error?: string | null
           sent_at?: string | null
           created_at?: string
+          updated_at?: string
         }
       }
     }

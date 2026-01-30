@@ -120,7 +120,7 @@ CREATE POLICY "Org admins can view own organization" ON public.organizations
   );
 
 -- Update existing RLS policies for leads to include organization filtering
-DROP POLICY IF EXISTS "Users can view their own leads" ON public.leads;
+DROP POLICY IF EXISTS "Leads: user can view own leads" ON public.leads;
 CREATE POLICY "Users can view leads" ON public.leads
   FOR SELECT
   USING (
@@ -141,14 +141,14 @@ CREATE POLICY "Users can view leads" ON public.leads
     )
   );
 
-DROP POLICY IF EXISTS "Users can insert their own leads" ON public.leads;
+DROP POLICY IF EXISTS "Leads: user can insert leads" ON public.leads;
 CREATE POLICY "Users can insert leads" ON public.leads
   FOR INSERT
   WITH CHECK (
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can update their own leads" ON public.leads;
+DROP POLICY IF EXISTS "Leads: user can update own leads" ON public.leads;
 CREATE POLICY "Users can update leads" ON public.leads
   FOR UPDATE
   USING (
@@ -162,7 +162,7 @@ CREATE POLICY "Users can update leads" ON public.leads
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can delete their own leads" ON public.leads;
+DROP POLICY IF EXISTS "Leads: user can delete own leads" ON public.leads;
 CREATE POLICY "Users can delete leads" ON public.leads
   FOR DELETE
   USING (
@@ -177,7 +177,7 @@ CREATE POLICY "Users can delete leads" ON public.leads
   );
 
 -- Update RLS for contact_groups
-DROP POLICY IF EXISTS "Users can view their own groups" ON public.contact_groups;
+DROP POLICY IF EXISTS "Groups: user can view own groups" ON public.contact_groups;
 CREATE POLICY "Users can view groups" ON public.contact_groups
   FOR SELECT
   USING (
@@ -195,14 +195,14 @@ CREATE POLICY "Users can view groups" ON public.contact_groups
     )
   );
 
-DROP POLICY IF EXISTS "Users can insert their own groups" ON public.contact_groups;
+DROP POLICY IF EXISTS "Groups: user can insert groups" ON public.contact_groups;
 CREATE POLICY "Users can insert groups" ON public.contact_groups
   FOR INSERT
   WITH CHECK (
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can update their own groups" ON public.contact_groups;
+DROP POLICY IF EXISTS "Groups: user can update own groups" ON public.contact_groups;
 CREATE POLICY "Users can update groups" ON public.contact_groups
   FOR UPDATE
   USING (
@@ -215,7 +215,7 @@ CREATE POLICY "Users can update groups" ON public.contact_groups
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can delete their own groups" ON public.contact_groups;
+DROP POLICY IF EXISTS "Groups: user can delete own groups" ON public.contact_groups;
 CREATE POLICY "Users can delete groups" ON public.contact_groups
   FOR DELETE
   USING (
@@ -229,7 +229,7 @@ CREATE POLICY "Users can delete groups" ON public.contact_groups
   );
 
 -- Update RLS for email_templates
-DROP POLICY IF EXISTS "Users can view their own templates" ON public.email_templates;
+DROP POLICY IF EXISTS "Templates: user can view own templates" ON public.email_templates;
 CREATE POLICY "Users can view templates" ON public.email_templates
   FOR SELECT
   USING (
@@ -247,14 +247,14 @@ CREATE POLICY "Users can view templates" ON public.email_templates
     )
   );
 
-DROP POLICY IF EXISTS "Users can insert their own templates" ON public.email_templates;
+DROP POLICY IF EXISTS "Templates: user can insert templates" ON public.email_templates;
 CREATE POLICY "Users can insert templates" ON public.email_templates
   FOR INSERT
   WITH CHECK (
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can update their own templates" ON public.email_templates;
+DROP POLICY IF EXISTS "Templates: user can update own templates" ON public.email_templates;
 CREATE POLICY "Users can update templates" ON public.email_templates
   FOR UPDATE
   USING (
@@ -267,7 +267,7 @@ CREATE POLICY "Users can update templates" ON public.email_templates
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can delete their own templates" ON public.email_templates;
+DROP POLICY IF EXISTS "Templates: user can delete own templates" ON public.email_templates;
 CREATE POLICY "Users can delete templates" ON public.email_templates
   FOR DELETE
   USING (
@@ -281,7 +281,7 @@ CREATE POLICY "Users can delete templates" ON public.email_templates
   );
 
 -- Update RLS for email_campaigns
-DROP POLICY IF EXISTS "Users can view their own campaigns" ON public.email_campaigns;
+DROP POLICY IF EXISTS "Campaigns: user can view own campaigns" ON public.email_campaigns;
 CREATE POLICY "Users can view campaigns" ON public.email_campaigns
   FOR SELECT
   USING (
@@ -299,14 +299,14 @@ CREATE POLICY "Users can view campaigns" ON public.email_campaigns
     )
   );
 
-DROP POLICY IF EXISTS "Users can insert their own campaigns" ON public.email_campaigns;
+DROP POLICY IF EXISTS "Campaigns: user can insert campaigns" ON public.email_campaigns;
 CREATE POLICY "Users can insert campaigns" ON public.email_campaigns
   FOR INSERT
   WITH CHECK (
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can update their own campaigns" ON public.email_campaigns;
+DROP POLICY IF EXISTS "Campaigns: user can update own campaigns" ON public.email_campaigns;
 CREATE POLICY "Users can update campaigns" ON public.email_campaigns
   FOR UPDATE
   USING (
@@ -319,7 +319,7 @@ CREATE POLICY "Users can update campaigns" ON public.email_campaigns
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can delete their own campaigns" ON public.email_campaigns;
+DROP POLICY IF EXISTS "Campaigns: user can delete own campaigns" ON public.email_campaigns;
 CREATE POLICY "Users can delete campaigns" ON public.email_campaigns
   FOR DELETE
   USING (
@@ -333,7 +333,7 @@ CREATE POLICY "Users can delete campaigns" ON public.email_campaigns
   );
 
 -- Update user_profiles RLS
-DROP POLICY IF EXISTS "Users can view their own profile" ON public.user_profiles;
+DROP POLICY IF EXISTS "Users can view own profile" ON public.user_profiles;
 CREATE POLICY "Users can view profiles" ON public.user_profiles
   FOR SELECT
   USING (
@@ -361,7 +361,7 @@ CREATE POLICY "Users can view profiles" ON public.user_profiles
     user_id = auth.uid()
   );
 
-DROP POLICY IF EXISTS "Users can insert their own profile" ON public.user_profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.user_profiles;
 CREATE POLICY "Users can insert profile" ON public.user_profiles
   FOR INSERT
   WITH CHECK (
@@ -374,7 +374,7 @@ CREATE POLICY "Users can insert profile" ON public.user_profiles
     )
   );
 
-DROP POLICY IF EXISTS "Users can update their own profile" ON public.user_profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.user_profiles;
 CREATE POLICY "Users can update profiles" ON public.user_profiles
   FOR UPDATE
   USING (
