@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, FolderOpen, FileText, Send, Sparkles, Mail } from 'lucide-react'
 import Link from 'next/link'
@@ -6,17 +7,64 @@ import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
+// Create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return null
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false }
+  })
+}
+
 async function getStats() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return null
 
+  // Check if user is super_admin using admin client
+  const adminClient = getAdminClient()
+  let isSuperAdmin = false
+  let userOrgId: string | null = null
+
+  if (adminClient) {
+    const { data: profile } = await adminClient
+      .from('user_profiles')
+      .select('role, organization_id')
+      .eq('user_id', user.id)
+      .single()
+
+    isSuperAdmin = profile?.role === 'super_admin'
+    userOrgId = profile?.organization_id || null
+  }
+
+  // For super_admin, show all data; for others, RLS filters by user/org
+  const client = isSuperAdmin && adminClient ? adminClient : supabase
+
+  // Build queries - for super_admin without org, show all; otherwise filter by org
+  let leadsQuery = client.from('leads').select('id', { count: 'exact', head: true })
+  let groupsQuery = client.from('contact_groups').select('id', { count: 'exact', head: true })
+  let templatesQuery = client.from('email_templates').select('id', { count: 'exact', head: true })
+  let campaignsQuery = client.from('email_campaigns').select('id', { count: 'exact', head: true })
+
+  // If super_admin has an org, filter to that org's data
+  if (isSuperAdmin && userOrgId) {
+    leadsQuery = leadsQuery.eq('organization_id', userOrgId)
+    groupsQuery = groupsQuery.eq('organization_id', userOrgId)
+    templatesQuery = templatesQuery.eq('organization_id', userOrgId)
+    campaignsQuery = campaignsQuery.eq('organization_id', userOrgId)
+  }
+
   const [leads, groups, templates, campaigns] = await Promise.all([
-    supabase.from('leads').select('id', { count: 'exact', head: true }),
-    supabase.from('contact_groups').select('id', { count: 'exact', head: true }),
-    supabase.from('email_templates').select('id', { count: 'exact', head: true }),
-    supabase.from('email_campaigns').select('id', { count: 'exact', head: true }),
+    leadsQuery,
+    groupsQuery,
+    templatesQuery,
+    campaignsQuery,
   ])
 
   return {
