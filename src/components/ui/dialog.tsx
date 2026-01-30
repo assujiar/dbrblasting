@@ -42,15 +42,14 @@ const DialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         // Position & size
-        'fixed z-50 w-[calc(100%-2rem)] sm:w-full max-w-lg',
+        'fixed z-50 w-[calc(100%-2rem)] sm:w-full max-w-lg p-6',
         'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
         'max-h-[85vh] overflow-y-auto',
         // Glass styling
         'rounded-2xl',
-        'bg-white/95 backdrop-blur-xl',
-        'border border-white/60',
+        'bg-white/98 backdrop-blur-xl',
+        'border border-neutral-200/60',
         'shadow-2xl shadow-neutral-900/10',
-        'p-5 sm:p-6',
         // Animation
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
@@ -65,8 +64,7 @@ const DialogContent = React.forwardRef<
       {children}
       <DialogPrimitive.Close
         className={cn(
-          'absolute right-4 top-4',
-          'rounded-xl p-2',
+          'absolute right-4 top-4 p-2 rounded-xl',
           'text-neutral-400 hover:text-neutral-700',
           'hover:bg-neutral-100/80',
           'transition-all duration-200',
@@ -74,7 +72,7 @@ const DialogContent = React.forwardRef<
           'focus:outline-none focus:ring-2 focus:ring-primary-400/40'
         )}
       >
-        <X className="h-4 w-4" />
+        <X className="w-4 h-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
@@ -88,7 +86,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'flex flex-col space-y-2 text-center sm:text-left pr-8 mb-5',
+      'flex flex-col text-center sm:text-left pr-8 mb-5',
       className
     )}
     {...props}
@@ -102,7 +100,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'flex flex-col-reverse gap-3 sm:flex-row sm:justify-end mt-6 pt-4 border-t border-neutral-100',
+      'flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 pt-4 border-t border-neutral-100',
       className
     )}
     {...props}
@@ -117,7 +115,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      'text-lg font-semibold text-neutral-900',
+      'text-lg font-semibold text-neutral-900 mb-2',
       className
     )}
     {...props}
