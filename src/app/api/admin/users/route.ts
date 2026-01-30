@@ -3,19 +3,38 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getAuthContext, requireSuperAdmin } from '@/lib/auth/rbac'
 
+// Helper to create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
+
 // GET - List all users (Super Admin only)
 export async function GET(request: NextRequest) {
   try {
     const context = await getAuthContext()
     requireSuperAdmin(context)
 
-    const supabase = await createClient()
+    // Use admin client to bypass RLS
+    const adminClient = getAdminClient()
+
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
     const organizationId = searchParams.get('organization_id')
     const role = searchParams.get('role')
 
-    let query = supabase
+    let query = adminClient
       .from('user_profiles')
       .select(`
         *,
@@ -103,24 +122,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create admin client with service role key
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !serviceRoleKey) {
-      console.error('Missing Supabase environment variables')
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      )
-    }
-
-    const adminClient = createAdminClient(supabaseUrl, serviceRoleKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    })
+    const adminClient = getAdminClient()
 
     // Check if email already exists
     const { data: existingUsers } = await adminClient

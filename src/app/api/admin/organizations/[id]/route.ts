@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getAuthContext, requireSuperAdmin } from '@/lib/auth/rbac'
+
+// Helper to create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
 
 // GET - Get a single organization (Super Admin only)
 export async function GET(
@@ -12,9 +29,9 @@ export async function GET(
     requireSuperAdmin(context)
 
     const { id } = await params
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('organizations')
       .select('*')
       .eq('id', id)
@@ -25,24 +42,24 @@ export async function GET(
     }
 
     // Get users in this organization
-    const { data: users } = await supabase
+    const { data: users } = await adminClient
       .from('user_profiles')
       .select('*')
       .eq('organization_id', id)
       .order('created_at', { ascending: false })
 
     // Get stats
-    const { count: leadsCount } = await supabase
+    const { count: leadsCount } = await adminClient
       .from('leads')
       .select('*', { count: 'exact', head: true })
       .eq('organization_id', id)
 
-    const { count: templatesCount } = await supabase
+    const { count: templatesCount } = await adminClient
       .from('email_templates')
       .select('*', { count: 'exact', head: true })
       .eq('organization_id', id)
 
-    const { count: campaignsCount } = await supabase
+    const { count: campaignsCount } = await adminClient
       .from('email_campaigns')
       .select('*', { count: 'exact', head: true })
       .eq('organization_id', id)
@@ -78,7 +95,7 @@ export async function PUT(
     requireSuperAdmin(context)
 
     const { id } = await params
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
     const body = await request.json()
 
     const {
@@ -102,7 +119,7 @@ export async function PUT(
 
     // Check if slug is unique (excluding current org)
     if (slug) {
-      const { data: existing } = await supabase
+      const { data: existing } = await adminClient
         .from('organizations')
         .select('id')
         .eq('slug', slug)
@@ -135,7 +152,7 @@ export async function PUT(
     if (smtp_from_email !== undefined) updateData.smtp_from_email = smtp_from_email
     if (is_active !== undefined) updateData.is_active = is_active
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('organizations')
       .update(updateData)
       .eq('id', id)
@@ -166,10 +183,10 @@ export async function DELETE(
     requireSuperAdmin(context)
 
     const { id } = await params
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
 
     // Check if organization has users
-    const { count: userCount } = await supabase
+    const { count: userCount } = await adminClient
       .from('user_profiles')
       .select('*', { count: 'exact', head: true })
       .eq('organization_id', id)
@@ -181,7 +198,7 @@ export async function DELETE(
       )
     }
 
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('organizations')
       .delete()
       .eq('id', id)
