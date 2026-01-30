@@ -50,22 +50,22 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col gap-2">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-4 border-b border-white/10">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shrink-0">
+      <div className="flex min-h-16 items-center gap-3 px-5 py-4 border-b border-white/10">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shrink-0">
           <Mail className="h-5 w-5 text-white" />
         </div>
         <div className="min-w-0">
-          <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent truncate">
+          <h1 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent truncate">
             BlastMail
           </h1>
-          <p className="text-[10px] text-gray-500 -mt-0.5">Email Marketing</p>
+          <p className="text-xs text-gray-500">Email Marketing</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
+      <nav className="flex-1 space-y-1.5 px-4 py-4 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = pathname === item.href ||
             (item.href !== '/app' && pathname.startsWith(item.href))
@@ -76,7 +76,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               href={item.href}
               onClick={onNavigate}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                'flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200',
                 isActive
                   ? 'bg-gradient-to-r from-blue-500/10 to-indigo-500/10 text-blue-700 shadow-sm'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
@@ -88,7 +88,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   isActive ? 'text-blue-600' : 'text-gray-400'
                 )}
               />
-              <span className="truncate">{item.name}</span>
+              <span className="truncate leading-5">{item.name}</span>
               {isActive && (
                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
               )}
@@ -99,9 +99,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* Footer */}
       <div className="p-4 border-t border-gray-100">
-        <div className="rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+        <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
           <p className="text-xs font-medium text-gray-700">Need help?</p>
-          <p className="text-[10px] text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Check our documentation for guides and tips.
           </p>
         </div>
@@ -138,18 +138,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-      {/* Desktop Sidebar - hidden on mobile */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-64 flex-col glass border-r border-white/20">
-        <SidebarContent />
-      </aside>
+    <div className="relative min-h-screen">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20" />
 
       {/* Mobile Drawer */}
       <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
         <DialogPortal>
           <DialogOverlay />
           <DialogPrimitive.Content
-            className="fixed inset-y-0 left-0 z-50 h-full w-72 max-w-[85vw] p-0 rounded-r-2xl glass-strong data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left duration-300 focus:outline-none"
+            className="fixed inset-y-0 left-0 z-[60] h-full w-[18rem] max-w-[85vw] p-0 rounded-r-2xl glass-strong data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left duration-300 focus:outline-none"
           >
             <VisuallyHidden>
               <DialogTitle>Navigation Menu</DialogTitle>
@@ -157,7 +154,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Close button */}
             <button
               onClick={() => setDrawerOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-10"
+              className="absolute top-4 right-4 z-10 rounded-lg p-2 transition-colors hover:bg-gray-100"
             >
               <X className="h-5 w-5 text-gray-500" />
             </button>
@@ -166,66 +163,75 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </DialogPortal>
       </Dialog>
 
-      {/* Topbar */}
-      <header className="fixed top-0 left-0 right-0 md:left-64 z-30 h-16 glass border-b border-white/20">
-        <div className="flex h-full items-center justify-between px-4 sm:px-6">
-          {/* Left: Hamburger on mobile */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setDrawerOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Open menu"
-            >
-              <Menu className="h-5 w-5 text-gray-600" />
-            </button>
-          </div>
+      <div className="min-h-screen md:grid md:grid-cols-[16rem_1fr]">
+        {/* Desktop Sidebar - hidden on mobile */}
+        <aside className="hidden md:flex sticky top-0 z-30 h-screen flex-col glass border-r border-white/20">
+          <SidebarContent />
+        </aside>
 
-          {/* Right: User menu */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 px-2 sm:px-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white font-medium text-sm shrink-0">
-                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  <span className="hidden sm:block text-sm text-gray-700 max-w-[150px] truncate">
-                    {user?.email || 'User'}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Account</p>
-                    <p className="text-xs leading-none text-gray-500 truncate">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/app/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
+        <div className="flex min-h-screen min-w-0 flex-col">
+          {/* Topbar */}
+          <header className="sticky top-0 z-30 h-16 glass border-b border-white/20">
+            <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
+              {/* Left: Hamburger on mobile */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  className="md:hidden -ml-2 rounded-xl p-2 transition-colors hover:bg-gray-100"
+                  aria-label="Open menu"
+                >
+                  <Menu className="h-5 w-5 text-gray-600" />
+                </button>
+              </div>
 
-      {/* Main content */}
-      <main className="pt-16 md:pl-64 min-h-screen">
-        <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
-          {children}
+              {/* Right: User menu */}
+              <div className="flex items-center gap-2 sm:gap-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2 px-2 sm:px-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white font-medium text-sm shrink-0">
+                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                      <span className="hidden sm:block text-sm text-gray-700 max-w-[160px] truncate">
+                        {user?.email || 'User'}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">Account</p>
+                        <p className="text-xs leading-none text-gray-500 truncate">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/app/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          </header>
+
+          {/* Main content */}
+          <main className="flex-1 min-w-0">
+            <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
+              {children}
+            </div>
+          </main>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
