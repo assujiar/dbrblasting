@@ -10,17 +10,15 @@ import { toast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Mail, Lock, User, ArrowRight } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Sparkles } from 'lucide-react'
 import { isValidEmail, cn } from '@/lib/utils'
 
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
   const [isLoading, setIsLoading] = useState(false)
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,35 +42,6 @@ export default function LoginPage() {
     router.refresh()
   }
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) {
-      toast({ title: 'Name required', description: 'Please enter your name.', variant: 'error' })
-      return
-    }
-    if (!isValidEmail(email)) {
-      toast({ title: 'Invalid email', description: 'Please enter a valid email address.', variant: 'error' })
-      return
-    }
-    if (password.length < 6) {
-      toast({ title: 'Invalid password', description: 'Password must be at least 6 characters.', variant: 'error' })
-      return
-    }
-    setIsLoading(true)
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
-    })
-    if (error) {
-      toast({ title: 'Sign up failed', description: error.message, variant: 'error' })
-      setIsLoading(false)
-      return
-    }
-    toast({ title: 'Account created!', description: 'Please check your email to verify your account.', variant: 'success' })
-    setIsLoading(false)
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative">
       {/* Animated background */}
@@ -82,16 +51,19 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8 animate-slide-up">
           <div className={cn(
-            'inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4',
-            'bg-gradient-to-br from-primary-600 to-primary-700',
-            'shadow-lg shadow-primary-500/30'
+            'inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4',
+            'bg-gradient-to-br from-primary-500 via-primary-600 to-accent-600',
+            'shadow-xl shadow-primary-500/40'
           )}>
-            <Mail className="h-7 w-7 text-white" />
+            <Mail className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-neutral-900">
             BlastMail
           </h1>
-          <p className="text-sm text-neutral-500 mt-1">Email marketing made simple</p>
+          <p className="text-sm text-neutral-500 mt-1 flex items-center justify-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-primary-500" />
+            Email marketing made simple
+          </p>
         </div>
 
         {/* Card */}
@@ -101,54 +73,14 @@ export default function LoginPage() {
           'border border-white/60',
           'shadow-xl shadow-neutral-900/10'
         )}>
-          {/* Tabs */}
-          <div className="flex border-b border-neutral-100">
-            <button
-              type="button"
-              onClick={() => setMode('login')}
-              className={cn(
-                'flex-1 py-3.5 text-sm font-medium transition-all duration-200 border-b-2',
-                mode === 'login'
-                  ? 'text-primary-700 border-primary-600'
-                  : 'text-neutral-400 border-transparent hover:text-neutral-600'
-              )}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('signup')}
-              className={cn(
-                'flex-1 py-3.5 text-sm font-medium transition-all duration-200 border-b-2',
-                mode === 'signup'
-                  ? 'text-primary-700 border-primary-600'
-                  : 'text-neutral-400 border-transparent hover:text-neutral-600'
-              )}
-            >
-              Sign Up
-            </button>
+          {/* Header */}
+          <div className="px-6 py-4 border-b border-neutral-100 bg-gradient-to-r from-primary-50/50 to-accent-50/50">
+            <h2 className="text-lg font-semibold text-neutral-900">Welcome Back</h2>
+            <p className="text-sm text-neutral-500">Sign in to your account to continue</p>
           </div>
 
           {/* Form */}
-          <form onSubmit={mode === 'login' ? handleLogin : handleSignUp} className="p-5 sm:p-6 space-y-4">
-            {mode === 'signup' && (
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    disabled={isLoading}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-            )}
-
+          <form onSubmit={handleLogin} className="p-5 sm:p-6 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <div className="relative">
@@ -168,21 +100,19 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                {mode === 'login' && (
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm text-primary-600 hover:text-primary-700 hover:underline transition-colors"
-                  >
-                    Forgot?
-                  </Link>
-                )}
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary-600 hover:text-primary-700 hover:underline transition-colors"
+                >
+                  Forgot password?
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
                 <Input
                   id="password"
                   type="password"
-                  placeholder={mode === 'signup' ? 'Min. 6 characters' : 'Enter password'}
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
@@ -191,8 +121,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" loading={isLoading} className="w-full">
-              {mode === 'login' ? 'Sign In' : 'Create Account'}
+            <Button type="submit" loading={isLoading} className="w-full mt-2">
+              Sign In
               <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
