@@ -373,6 +373,7 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
             <DialogTitle>Campaign Recipients</DialogTitle>
             <DialogDescription>
               Sent on {selectedCampaign && formatDate(selectedCampaign.created_at)}
+              {' • '}Click on a recipient to view details
             </DialogDescription>
           </DialogHeader>
           <div className="flex-1 overflow-auto">
@@ -381,20 +382,26 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
                 <TableRow>
                   <TableHead className="w-12">No</TableHead>
                   <TableHead>Contact Name</TableHead>
-                  <TableHead>Company</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Sent At</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {selectedCampaign?.recipients
                   .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                   .map((recipient, index) => (
-                    <TableRow key={recipient.id}>
+                    <TableRow
+                      key={recipient.id}
+                      className={cn(
+                        'transition-colors duration-150',
+                        recipient.lead_id && 'cursor-pointer hover:bg-primary-50/50'
+                      )}
+                      onClick={() => recipient.lead_id && router.push(`/app/leads/${recipient.lead_id}`)}
+                    >
                       <TableCell className="text-neutral-500">{index + 1}</TableCell>
                       <TableCell className="font-medium">{recipient.to_name}</TableCell>
-                      <TableCell className="text-neutral-500">-</TableCell>
                       <TableCell className="text-neutral-500">{recipient.to_email}</TableCell>
                       <TableCell className="text-neutral-500">
                         {recipient.sent_at ? formatDate(recipient.sent_at) : '-'}
@@ -415,10 +422,21 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
                           {recipient.status}
                         </Badge>
                       </TableCell>
+                      <TableCell>
+                        {recipient.lead_id && (
+                          <ChevronRight className="h-4 w-4 text-neutral-400" />
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
               </TableBody>
             </Table>
+          </div>
+          <div className="flex justify-end pt-4 border-t">
+            <Button variant="outline" onClick={() => router.push(`/app/campaigns/${selectedCampaign?.id}`)}>
+              View Campaign Details
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
