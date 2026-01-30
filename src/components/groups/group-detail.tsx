@@ -185,43 +185,70 @@ export function GroupDetail({ group, onClose, onEdit, onRefresh }: GroupDetailPr
 
           <div className="mt-4">
             {group.members?.length > 0 ? (
-              <div className="border rounded-xl overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead className="w-[60px]"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {group.members.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell className="font-medium">
-                          {member.lead?.name || 'Unknown'}
-                        </TableCell>
-                        <TableCell>{member.lead?.email || '-'}</TableCell>
-                        <TableCell>{member.lead?.company || '-'}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => handleRemoveMember(member.lead?.id)}
-                            disabled={removingMemberId === member.lead?.id}
-                          >
-                            {removingMemberId === member.lead?.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <X className="h-4 w-4 text-gray-400 hover:text-red-500" />
-                            )}
-                          </Button>
-                        </TableCell>
+              <>
+                {/* Mobile Member Cards */}
+                <div className="space-y-2 sm:hidden max-h-[300px] overflow-y-auto">
+                  {group.members.map((member) => (
+                    <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 truncate">{member.lead?.name || 'Unknown'}</p>
+                        <p className="text-sm text-gray-500 truncate">{member.lead?.email || '-'}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => handleRemoveMember(member.lead?.id)}
+                        disabled={removingMemberId === member.lead?.id}
+                      >
+                        {removingMemberId === member.lead?.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <X className="h-4 w-4 text-gray-400 hover:text-red-500" />
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Table */}
+                <div className="hidden sm:block border rounded-xl overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Company</TableHead>
+                        <TableHead className="w-[60px]"></TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {group.members.map((member) => (
+                        <TableRow key={member.id}>
+                          <TableCell className="font-medium">
+                            {member.lead?.name || 'Unknown'}
+                          </TableCell>
+                          <TableCell>{member.lead?.email || '-'}</TableCell>
+                          <TableCell>{member.lead?.company || '-'}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleRemoveMember(member.lead?.id)}
+                              disabled={removingMemberId === member.lead?.id}
+                            >
+                              {removingMemberId === member.lead?.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <X className="h-4 w-4 text-gray-400 hover:text-red-500" />
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="text-center py-8 text-gray-500">
                 No members in this group yet
