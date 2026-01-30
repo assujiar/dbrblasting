@@ -5,20 +5,41 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { toast } from '@/components/ui/use-toast'
-import { User, Building2, Briefcase, Phone, Mail, Loader2, Save } from 'lucide-react'
+import { User, Building2, Briefcase, Phone, Mail, Loader2, Save, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { UserProfile } from '@/types/database'
+import type { UserRole } from '@/types/database'
+
+interface ProfileData {
+  id?: string
+  user_id: string
+  full_name: string
+  email: string
+  phone: string
+  position: string
+  company: string
+  role: UserRole
+  organization: {
+    id: string
+    name: string
+    slug: string
+    is_active: boolean
+  } | null
+}
 
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [profile, setProfile] = useState<Partial<UserProfile>>({
+  const [profile, setProfile] = useState<ProfileData>({
+    user_id: '',
     full_name: '',
     email: '',
     phone: '',
     position: '',
     company: '',
+    role: 'user',
+    organization: null,
   })
 
   const fetchProfile = useCallback(async () => {
@@ -49,7 +70,13 @@ export default function ProfilePage() {
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile),
+        body: JSON.stringify({
+          full_name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          position: profile.position,
+          company: profile.company,
+        }),
       })
 
       const result = await response.json()
@@ -98,6 +125,17 @@ export default function ProfilePage() {
         </div>
       </div>
     )
+  }
+
+  const getRoleBadge = (role: UserRole) => {
+    switch (role) {
+      case 'super_admin':
+        return <Badge variant="error">Super Admin</Badge>
+      case 'org_admin':
+        return <Badge variant="warning">Org Admin</Badge>
+      default:
+        return <Badge variant="neutral">User</Badge>
+    }
   }
 
   return (
@@ -221,55 +259,102 @@ export default function ProfilePage() {
                     />
                   </div>
                 </div>
-
-                <div className="pt-2">
-                  <Button type="submit" loading={isSaving} className="w-full sm:w-auto">
-                    <Save className="h-4 w-4" />
-                    Save Profile
-                  </Button>
-                </div>
               </CardContent>
             </Card>
 
-            {/* Signature Preview */}
-            <Card className="w-full max-w-2xl animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-100 to-accent-50">
-                    <Mail className="h-4 w-4 text-accent-600" />
+            <div className="space-y-6">
+              {/* Signature Preview */}
+              <Card className="w-full max-w-2xl animate-slide-up" style={{ animationDelay: '100ms' }}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-100 to-accent-50">
+                      <Mail className="h-4 w-4 text-accent-600" />
+                    </div>
+                    Email Signature Preview
+                  </CardTitle>
+                  <CardDescription>
+                    This is how your signature will appear in emails. Use placeholders like{' '}
+                    <code className="text-xs bg-neutral-100 px-1 py-0.5 rounded">{'{{sender_name}}'}</code>,{' '}
+                    <code className="text-xs bg-neutral-100 px-1 py-0.5 rounded">{'{{sender_email}}'}</code>{' '}
+                    in your templates.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {profile.full_name ? (
+                    <div className={cn(
+                      'rounded-xl p-4',
+                      'bg-gradient-to-br from-neutral-50 to-neutral-100/50',
+                      'border border-neutral-200'
+                    )}>
+                      <p className="text-sm text-neutral-500 mb-2 font-medium">Signature:</p>
+                      {signaturePreview()}
+                    </div>
+                  ) : (
+                    <div className={cn(
+                      'text-center py-10 rounded-xl',
+                      'bg-gradient-to-br from-neutral-50 to-neutral-100/50',
+                      'border border-neutral-200'
+                    )}>
+                      <p className="text-neutral-400">
+                        Fill in your profile to see the signature preview
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Role & Organization Info */}
+              <Card className="w-full max-w-2xl animate-slide-up" style={{ animationDelay: '150ms' }}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-success-100 to-success-50">
+                      <Shield className="h-4 w-4 text-success-600" />
+                    </div>
+                    Role & Organization
+                  </CardTitle>
+                  <CardDescription>
+                    Your role and organization assignment (managed by administrators)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+                    <div>
+                      <p className="text-sm font-medium text-neutral-700">Role</p>
+                      <p className="text-xs text-neutral-500 mt-0.5">Your access level in the system</p>
+                    </div>
+                    {getRoleBadge(profile.role)}
                   </div>
-                  Email Signature Preview
-                </CardTitle>
-                <CardDescription>
-                  This is how your signature will appear in emails. Use placeholders like{' '}
-                  <code className="text-xs bg-neutral-100 px-1 py-0.5 rounded">{'{{sender_name}}'}</code>,{' '}
-                  <code className="text-xs bg-neutral-100 px-1 py-0.5 rounded">{'{{sender_email}}'}</code>{' '}
-                  in your templates.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {profile.full_name ? (
-                  <div className={cn(
-                    'rounded-xl p-4',
-                    'bg-gradient-to-br from-neutral-50 to-neutral-100/50',
-                    'border border-neutral-200'
-                  )}>
-                    <p className="text-sm text-neutral-500 mb-2 font-medium">Signature:</p>
-                    {signaturePreview()}
+
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+                    <div>
+                      <p className="text-sm font-medium text-neutral-700">Organization</p>
+                      <p className="text-xs text-neutral-500 mt-0.5">Your assigned organization</p>
+                    </div>
+                    {profile.organization ? (
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-neutral-900">{profile.organization.name}</p>
+                        <p className="text-xs text-neutral-500">@{profile.organization.slug}</p>
+                      </div>
+                    ) : (
+                      <Badge variant="neutral">No Organization</Badge>
+                    )}
                   </div>
-                ) : (
-                  <div className={cn(
-                    'text-center py-10 rounded-xl',
-                    'bg-gradient-to-br from-neutral-50 to-neutral-100/50',
-                    'border border-neutral-200'
-                  )}>
-                    <p className="text-neutral-400">
-                      Fill in your profile to see the signature preview
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+
+                  <p className="text-xs text-neutral-500 text-center">
+                    Contact your Super Admin to change your role or organization assignment.
+                    SMTP settings are managed at the organization level.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end pt-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <Button type="submit" loading={isSaving} size="lg">
+              <Save className="h-4 w-4" />
+              Save Profile
+            </Button>
           </div>
         </form>
       )}

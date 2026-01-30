@@ -43,9 +43,11 @@ import {
   ChevronLeft,
   PanelLeftClose,
   PanelLeft,
+  Shield,
 } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import type { UserRole } from '@/types/database'
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
@@ -60,12 +62,15 @@ function SidebarContent({
   onNavigate,
   collapsed = false,
   onToggleCollapse,
+  userRole,
 }: {
   onNavigate?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
+  userRole?: UserRole
 }) {
   const pathname = usePathname()
+  const isSuperAdmin = userRole === 'super_admin'
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -179,6 +184,82 @@ function SidebarContent({
 
               return linkContent
             })}
+
+            {/* Admin Link for Super Admins */}
+            {isSuperAdmin && (
+              <>
+                <div className={cn(
+                  'my-2 border-t border-neutral-100',
+                  collapsed ? 'mx-1' : 'mx-0'
+                )} />
+                {(() => {
+                  const isActive = pathname.startsWith('/admin')
+                  const linkContent = (
+                    <Link
+                      href="/admin"
+                      onClick={onNavigate}
+                      className={cn(
+                        'group relative flex items-center rounded-xl text-sm font-medium transition-all duration-200',
+                        collapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3',
+                        isActive
+                          ? 'bg-error-50 text-error-700'
+                          : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                      )}
+                    >
+                      {isActive && !collapsed && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-sm bg-gradient-to-b from-error-500 to-error-600" />
+                      )}
+                      <div
+                        className={cn(
+                          'flex items-center justify-center rounded-lg transition-all duration-200',
+                          collapsed ? 'w-9 h-9' : 'w-9 h-9',
+                          isActive
+                            ? 'bg-error-100'
+                            : 'bg-neutral-100 group-hover:bg-neutral-200'
+                        )}
+                      >
+                        <Shield
+                          className={cn(
+                            'w-[18px] h-[18px] transition-colors duration-200',
+                            isActive
+                              ? 'text-error-600'
+                              : 'text-neutral-500 group-hover:text-neutral-700'
+                          )}
+                        />
+                      </div>
+                      {!collapsed && (
+                        <>
+                          <span className="flex-1">Admin Panel</span>
+                          <ChevronRight
+                            className={cn(
+                              'w-4 h-4 transition-all duration-200',
+                              isActive
+                                ? 'text-error-400 opacity-100'
+                                : 'text-neutral-300 opacity-0 group-hover:opacity-100'
+                            )}
+                          />
+                        </>
+                      )}
+                    </Link>
+                  )
+
+                  if (collapsed) {
+                    return (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {linkContent}
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={10}>
+                          Admin Panel
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  }
+
+                  return linkContent
+                })()}
+              </>
+            )}
           </div>
         </nav>
 
@@ -244,6 +325,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [userRole, setUserRole] = useState<UserRole | undefined>(undefined)
 
   // Load collapsed state from localStorage
   useEffect(() => {
@@ -270,9 +352,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         data: { user },
       } = await supabase.auth.getUser()
       setUser(user)
+
+      // Fetch user profile to get role
+      if (user) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single()
+
+        if (profile?.role) {
+          setUserRole(profile.role as UserRole)
+        }
+      }
     }
     getUser()
-  }, [supabase.auth])
+  }, [supabase])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -310,7 +405,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <X className="w-5 h-5" />
             </button>
-            <SidebarContent onNavigate={() => setDrawerOpen(false)} />
+            <SidebarContent onNavigate={() => setDrawerOpen(false)} userRole={userRole} />
           </DialogPrimitive.Content>
         </DialogPortal>
       </Dialog>
@@ -324,7 +419,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
         style={{ width: sidebarWidth }}
       >
-        <SidebarContent collapsed={collapsed} onToggleCollapse={toggleCollapse} />
+        <SidebarContent collapsed={collapsed} onToggleCollapse={toggleCollapse} userRole={userRole} />
       </aside>
 
       {/* Main content wrapper - Offset by sidebar width on desktop */}
