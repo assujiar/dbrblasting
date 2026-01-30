@@ -151,8 +151,17 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
     setIsTesting(true)
     setSmtpTestResult(null)
     try {
+      // Send current form data to test (allows testing before saving)
       const response = await fetch(`/api/admin/organizations/${id}/test-smtp`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          smtp_host: formData.smtp_host,
+          smtp_port: formData.smtp_port,
+          smtp_user: formData.smtp_user,
+          smtp_pass: formData.smtp_pass,
+          smtp_secure: formData.smtp_secure,
+        }),
       })
 
       const result = await response.json()
