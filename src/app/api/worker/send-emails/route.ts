@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     if (userProfile?.organization_id) {
       const { data: organization } = await supabase
         .from('organizations')
-        .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure, smtp_from_name, smtp_from_email')
+        .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure, smtp_from_name, smtp_from_email, smtp_reply_to')
         .eq('id', userProfile.organization_id)
         .eq('is_active', true)
         .single()
@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
           smtp_secure: organization.smtp_secure || false,
           smtp_from_name: organization.smtp_from_name,
           smtp_from_email: organization.smtp_from_email,
+          smtp_reply_to: organization.smtp_reply_to,
         }
       }
     }
