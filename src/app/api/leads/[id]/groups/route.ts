@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getClientForUser } from '@/lib/supabase/admin'
 
 export async function GET(
   request: NextRequest,
@@ -7,15 +7,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Get all groups this lead belongs to
-    const { data: memberships, error: memberError } = await supabase
+    const { data: memberships, error: memberError } = await client
       .from('contact_group_members')
       .select('group_id')
       .eq('lead_id', id)
@@ -31,7 +30,7 @@ export async function GET(
 
     const groupIds = memberships.map(m => m.group_id)
 
-    const { data: groups, error: groupsError } = await supabase
+    const { data: groups, error: groupsError } = await client
       .from('contact_groups')
       .select('*')
       .in('id', groupIds)

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getClientForUser } from '@/lib/supabase/admin'
 import { isValidEmail } from '@/lib/utils'
 import * as XLSX from 'xlsx'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user, profile } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -98,9 +97,10 @@ export async function POST(request: NextRequest) {
       email: lead.email,
       company: lead.company,
       phone: lead.phone,
+      organization_id: profile?.organization_id || null,
     }))
 
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('leads')
       .upsert(insertData, {
         onConflict: 'user_id,email',
