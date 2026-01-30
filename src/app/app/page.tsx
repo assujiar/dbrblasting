@@ -79,10 +79,10 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 stagger-children">
         {statCards.map((stat) => (
           <Link key={stat.title} href={stat.href}>
-            <Card className="hover:shadow-lg transition-all duration-300 active:scale-[0.98] sm:hover:scale-[1.02] cursor-pointer h-full">
+            <Card className="card-hover cursor-pointer h-full border-gray-200/60 bg-white/80 backdrop-blur-sm">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="order-2 sm:order-1">
@@ -90,7 +90,7 @@ export default async function DashboardPage() {
                     <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-0.5 sm:mt-1">{stat.value}</p>
                     <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1 hidden sm:block">{stat.description}</p>
                   </div>
-                  <div className={`order-1 sm:order-2 p-2.5 sm:p-3 rounded-xl ${stat.bgColor} self-start`}>
+                  <div className={`order-1 sm:order-2 p-2.5 sm:p-3 rounded-xl ${stat.bgColor} self-start transition-transform duration-300 group-hover:scale-110`}>
                     <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.iconColor}`} />
                   </div>
                 </div>
