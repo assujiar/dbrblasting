@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getAuthContext, requireSuperAdmin } from '@/lib/auth/rbac'
+
+// Helper to create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
 
 // GET - List all organizations (Super Admin only)
 export async function GET(request: NextRequest) {
@@ -8,17 +25,14 @@ export async function GET(request: NextRequest) {
     const context = await getAuthContext()
     requireSuperAdmin(context)
 
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
     const isActive = searchParams.get('is_active')
 
-    let query = supabase
+    let query = adminClient
       .from('organizations')
-      .select(`
-        *,
-        users:user_profiles(count)
-      `)
+      .select('*')
       .order('created_at', { ascending: false })
 
     if (search) {
@@ -38,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Get user counts for each organization
     const orgsWithCounts = await Promise.all(
       (data || []).map(async (org) => {
-        const { count } = await supabase
+        const { count } = await adminClient
           .from('user_profiles')
           .select('*', { count: 'exact', head: true })
           .eq('organization_id', org.id)
@@ -66,7 +80,7 @@ export async function POST(request: NextRequest) {
     const context = await getAuthContext()
     requireSuperAdmin(context)
 
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
     const body = await request.json()
 
     const {
@@ -92,7 +106,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if slug is unique
-    const { data: existing } = await supabase
+    const { data: existing } = await adminClient
       .from('organizations')
       .select('id')
       .eq('slug', slug)
@@ -105,7 +119,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('organizations')
       .insert({
         name,

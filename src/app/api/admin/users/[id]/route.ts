@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getAuthContext, requireSuperAdmin } from '@/lib/auth/rbac'
+
+// Helper to create admin client that bypasses RLS
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
 
 // GET - Get a single user (Super Admin only)
 export async function GET(
@@ -12,9 +29,9 @@ export async function GET(
     requireSuperAdmin(context)
 
     const { id } = await params
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('user_profiles')
       .select(`
         *,
@@ -30,17 +47,17 @@ export async function GET(
     // Get user's activity stats
     const userId = data.user_id
 
-    const { count: leadsCount } = await supabase
+    const { count: leadsCount } = await adminClient
       .from('leads')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
 
-    const { count: templatesCount } = await supabase
+    const { count: templatesCount } = await adminClient
       .from('email_templates')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
 
-    const { count: campaignsCount } = await supabase
+    const { count: campaignsCount } = await adminClient
       .from('email_campaigns')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
@@ -74,7 +91,7 @@ export async function PUT(
     requireSuperAdmin(context)
 
     const { id } = await params
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
     const body = await request.json()
 
     const {
@@ -100,7 +117,7 @@ export async function PUT(
     if (role !== undefined) updateData.role = role
     if (organization_id !== undefined) updateData.organization_id = organization_id
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('user_profiles')
       .update(updateData)
       .eq('id', id)
@@ -124,8 +141,7 @@ export async function PUT(
   }
 }
 
-// DELETE - Remove a user's profile (Super Admin only)
-// Note: This doesn't delete the auth user, just the profile
+// DELETE - Remove a user's profile and auth user (Super Admin only)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -135,29 +151,43 @@ export async function DELETE(
     requireSuperAdmin(context)
 
     const { id } = await params
-    const supabase = await createClient()
+    const adminClient = getAdminClient()
 
-    // Don't allow deleting super admin
-    const { data: profile } = await supabase
+    // Get user profile to check role and get user_id
+    const { data: profile } = await adminClient
       .from('user_profiles')
-      .select('role')
+      .select('role, user_id')
       .eq('id', id)
       .single()
 
-    if (profile?.role === 'super_admin') {
+    if (!profile) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // Don't allow deleting super admin
+    if (profile.role === 'super_admin') {
       return NextResponse.json(
         { error: 'Cannot delete super admin user' },
         { status: 400 }
       )
     }
 
-    const { error } = await supabase
+    // Delete user profile first
+    const { error: profileError } = await adminClient
       .from('user_profiles')
       .delete()
       .eq('id', id)
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (profileError) {
+      return NextResponse.json({ error: profileError.message }, { status: 500 })
+    }
+
+    // Also delete auth user
+    const { error: authError } = await adminClient.auth.admin.deleteUser(profile.user_id)
+
+    if (authError) {
+      console.error('Failed to delete auth user:', authError)
+      // Profile already deleted, log the error but return success
     }
 
     return NextResponse.json({ success: true })
