@@ -50,22 +50,22 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col gap-2">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-4 border-b border-white/10">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shrink-0">
+      <div className="flex min-h-16 items-center gap-4 px-6 py-4 border-b border-white/10">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shrink-0">
           <Mail className="h-5 w-5 text-white" />
         </div>
         <div className="min-w-0">
-          <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent truncate">
+          <h1 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent truncate">
             BlastMail
           </h1>
-          <p className="text-[10px] text-gray-500 -mt-0.5">Email Marketing</p>
+          <p className="text-xs text-gray-500">Email Marketing</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
+      <nav className="flex-1 space-y-2 px-5 py-4 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = pathname === item.href ||
             (item.href !== '/app' && pathname.startsWith(item.href))
@@ -76,7 +76,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               href={item.href}
               onClick={onNavigate}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                'flex items-center gap-4 rounded-2xl px-4 py-4 text-sm font-medium transition-all duration-200',
                 isActive
                   ? 'bg-gradient-to-r from-blue-500/10 to-indigo-500/10 text-blue-700 shadow-sm'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
@@ -88,7 +88,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   isActive ? 'text-blue-600' : 'text-gray-400'
                 )}
               />
-              <span className="truncate">{item.name}</span>
+              <span className="truncate leading-6">{item.name}</span>
               {isActive && (
                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
               )}
@@ -98,10 +98,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-100">
-        <div className="rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+      <div className="p-5 border-t border-gray-100">
+        <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-5">
           <p className="text-xs font-medium text-gray-700">Need help?</p>
-          <p className="text-[10px] text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Check our documentation for guides and tips.
           </p>
         </div>
