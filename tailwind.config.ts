@@ -1,11 +1,9 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
-  darkMode: false,
+  darkMode: 'class',
   content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './lib/**/*.{ts,tsx}'
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
@@ -34,6 +32,7 @@ const config: Config = {
       boxShadow: {
         card: '0 4px 20px rgba(0, 0, 0, 0.06)',
         button: '0 2px 4px rgba(0, 0, 0, 0.05)',
+        glass: 'var(--shadow-glass)',
       },
       backdropBlur: {
         DEFAULT: 'var(--blur)',
