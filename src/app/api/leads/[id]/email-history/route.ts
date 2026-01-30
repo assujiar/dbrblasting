@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getClientForUser } from '@/lib/supabase/admin'
 
 export async function GET(
   request: NextRequest,
@@ -7,15 +7,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Get all email campaign recipients for this lead
-    const { data: recipients, error: recipientError } = await supabase
+    const { data: recipients, error: recipientError } = await client
       .from('email_campaign_recipients')
       .select(`
         id,

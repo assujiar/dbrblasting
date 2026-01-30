@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getClientForUser } from '@/lib/supabase/admin'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -15,7 +14,7 @@ export async function GET(
 
     const { id } = await params
 
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('email_campaigns')
       .select(`
         *,
@@ -41,8 +40,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -50,7 +48,7 @@ export async function DELETE(
 
     const { id } = await params
 
-    const { error } = await supabase
+    const { error } = await client
       .from('email_campaigns')
       .delete()
       .eq('id', id)

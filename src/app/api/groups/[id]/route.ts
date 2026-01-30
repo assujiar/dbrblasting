@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getClientForUser } from '@/lib/supabase/admin'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -15,7 +14,7 @@ export async function GET(
 
     const { id } = await params
 
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('contact_groups')
       .select(`
         *,
@@ -43,8 +42,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -58,7 +56,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('contact_groups')
       .update({ name: name.trim() })
       .eq('id', id)
@@ -81,8 +79,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -90,7 +87,7 @@ export async function DELETE(
 
     const { id } = await params
 
-    const { error } = await supabase
+    const { error } = await client
       .from('contact_groups')
       .delete()
       .eq('id', id)

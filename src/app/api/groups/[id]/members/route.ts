@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getClientForUser } from '@/lib/supabase/admin'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user, profile } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -25,9 +24,10 @@ export async function POST(
       user_id: user.id,
       group_id: groupId,
       lead_id: leadId,
+      organization_id: profile?.organization_id || null,
     }))
 
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('contact_group_members')
       .upsert(members, { onConflict: 'user_id,group_id,lead_id' })
       .select()
@@ -48,8 +48,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -63,7 +62,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Lead ID is required' }, { status: 400 })
     }
 
-    const { error } = await supabase
+    const { error } = await client
       .from('contact_group_members')
       .delete()
       .eq('group_id', groupId)

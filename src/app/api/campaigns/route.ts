@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getClientForUser } from '@/lib/supabase/admin'
 import { generateCampaignName } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -16,7 +15,7 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('date_from')
     const dateTo = searchParams.get('date_to')
 
-    let query = supabase
+    let query = client
       .from('email_campaigns')
       .select(`
         *,
@@ -79,8 +78,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { client, user, profile } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -94,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get template
-    const { data: template, error: templateError } = await supabase
+    const { data: template, error: templateError } = await client
       .from('email_templates')
       .select('*')
       .eq('id', templateId)
@@ -109,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     // Get leads from leadIds
     if (leadIds?.length > 0) {
-      const { data: leads } = await supabase
+      const { data: leads } = await client
         .from('leads')
         .select('id, name, email')
         .in('id', leadIds)
@@ -121,14 +119,14 @@ export async function POST(request: NextRequest) {
 
     // Get leads from groups
     if (groupIds?.length > 0) {
-      const { data: groupMembers } = await supabase
+      const { data: groupMembers } = await client
         .from('contact_group_members')
         .select('lead_id')
         .in('group_id', groupIds)
 
       if (groupMembers && groupMembers.length > 0) {
         const leadIdsFromGroups = (groupMembers as { lead_id: string }[]).map((m) => m.lead_id)
-        const { data: groupLeadsData } = await supabase
+        const { data: groupLeadsData } = await client
           .from('leads')
           .select('id, name, email')
           .in('id', leadIdsFromGroups)
@@ -149,13 +147,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create campaign
-    const { data: campaign, error: campaignError } = await supabase
+    const { data: campaign, error: campaignError } = await client
       .from('email_campaigns')
       .insert({
         user_id: user.id,
         template_id: templateId,
         name: generateCampaignName(template.name),
         status: 'running',
+        organization_id: profile?.organization_id || null,
       })
       .select()
       .single()
@@ -172,15 +171,16 @@ export async function POST(request: NextRequest) {
       to_email: lead.email.toLowerCase(),
       to_name: lead.name,
       status: 'pending',
+      organization_id: profile?.organization_id || null,
     }))
 
-    const { error: recipientsError } = await supabase
+    const { error: recipientsError } = await client
       .from('email_campaign_recipients')
       .insert(recipients)
 
     if (recipientsError) {
       // Rollback campaign
-      await supabase.from('email_campaigns').delete().eq('id', campaign.id)
+      await client.from('email_campaigns').delete().eq('id', campaign.id)
       return NextResponse.json({ error: recipientsError.message }, { status: 500 })
     }
 
