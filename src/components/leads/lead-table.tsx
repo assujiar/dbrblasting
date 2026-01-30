@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
 import { MoreHorizontal, Pencil, Trash2, Mail, Phone, Building2 } from 'lucide-react'
-import { formatDateShort } from '@/lib/utils'
+import { formatDateShort, cn } from '@/lib/utils'
 import type { Lead } from '@/types/database'
 
 interface LeadTableProps {
@@ -77,29 +77,29 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
       {/* Mobile Card View */}
       <div className="space-y-3 md:hidden">
         {leads.map((lead) => (
-          <Card key={lead.id} className="p-4">
+          <Card key={lead.id} hover className="p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-gray-900 truncate">{lead.name}</h3>
+                <h3 className="font-semibold text-neutral-900 truncate">{lead.name}</h3>
                 <div className="mt-2 space-y-1.5">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Mail className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                  <div className="flex items-center gap-2 text-sm text-neutral-600">
+                    <Mail className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
                     <span className="truncate">{lead.email}</span>
                   </div>
                   {lead.company && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                    <div className="flex items-center gap-2 text-sm text-neutral-600">
+                      <Building2 className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
                       <span className="truncate">{lead.company}</span>
                     </div>
                   )}
                   {lead.phone && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Phone className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                    <div className="flex items-center gap-2 text-sm text-neutral-600">
+                      <Phone className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
                       <span>{lead.phone}</span>
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-400 mt-2">{formatDateShort(lead.created_at)}</p>
+                <p className="text-xs text-neutral-400 mt-2">{formatDateShort(lead.created_at)}</p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -114,7 +114,7 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setDeleteId(lead.id)}
-                    className="text-red-600 focus:text-red-600"
+                    className="text-error-600 focus:text-error-600 focus:bg-error-50"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete
@@ -143,34 +143,34 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
             <TableBody>
               {leads.map((lead) => (
                 <TableRow key={lead.id}>
-                  <TableCell className="font-medium">{lead.name}</TableCell>
+                  <TableCell className="font-medium text-neutral-900">{lead.name}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Mail className="h-3.5 w-3.5 text-gray-400" />
+                    <div className="flex items-center gap-2 text-neutral-600">
+                      <Mail className="h-3.5 w-3.5 text-neutral-400" />
                       {lead.email}
                     </div>
                   </TableCell>
                   <TableCell>
                     {lead.company ? (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Building2 className="h-3.5 w-3.5 text-gray-400" />
+                      <div className="flex items-center gap-2 text-neutral-600">
+                        <Building2 className="h-3.5 w-3.5 text-neutral-400" />
                         {lead.company}
                       </div>
                     ) : (
-                      <span className="text-gray-400">-</span>
+                      <span className="text-neutral-400">-</span>
                     )}
                   </TableCell>
                   <TableCell>
                     {lead.phone ? (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Phone className="h-3.5 w-3.5 text-gray-400" />
+                      <div className="flex items-center gap-2 text-neutral-600">
+                        <Phone className="h-3.5 w-3.5 text-neutral-400" />
                         {lead.phone}
                       </div>
                     ) : (
-                      <span className="text-gray-400">-</span>
+                      <span className="text-neutral-400">-</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-gray-500">
+                  <TableCell className="text-neutral-500">
                     {formatDateShort(lead.created_at)}
                   </TableCell>
                   <TableCell>
@@ -187,7 +187,7 @@ export function LeadTable({ leads, onEdit, onRefresh }: LeadTableProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => setDeleteId(lead.id)}
-                          className="text-red-600 focus:text-red-600"
+                          className="text-error-600 focus:text-error-600 focus:bg-error-50"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete

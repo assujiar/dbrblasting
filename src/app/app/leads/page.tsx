@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { LeadForm } from '@/components/leads/lead-form'
 import { LeadTable } from '@/components/leads/lead-table'
 import { Plus, Search, Users, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { Lead } from '@/types/database'
 
 interface Pagination {
@@ -73,12 +74,12 @@ export default function LeadsPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Leads</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-neutral-900">Leads</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             Manage your contact database
           </p>
         </div>
@@ -89,20 +90,21 @@ export default function LeadsPage() {
       </div>
 
       {/* Search & Filter */}
-      <Card>
-        <CardContent className="py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+        <CardContent className="py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
               <Input
-                placeholder="Search leads..."
+                placeholder="Search by name, email, or company..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <div className="text-xs sm:text-sm text-gray-500">
-              {pagination.total} {pagination.total === 1 ? 'lead' : 'leads'} total
+            <div className="text-sm text-neutral-500">
+              <span className="font-semibold text-neutral-700">{pagination.total}</span>{' '}
+              {pagination.total === 1 ? 'lead' : 'leads'} total
             </div>
           </div>
         </CardContent>
@@ -110,23 +112,24 @@ export default function LeadsPage() {
 
       {/* Content */}
       {isLoading ? (
-        <Card>
-          <CardContent className="py-12">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+        <Card className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <CardContent className="py-16">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <p className="text-sm text-neutral-500">Loading leads...</p>
             </div>
           </CardContent>
         </Card>
       ) : leads.length === 0 ? (
-        <Card>
-          <CardContent>
+        <Card className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <CardContent className="py-4">
             <EmptyState
               icon={Users}
               title={search ? 'No leads found' : 'No leads yet'}
               description={
                 search
                   ? 'Try adjusting your search query'
-                  : 'Get started by adding your first lead'
+                  : 'Get started by adding your first lead to your database'
               }
               action={
                 !search && (
@@ -141,21 +144,30 @@ export default function LeadsPage() {
         </Card>
       ) : (
         <>
-          <LeadTable
-            leads={leads}
-            onEdit={handleEdit}
-            onRefresh={fetchLeads}
-          />
+          <div className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <LeadTable
+              leads={leads}
+              onEdit={handleEdit}
+              onRefresh={fetchLeads}
+            />
+          </div>
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <Card>
-              <CardContent className="py-3 sm:py-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
-                    Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                    {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                    {pagination.total}
+            <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
+              <CardContent className="py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <p className="text-sm text-neutral-500 text-center sm:text-left">
+                    Showing{' '}
+                    <span className="font-medium text-neutral-700">
+                      {(pagination.page - 1) * pagination.limit + 1}
+                    </span>{' '}
+                    to{' '}
+                    <span className="font-medium text-neutral-700">
+                      {Math.min(pagination.page * pagination.limit, pagination.total)}
+                    </span>{' '}
+                    of{' '}
+                    <span className="font-medium text-neutral-700">{pagination.total}</span>
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <Button
@@ -177,11 +189,11 @@ export default function LeadsPage() {
                             page === pagination.totalPages ||
                             Math.abs(page - pagination.page) <= 1
                         )
-                        .slice(0, 5) // Limit visible pages on mobile
+                        .slice(0, 5)
                         .map((page, index, array) => (
                           <span key={page}>
                             {index > 0 && array[index - 1] !== page - 1 && (
-                              <span className="px-1 sm:px-2 text-gray-400">...</span>
+                              <span className="px-1 sm:px-2 text-neutral-400">...</span>
                             )}
                             <Button
                               variant={pagination.page === page ? 'default' : 'ghost'}
@@ -189,6 +201,9 @@ export default function LeadsPage() {
                               onClick={() =>
                                 setPagination((prev) => ({ ...prev, page }))
                               }
+                              className={cn(
+                                pagination.page === page && 'shadow-sm'
+                              )}
                             >
                               {page}
                             </Button>

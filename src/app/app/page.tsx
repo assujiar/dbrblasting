@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, FolderKanban, FileText, Send, TrendingUp, Mail } from 'lucide-react'
+import { Users, FolderOpen, FileText, Send, Sparkles, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,98 +31,168 @@ export default async function DashboardPage() {
   const stats = await getStats()
 
   const statCards = [
-    { title: 'Leads', value: stats?.leads || 0, icon: Users, href: '/app/leads', color: 'lavender' },
-    { title: 'Groups', value: stats?.groups || 0, icon: FolderKanban, href: '/app/groups', color: 'softBlue' },
-    { title: 'Templates', value: stats?.templates || 0, icon: FileText, href: '/app/templates', color: 'purple' },
-    { title: 'Campaigns', value: stats?.campaigns || 0, icon: Send, href: '/app/campaigns', color: 'ink' },
+    {
+      title: 'Total Leads',
+      value: stats?.leads || 0,
+      icon: Users,
+      href: '/app/leads',
+      gradient: 'from-primary-500 to-primary-600',
+      bgLight: 'from-primary-50 to-primary-100/50',
+    },
+    {
+      title: 'Contact Groups',
+      value: stats?.groups || 0,
+      icon: FolderOpen,
+      href: '/app/groups',
+      gradient: 'from-accent-500 to-accent-600',
+      bgLight: 'from-accent-50 to-accent-100/50',
+    },
+    {
+      title: 'Email Templates',
+      value: stats?.templates || 0,
+      icon: FileText,
+      href: '/app/templates',
+      gradient: 'from-secondary-500 to-secondary-600',
+      bgLight: 'from-secondary-50 to-secondary-100/50',
+    },
+    {
+      title: 'Campaigns Sent',
+      value: stats?.campaigns || 0,
+      icon: Send,
+      href: '/app/campaigns',
+      gradient: 'from-success-500 to-success-600',
+      bgLight: 'from-success-50 to-success-100/50',
+    },
   ]
 
-  const colorMap: Record<string, { bg: string; text: string; iconBg: string }> = {
-    lavender: { bg: 'bg-[#F7F4FE]', text: 'text-[#5B46FB]', iconBg: 'bg-[#E9E2FA]' },
-    softBlue: { bg: 'bg-[#F2F6FD]', text: 'text-[#4E4D5C]', iconBg: 'bg-[#E2ECF8]' },
-    purple: { bg: 'bg-[#F3EFFD]', text: 'text-[#977EF2]', iconBg: 'bg-[#E3D8F6]' },
-    ink: { bg: 'bg-[#F5F5F7]', text: 'text-[#040404]', iconBg: 'bg-[#E8E8EE]' },
-  }
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-[#040404]">Dashboard</h1>
-        <p className="text-sm text-[#4E4D5C] mt-1">Ringkasan performa tim dan campaign kamu.</p>
+      <div className="animate-slide-up">
+        <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
+        <p className="text-sm text-neutral-500 mt-1">
+          Overview of your email marketing performance
+        </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {statCards.map((stat) => {
-          const colors = colorMap[stat.color]
-          return (
-            <Link key={stat.title} href={stat.href}>
-              <Card className="h-full transition-shadow hover:shadow-md hover:shadow-black/5">
-                <CardContent className="p-4">
-                  <div className={`w-10 h-10 rounded-lg ${colors.iconBg} flex items-center justify-center mb-3`}>
-                    <stat.icon className={`h-5 w-5 ${colors.text}`} />
-                  </div>
-                  <p className="text-2xl font-bold text-[#040404]">{stat.value}</p>
-                  <p className="text-sm text-[#4E4D5C]">{stat.title}</p>
-                </CardContent>
-              </Card>
-            </Link>
-          )
-        })}
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 stagger-children">
+        {statCards.map((stat) => (
+          <Link key={stat.title} href={stat.href}>
+            <Card hover className="h-full group">
+              <CardContent className="p-5">
+                <div
+                  className={cn(
+                    'w-11 h-11 rounded-xl flex items-center justify-center mb-4',
+                    'bg-gradient-to-br',
+                    stat.bgLight,
+                    'group-hover:scale-110 transition-transform duration-200'
+                  )}
+                >
+                  <stat.icon
+                    className={cn(
+                      'h-5 w-5 bg-gradient-to-br bg-clip-text',
+                      stat.gradient.replace('from-', 'text-').split(' ')[0]
+                    )}
+                    style={{
+                      color: `var(--color-${stat.gradient.includes('primary') ? 'primary' : stat.gradient.includes('accent') ? 'accent' : stat.gradient.includes('secondary') ? 'secondary' : 'success'}-600)`,
+                    }}
+                  />
+                </div>
+                <p className="text-3xl font-bold text-neutral-900">{stat.value}</p>
+                <p className="text-sm text-neutral-500 mt-1">{stat.title}</p>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
 
       {/* Quick Start & Tags */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <TrendingUp className="h-5 w-5 text-[#977EF2]" />
-              Quick Start
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="animate-slide-up">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-100 to-primary-50">
+                <Sparkles className="h-4 w-4 text-primary-600" />
+              </div>
+              Quick Start Guide
             </CardTitle>
-            <CardDescription>Mulai cepat tanpa ribet.</CardDescription>
+            <CardDescription>Get started with your first campaign in 4 easy steps</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <ol className="space-y-3">
+            <ol className="space-y-4">
               {[
-                { step: '1', title: 'Add leads', desc: 'Import your contacts' },
-                { step: '2', title: 'Create groups', desc: 'Organize into segments' },
-                { step: '3', title: 'Design templates', desc: 'Create email templates' },
-                { step: '4', title: 'Send campaigns', desc: 'Launch your campaign' },
+                { step: '1', title: 'Add your leads', desc: 'Import or manually add your contacts', href: '/app/leads' },
+                { step: '2', title: 'Create groups', desc: 'Organize leads into targeted segments', href: '/app/groups' },
+                { step: '3', title: 'Design templates', desc: 'Create beautiful email templates', href: '/app/templates' },
+                { step: '4', title: 'Send campaigns', desc: 'Launch and track your campaigns', href: '/app/campaigns' },
               ].map((item) => (
-                <li key={item.step} className="flex items-start gap-3">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#EEEAF7] text-xs font-semibold text-[#5B46FB] shrink-0">
-                    {item.step}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-medium text-[#040404] text-sm">{item.title}</p>
-                    <p className="text-xs text-[#4E4D5C]">{item.desc}</p>
-                  </div>
+                <li key={item.step}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      'flex items-start gap-4 p-3 -mx-3 rounded-xl',
+                      'transition-all duration-200',
+                      'hover:bg-primary-50/50'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'flex h-7 w-7 items-center justify-center rounded-full shrink-0',
+                        'bg-gradient-to-br from-primary-500 to-primary-600',
+                        'text-xs font-bold text-white',
+                        'shadow-sm shadow-primary-500/25'
+                      )}
+                    >
+                      {item.step}
+                    </span>
+                    <div className="min-w-0 pt-0.5">
+                      <p className="font-semibold text-neutral-900 text-sm">{item.title}</p>
+                      <p className="text-xs text-neutral-500 mt-0.5">{item.desc}</p>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ol>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Mail className="h-5 w-5 text-[#5B46FB]" />
-              Template Tags
+        <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-100 to-accent-50">
+                <Mail className="h-4 w-4 text-accent-600" />
+              </div>
+              Template Variables
             </CardTitle>
-            <CardDescription>Gunakan di template biar otomatis.</CardDescription>
+            <CardDescription>Use these placeholders in your templates for personalization</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-2">
+            <div className="space-y-3">
               {[
-                { tag: '{{name}}', desc: 'Name' },
-                { tag: '{{company}}', desc: 'Company' },
-                { tag: '{{email}}', desc: 'Email' },
-                { tag: '{{phone}}', desc: 'Phone' },
+                { tag: '{{name}}', desc: 'Recipient name' },
+                { tag: '{{company}}', desc: 'Company name' },
+                { tag: '{{email}}', desc: 'Email address' },
+                { tag: '{{phone}}', desc: 'Phone number' },
               ].map((item) => (
-                <div key={item.tag} className="flex items-center justify-between p-2 rounded-lg bg-[#F7F6FB]">
-                  <code className="text-sm font-mono text-[#5B46FB]">{item.tag}</code>
-                  <span className="text-sm text-[#4E4D5C]">{item.desc}</span>
+                <div
+                  key={item.tag}
+                  className={cn(
+                    'flex items-center justify-between p-3 rounded-xl',
+                    'bg-gradient-to-r from-neutral-50 to-neutral-100/50',
+                    'border border-neutral-100'
+                  )}
+                >
+                  <code
+                    className={cn(
+                      'text-sm font-mono font-semibold',
+                      'bg-gradient-to-r from-primary-600 to-accent-600',
+                      'bg-clip-text text-transparent'
+                    )}
+                  >
+                    {item.tag}
+                  </code>
+                  <span className="text-sm text-neutral-500">{item.desc}</span>
                 </div>
               ))}
             </div>

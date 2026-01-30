@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/components/ui/use-toast'
 import { User, Building2, Briefcase, Phone, Mail, Loader2, Save } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { UserProfile } from '@/types/database'
 
 export default function ProfilePage() {
@@ -79,19 +80,19 @@ export default function ProfilePage() {
     if (!profile.full_name) return null
 
     return (
-      <div className="text-sm text-gray-600 border-t pt-4 mt-4">
-        <p className="font-semibold text-gray-900">{profile.full_name}</p>
-        {profile.position && <p>{profile.position}</p>}
-        {profile.company && <p className="font-medium">{profile.company}</p>}
-        <div className="mt-2 space-y-1">
+      <div className="text-sm text-neutral-600 border-t border-neutral-200 pt-4 mt-4">
+        <p className="font-semibold text-neutral-900">{profile.full_name}</p>
+        {profile.position && <p className="text-neutral-600">{profile.position}</p>}
+        {profile.company && <p className="font-medium text-neutral-700">{profile.company}</p>}
+        <div className="mt-3 space-y-1.5">
           {profile.email && (
-            <p className="flex items-center gap-2">
-              <Mail className="h-3 w-3" /> {profile.email}
+            <p className="flex items-center gap-2 text-neutral-500">
+              <Mail className="h-3.5 w-3.5 text-neutral-400" /> {profile.email}
             </p>
           )}
           {profile.phone && (
-            <p className="flex items-center gap-2">
-              <Phone className="h-3 w-3" /> {profile.phone}
+            <p className="flex items-center gap-2 text-neutral-500">
+              <Phone className="h-3.5 w-3.5 text-neutral-400" /> {profile.phone}
             </p>
           )}
         </div>
@@ -102,112 +103,123 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Profile</h1>
-        <p className="text-sm text-gray-500 mt-1">
+      <div className="animate-slide-up">
+        <h1 className="text-2xl font-bold text-neutral-900">Profile</h1>
+        <p className="text-sm text-neutral-500 mt-1">
           Manage your profile information. This will be used as your email signature.
         </p>
       </div>
 
       {/* Content */}
       {isLoading ? (
-        <Card className="w-full max-w-2xl">
-          <CardContent className="py-12">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+        <Card className="w-full max-w-2xl animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <CardContent className="py-16">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+              <p className="text-sm text-neutral-500">Loading profile...</p>
             </div>
           </CardContent>
         </Card>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-            <Card className="w-full max-w-2xl">
+            <Card className="w-full max-w-2xl animate-slide-up" style={{ animationDelay: '50ms' }}>
               <CardHeader>
-                <CardTitle className="text-lg">Personal Information</CardTitle>
+                <CardTitle className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-100 to-primary-50">
+                    <User className="h-4 w-4 text-primary-600" />
+                  </div>
+                  Personal Information
+                </CardTitle>
                 <CardDescription>
-                  This information will appear in your email signature and CTA buttons.
+                  This information will appear in your email signature and sender details.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4">
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name" className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-400" />
-                    Full Name *
-                  </Label>
-                  <Input
-                    id="full_name"
-                    placeholder="John Doe"
-                    value={profile.full_name || ''}
-                    onChange={(e) =>
-                      setProfile((prev) => ({ ...prev, full_name: e.target.value }))
-                    }
-                    disabled={isSaving}
-                  />
+                  <Label htmlFor="full_name">Full Name *</Label>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                    <Input
+                      id="full_name"
+                      placeholder="John Doe"
+                      value={profile.full_name || ''}
+                      onChange={(e) =>
+                        setProfile((prev) => ({ ...prev, full_name: e.target.value }))
+                      }
+                      disabled={isSaving}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-400" />
-                    Email *
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="john@company.com"
-                    value={profile.email || ''}
-                    onChange={(e) =>
-                      setProfile((prev) => ({ ...prev, email: e.target.value }))
-                    }
-                    disabled={isSaving}
-                  />
+                  <Label htmlFor="email">Email *</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="john@company.com"
+                      value={profile.email || ''}
+                      onChange={(e) =>
+                        setProfile((prev) => ({ ...prev, email: e.target.value }))
+                      }
+                      disabled={isSaving}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-gray-400" />
-                    Phone Number
-                  </Label>
-                  <Input
-                    id="phone"
-                    placeholder="+62 812 3456 7890"
-                    value={profile.phone || ''}
-                    onChange={(e) =>
-                      setProfile((prev) => ({ ...prev, phone: e.target.value }))
-                    }
-                    disabled={isSaving}
-                  />
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                    <Input
+                      id="phone"
+                      placeholder="+62 812 3456 7890"
+                      value={profile.phone || ''}
+                      onChange={(e) =>
+                        setProfile((prev) => ({ ...prev, phone: e.target.value }))
+                      }
+                      disabled={isSaving}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="position" className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-gray-400" />
-                    Position / Job Title
-                  </Label>
-                  <Input
-                    id="position"
-                    placeholder="Marketing Manager"
-                    value={profile.position || ''}
-                    onChange={(e) =>
-                      setProfile((prev) => ({ ...prev, position: e.target.value }))
-                    }
-                    disabled={isSaving}
-                  />
+                  <Label htmlFor="position">Position / Job Title</Label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                    <Input
+                      id="position"
+                      placeholder="Marketing Manager"
+                      value={profile.position || ''}
+                      onChange={(e) =>
+                        setProfile((prev) => ({ ...prev, position: e.target.value }))
+                      }
+                      disabled={isSaving}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="company" className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-gray-400" />
-                    Company Name
-                  </Label>
-                  <Input
-                    id="company"
-                    placeholder="PT Example Indonesia"
-                    value={profile.company || ''}
-                    onChange={(e) =>
-                      setProfile((prev) => ({ ...prev, company: e.target.value }))
-                    }
-                    disabled={isSaving}
-                  />
+                  <Label htmlFor="company">Company Name</Label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                    <Input
+                      id="company"
+                      placeholder="PT Example Indonesia"
+                      value={profile.company || ''}
+                      onChange={(e) =>
+                        setProfile((prev) => ({ ...prev, company: e.target.value }))
+                      }
+                      disabled={isSaving}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
 
                 <div className="pt-2">
@@ -220,24 +232,40 @@ export default function ProfilePage() {
             </Card>
 
             {/* Signature Preview */}
-            <Card className="w-full max-w-2xl">
+            <Card className="w-full max-w-2xl animate-slide-up" style={{ animationDelay: '100ms' }}>
               <CardHeader>
-                <CardTitle className="text-lg">Email Signature Preview</CardTitle>
+                <CardTitle className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-100 to-accent-50">
+                    <Mail className="h-4 w-4 text-accent-600" />
+                  </div>
+                  Email Signature Preview
+                </CardTitle>
                 <CardDescription>
                   This is how your signature will appear in emails. Use placeholders like{' '}
-                  {'{{sender_name}}'}, {'{{sender_position}}'}, {'{{sender_company}}'},{' '}
-                  {'{{sender_email}}'}, {'{{sender_phone}}'} in your templates.
+                  <code className="text-xs bg-neutral-100 px-1 py-0.5 rounded">{'{{sender_name}}'}</code>,{' '}
+                  <code className="text-xs bg-neutral-100 px-1 py-0.5 rounded">{'{{sender_email}}'}</code>{' '}
+                  in your templates.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {profile.full_name ? (
-                  <div className="glass-light rounded-xl p-4">
-                    <p className="text-sm text-gray-500 mb-2">Signature:</p>
+                  <div className={cn(
+                    'rounded-xl p-4',
+                    'bg-gradient-to-br from-neutral-50 to-neutral-100/50',
+                    'border border-neutral-200'
+                  )}>
+                    <p className="text-sm text-neutral-500 mb-2 font-medium">Signature:</p>
                     {signaturePreview()}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-400">
-                    Fill in your profile to see the signature preview
+                  <div className={cn(
+                    'text-center py-10 rounded-xl',
+                    'bg-gradient-to-br from-neutral-50 to-neutral-100/50',
+                    'border border-neutral-200'
+                  )}>
+                    <p className="text-neutral-400">
+                      Fill in your profile to see the signature preview
+                    </p>
                   </div>
                 )}
               </CardContent>

@@ -5,18 +5,47 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors',
+  'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all duration-200',
   {
     variants: {
       variant: {
-        default: 'bg-blue-100 text-blue-700 border border-blue-200',
-        secondary: 'bg-purple-100 text-purple-700 border border-purple-200',
-        accent: 'bg-indigo-100 text-indigo-700 border border-indigo-200',
-        success: 'bg-green-100 text-green-700 border border-green-200',
-        warning: 'bg-yellow-100 text-yellow-700 border border-yellow-200',
-        error: 'bg-red-100 text-red-700 border border-red-200',
-        outline: 'border border-gray-300 text-gray-700 bg-white',
-        neutral: 'bg-gray-100 text-gray-700 border border-gray-200',
+        default: [
+          'bg-gradient-to-r from-primary-100 to-primary-50',
+          'text-primary-700 border border-primary-200/60',
+        ].join(' '),
+        secondary: [
+          'bg-gradient-to-r from-secondary-100 to-secondary-50',
+          'text-secondary-700 border border-secondary-200/60',
+        ].join(' '),
+        accent: [
+          'bg-gradient-to-r from-accent-100 to-accent-50',
+          'text-accent-700 border border-accent-200/60',
+        ].join(' '),
+        success: [
+          'bg-gradient-to-r from-success-100 to-success-50',
+          'text-success-700 border border-success-200/60',
+        ].join(' '),
+        warning: [
+          'bg-gradient-to-r from-warning-100 to-warning-50',
+          'text-warning-600 border border-warning-200/60',
+        ].join(' '),
+        error: [
+          'bg-gradient-to-r from-error-100 to-error-50',
+          'text-error-700 border border-error-200/60',
+        ].join(' '),
+        outline: [
+          'border border-neutral-200 bg-white/80 backdrop-blur-sm',
+          'text-neutral-600',
+        ].join(' '),
+        neutral: [
+          'bg-neutral-100/80 backdrop-blur-sm',
+          'text-neutral-600 border border-neutral-200/60',
+        ].join(' '),
+        glass: [
+          'bg-white/60 backdrop-blur-md',
+          'text-neutral-700 border border-white/40',
+          'shadow-sm',
+        ].join(' '),
       },
     },
     defaultVariants: {

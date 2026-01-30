@@ -15,7 +15,8 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      'fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]',
+      'fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4',
+      'sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]',
       className
     )}
     {...props}
@@ -24,15 +25,30 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  'group pointer-events-auto relative flex w-full items-center space-x-4 overflow-hidden rounded-xl bg-white border border-gray-200 p-4 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-slide-up data-[state=closed]:animate-fade-in',
+  [
+    'group pointer-events-auto relative flex w-full items-center gap-4 overflow-hidden',
+    'rounded-xl p-4 pr-9',
+    // Glass styling
+    'bg-white/95 backdrop-blur-xl',
+    'border border-white/60',
+    'shadow-xl shadow-neutral-900/10',
+    // Animation
+    'transition-all',
+    'data-[swipe=cancel]:translate-x-0',
+    'data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)]',
+    'data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]',
+    'data-[swipe=move]:transition-none',
+    'data-[state=open]:animate-slide-up',
+    'data-[state=closed]:animate-fade-in',
+  ].join(' '),
   {
     variants: {
       variant: {
-        default: 'border-l-4 border-l-blue-500',
-        success: 'border-l-4 border-l-green-500',
-        error: 'border-l-4 border-l-red-500',
-        warning: 'border-l-4 border-l-yellow-500',
-        info: 'border-l-4 border-l-indigo-500',
+        default: 'border-l-4 border-l-primary-500',
+        success: 'border-l-4 border-l-success-500',
+        error: 'border-l-4 border-l-error-500',
+        warning: 'border-l-4 border-l-warning-500',
+        info: 'border-l-4 border-l-accent-500',
       },
     },
     defaultVariants: {
@@ -63,7 +79,13 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      'inline-flex h-8 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+      'inline-flex h-8 shrink-0 items-center justify-center',
+      'rounded-lg px-3 text-sm font-medium',
+      'border border-neutral-200 bg-white',
+      'transition-colors duration-150',
+      'hover:bg-neutral-50',
+      'focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:ring-offset-2',
+      'disabled:pointer-events-none disabled:opacity-50',
       className
     )}
     {...props}
@@ -78,7 +100,13 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      'absolute right-2 top-2 rounded-lg p-1 text-gray-400 opacity-0 transition-opacity hover:text-gray-600 focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100',
+      'absolute right-3 top-3',
+      'rounded-lg p-1',
+      'text-neutral-400 opacity-0',
+      'transition-all duration-150',
+      'hover:text-neutral-600 hover:bg-neutral-100',
+      'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary-400/50',
+      'group-hover:opacity-100',
       className
     )}
     toast-close=""
@@ -95,7 +123,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn('text-sm font-semibold text-gray-900', className)}
+    className={cn('text-sm font-semibold text-neutral-900', className)}
     {...props}
   />
 ))
@@ -107,7 +135,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn('text-sm text-gray-600', className)}
+    className={cn('text-sm text-neutral-500', className)}
     {...props}
   />
 ))
@@ -123,15 +151,15 @@ const ToastIcon = ({ variant }: { variant?: 'default' | 'success' | 'error' | 'w
 
   switch (variant) {
     case 'success':
-      return <CheckCircle2 className={cn(iconClass, 'text-green-600')} />
+      return <CheckCircle2 className={cn(iconClass, 'text-success-600')} />
     case 'error':
-      return <AlertCircle className={cn(iconClass, 'text-red-600')} />
+      return <AlertCircle className={cn(iconClass, 'text-error-600')} />
     case 'warning':
-      return <AlertTriangle className={cn(iconClass, 'text-yellow-600')} />
+      return <AlertTriangle className={cn(iconClass, 'text-warning-600')} />
     case 'info':
-      return <Info className={cn(iconClass, 'text-indigo-600')} />
+      return <Info className={cn(iconClass, 'text-accent-600')} />
     default:
-      return <Info className={cn(iconClass, 'text-blue-600')} />
+      return <Info className={cn(iconClass, 'text-primary-600')} />
   }
 }
 

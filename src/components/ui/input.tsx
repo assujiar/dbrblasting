@@ -12,14 +12,30 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          'flex h-11 w-full rounded-xl border bg-white px-4 py-2 text-sm text-[#040404] transition-all duration-200',
-          'placeholder:text-[#AAA7B4]',
-          'focus:outline-none focus:ring-2 focus:ring-[#977EF2]/20 focus:border-[#977EF2] focus:bg-white',
-          'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-[#F3F2F6]',
-          'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-          error
-            ? 'border-red-300 focus:border-red-400 focus:ring-red-500/20'
-            : 'border-[#DDDCE1] hover:border-[#AFCCEF]',
+          // Base styles
+          'flex h-11 w-full rounded-xl px-4 py-2.5 text-sm',
+          // Glass effect
+          'bg-white/80 backdrop-blur-sm',
+          'border border-neutral-200/60',
+          'shadow-sm',
+          // Typography
+          'text-neutral-900 placeholder:text-neutral-400',
+          // Transitions
+          'transition-all duration-200',
+          // Focus state
+          'focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400',
+          'focus:bg-white focus:shadow-md',
+          // Hover state
+          'hover:border-neutral-300',
+          // Disabled state
+          'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-neutral-100/80',
+          // File input styles
+          'file:border-0 file:bg-primary-100 file:text-primary-700 file:text-sm file:font-medium file:rounded-lg file:px-3 file:py-1 file:mr-3',
+          // Error state
+          error && [
+            'border-error-300 focus:border-error-400 focus:ring-error-400/30',
+            'hover:border-error-400',
+          ],
           className
         )}
         ref={ref}
