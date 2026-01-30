@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -15,6 +16,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Table,
   TableBody,
   TableCell,
@@ -22,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { toast } from '@/components/ui/use-toast'
 import {
   Users,
   Loader2,
@@ -29,14 +39,43 @@ import {
   Search,
   Shield,
   Building2,
-  Filter,
   X,
+  Plus,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Briefcase,
 } from 'lucide-react'
 import { cn, formatDateShort } from '@/lib/utils'
-import type { Organization, UserProfile } from '@/types/database'
+import type { Organization, UserProfile, UserRole } from '@/types/database'
 
 interface UserWithOrganization extends UserProfile {
   organization: Organization | null
+}
+
+interface NewUserForm {
+  email: string
+  password: string
+  full_name: string
+  phone: string
+  position: string
+  company: string
+  role: UserRole
+  organization_id: string
+}
+
+const initialFormState: NewUserForm = {
+  email: '',
+  password: '',
+  full_name: '',
+  phone: '',
+  position: '',
+  company: '',
+  role: 'user',
+  organization_id: '',
 }
 
 export default function UsersPage() {
@@ -47,6 +86,12 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [orgFilter, setOrgFilter] = useState<string>('all')
   const [roleFilter, setRoleFilter] = useState<string>('all')
+
+  // Create user dialog state
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [newUser, setNewUser] = useState<NewUserForm>(initialFormState)
 
   const fetchData = useCallback(async () => {
     setIsLoading(true)
@@ -93,6 +138,62 @@ export default function UsersPage() {
     regularUsers: users.filter((u) => u.role === 'user').length,
   }
 
+  const handleCreateUser = async () => {
+    if (!newUser.email || !newUser.password || !newUser.full_name) {
+      toast({
+        title: 'Validation Error',
+        description: 'Email, password, and full name are required',
+        variant: 'error',
+      })
+      return
+    }
+
+    if (newUser.password.length < 6) {
+      toast({
+        title: 'Validation Error',
+        description: 'Password must be at least 6 characters',
+        variant: 'error',
+      })
+      return
+    }
+
+    setIsCreating(true)
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newUser,
+          organization_id: newUser.organization_id || null,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create user')
+      }
+
+      toast({
+        title: 'User Created',
+        description: `Successfully created user ${newUser.email}`,
+        variant: 'success',
+      })
+
+      setCreateDialogOpen(false)
+      setNewUser(initialFormState)
+      fetchData()
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to create user',
+        variant: 'error',
+      })
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -103,6 +204,10 @@ export default function UsersPage() {
             Manage user roles and organization assignments
           </p>
         </div>
+        <Button onClick={() => setCreateDialogOpen(true)}>
+          <Plus className="h-4 w-4" />
+          Add User
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -257,11 +362,16 @@ export default function UsersPage() {
             <EmptyState
               icon={Users}
               title={hasFilters ? 'No users found' : 'No users yet'}
-              description={hasFilters ? 'Try adjusting your filters' : 'Users will appear here once they sign up'}
+              description={hasFilters ? 'Try adjusting your filters' : 'Click "Add User" to create your first user'}
               action={
-                hasFilters && (
+                hasFilters ? (
                   <Button variant="outline" onClick={clearFilters}>
                     Clear Filters
+                  </Button>
+                ) : (
+                  <Button onClick={() => setCreateDialogOpen(true)}>
+                    <Plus className="h-4 w-4" />
+                    Add User
                   </Button>
                 )
               }
@@ -341,6 +451,167 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Create User Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+            <DialogDescription>
+              Add a new user to the system. They will be able to login immediately.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="user@example.com"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password *</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Min. 6 characters"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    className="pl-9 pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="full_name">Full Name *</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <Input
+                  id="full_name"
+                  placeholder="John Doe"
+                  value={newUser.full_name}
+                  onChange={(e) => setNewUser({ ...newUser, full_name: e.target.value })}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                  <Input
+                    id="phone"
+                    placeholder="+62 812 3456 7890"
+                    value={newUser.phone}
+                    onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="position">Position</Label>
+                <div className="relative">
+                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                  <Input
+                    id="position"
+                    placeholder="Marketing Manager"
+                    value={newUser.position}
+                    onChange={(e) => setNewUser({ ...newUser, position: e.target.value })}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="company">Company</Label>
+              <div className="relative">
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <Input
+                  id="company"
+                  placeholder="PT Example Indonesia"
+                  value={newUser.company}
+                  onChange={(e) => setNewUser({ ...newUser, company: e.target.value })}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="role">Role</Label>
+                <Select
+                  value={newUser.role}
+                  onValueChange={(value: UserRole) => setNewUser({ ...newUser, role: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="org_admin">Org Admin</SelectItem>
+                    <SelectItem value="super_admin">Super Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="organization">Organization</Label>
+                <Select
+                  value={newUser.organization_id}
+                  onValueChange={(value) => setNewUser({ ...newUser, organization_id: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select organization" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No Organization</SelectItem>
+                    {organizations.map((org) => (
+                      <SelectItem key={org.id} value={org.id}>
+                        {org.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCreateDialogOpen(false)
+                setNewUser(initialFormState)
+              }}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreateUser} loading={isCreating}>
+              Create User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
