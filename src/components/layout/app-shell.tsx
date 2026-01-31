@@ -112,10 +112,14 @@ function SidebarContent({
               </div>
             ) : (
               <div className={cn(
-                'flex items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-500/30 transition-all duration-300',
+                'flex items-center justify-center rounded-xl overflow-hidden bg-white shadow-lg shadow-primary-500/30 transition-all duration-300',
                 collapsed ? 'w-10 h-10' : 'w-10 h-10'
               )}>
-                <Mail className="w-5 h-5 text-white" />
+                <img
+                  src="/logo-icon.svg"
+                  alt="BlastMail"
+                  className="w-full h-full object-contain p-1"
+                />
               </div>
             )}
             <span className={cn(
@@ -486,8 +490,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25">
-                      <Mail className="w-4 h-4 text-white" />
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden bg-white shadow-md shadow-primary-500/25">
+                      <img
+                        src="/logo-icon.svg"
+                        alt="BlastMail"
+                        className="w-full h-full object-contain p-0.5"
+                      />
                     </div>
                   )}
                   <span className="font-bold text-neutral-900">{organization?.name || 'BlastMail'}</span>
