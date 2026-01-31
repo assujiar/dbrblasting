@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
+import { APP_LOGO_URL, APP_ICON_URL, APP_NAME } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -90,7 +90,7 @@ function SidebarContent({
         {/* Logo */}
         <div className={cn(
           'flex items-center border-b border-neutral-100 transition-all duration-300 shrink-0',
-          collapsed ? 'h-[72px] justify-center px-2' : 'h-[72px] px-6'
+          collapsed ? 'h-[72px] justify-center px-2' : 'h-[72px] px-4'
         )}>
           <Link
             href="/app"
@@ -101,34 +101,44 @@ function SidebarContent({
             )}
           >
             {organization?.logo_url ? (
-              <div className={cn(
-                'flex items-center justify-center rounded-xl overflow-hidden bg-white shadow-lg transition-all duration-300',
-                collapsed ? 'w-10 h-10' : 'w-10 h-10'
-              )}>
-                <img
-                  src={organization.logo_url}
-                  alt={organization.name}
-                  className="w-full h-full object-contain"
-                />
-              </div>
+              <>
+                <div className={cn(
+                  'flex items-center justify-center rounded-xl overflow-hidden bg-white shadow-lg transition-all duration-300 shrink-0',
+                  collapsed ? 'w-10 h-10' : 'w-10 h-10'
+                )}>
+                  <img
+                    src={organization.logo_url}
+                    alt={organization.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <span className={cn(
+                  'text-lg font-bold text-neutral-900 transition-all duration-300 overflow-hidden whitespace-nowrap',
+                  collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+                )}>
+                  {organization.name}
+                </span>
+              </>
             ) : (
-              <div className={cn(
-                'flex items-center justify-center rounded-xl overflow-hidden bg-white shadow-lg shadow-primary-500/30 transition-all duration-300',
-                collapsed ? 'w-10 h-10' : 'w-10 h-10'
-              )}>
-                <img
-                  src={APP_LOGO_URL}
-                  alt="BlastMail"
-                  className="w-full h-full object-contain p-1"
-                />
-              </div>
+              // BlastMail logo - use icon when collapsed, full logo when expanded
+              collapsed ? (
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img
+                    src={APP_ICON_URL}
+                    alt={APP_NAME}
+                    className="w-9 h-9 object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="h-10 flex items-center">
+                  <img
+                    src={APP_LOGO_URL}
+                    alt={APP_NAME}
+                    className="h-9 w-auto object-contain"
+                  />
+                </div>
+              )
             )}
-            <span className={cn(
-              'text-lg font-bold text-neutral-900 transition-all duration-300 overflow-hidden whitespace-nowrap',
-              collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
-            )}>
-              {organization?.name || 'BlastMail'}
-            </span>
           </Link>
         </div>
 
@@ -336,19 +346,17 @@ function SidebarContent({
               'flex items-center gap-2 text-neutral-400 transition-all duration-300',
               collapsed ? 'justify-center' : 'justify-start'
             )}>
-              <div className={cn(
-                'flex items-center justify-center rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-300',
-                collapsed ? 'w-8 h-8' : 'w-6 h-6'
-              )}>
-                <img
-                  src={APP_LOGO_URL}
-                  alt="BlastMail"
-                  className="w-full h-full object-contain p-0.5"
-                />
-              </div>
+              <img
+                src={APP_ICON_URL}
+                alt={APP_NAME}
+                className={cn(
+                  'object-contain transition-all duration-300',
+                  collapsed ? 'w-7 h-7' : 'w-5 h-5'
+                )}
+              />
               {!collapsed && (
                 <span className="text-xs">
-                  Powered by <span className="font-semibold text-neutral-500">BlastMail</span>
+                  Powered by <span className="font-semibold text-neutral-500">{APP_NAME}</span>
                 </span>
               )}
             </div>
@@ -359,13 +367,11 @@ function SidebarContent({
         {!collapsed && !onToggleCollapse && (
           <div className="shrink-0 p-4">
             <div className="p-4 rounded-2xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100/50">
-              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/80 shadow-sm mb-2">
-                <img
-                  src={APP_LOGO_URL}
-                  alt="BlastMail"
-                  className="w-5 h-5 object-contain"
-                />
-              </div>
+              <img
+                src={APP_ICON_URL}
+                alt={APP_NAME}
+                className="w-9 h-9 object-contain mb-2"
+              />
               <p className="text-sm font-semibold text-neutral-900">
                 Need help?
               </p>
@@ -516,23 +522,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   className="flex items-center gap-2.5 md:hidden"
                 >
                   {organization?.logo_url ? (
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden bg-white shadow-md">
-                      <img
-                        src={organization.logo_url}
-                        alt={organization.name}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
+                    <>
+                      <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden bg-white shadow-md shrink-0">
+                        <img
+                          src={organization.logo_url}
+                          alt={organization.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <span className="font-bold text-neutral-900">{organization.name}</span>
+                    </>
                   ) : (
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden bg-white shadow-md shadow-primary-500/25">
-                      <img
-                        src={APP_LOGO_URL}
-                        alt="BlastMail"
-                        className="w-full h-full object-contain p-0.5"
-                      />
-                    </div>
+                    <img
+                      src={APP_LOGO_URL}
+                      alt={APP_NAME}
+                      className="h-8 w-auto object-contain"
+                    />
                   )}
-                  <span className="font-bold text-neutral-900">{organization?.name || 'BlastMail'}</span>
                 </Link>
               </div>
 

@@ -54,12 +54,9 @@ export default function LoginPage() {
           <img
             src={APP_LOGO_URL}
             alt={APP_NAME}
-            className="w-20 h-20 mx-auto mb-4 object-contain"
+            className="h-16 w-auto mx-auto mb-4 object-contain"
           />
-          <h1 className="text-2xl font-bold text-neutral-900">
-            {APP_NAME}
-          </h1>
-          <p className="text-sm text-neutral-500 mt-1 flex items-center justify-center gap-1.5">
+          <p className="text-sm text-neutral-500 flex items-center justify-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary-500" />
             Email marketing made simple
           </p>
