@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server'
 import { getClientForUser } from '@/lib/supabase/admin'
 
 // Tier limits configuration
-// - free: 1 campaign, 5 recipients/day (includes watermark)
-// - basic: 3 campaigns, 50 recipients/day
-// - regular: 5 campaigns, 100 recipients/day
-// - pro: 10 campaigns, 500 recipients/day
+// - free: 1 campaign, 5 recipients/day (includes watermark), 0 AI generations/day
+// - basic: 3 campaigns, 50 recipients/day, 1 AI generation/day
+// - regular: 5 campaigns, 100 recipients/day, 2 AI generations/day
+// - pro: 10 campaigns, 500 recipients/day, 5 AI generations/day
 export const TIER_LIMITS = {
-  free: { maxCampaigns: 1, maxRecipientsPerDay: 5, hasWatermark: true },
-  basic: { maxCampaigns: 3, maxRecipientsPerDay: 50, hasWatermark: false },
-  regular: { maxCampaigns: 5, maxRecipientsPerDay: 100, hasWatermark: false },
-  pro: { maxCampaigns: 10, maxRecipientsPerDay: 500, hasWatermark: false },
+  free: { maxCampaigns: 1, maxRecipientsPerDay: 5, hasWatermark: true, maxAIGenerationsPerDay: 0 },
+  basic: { maxCampaigns: 3, maxRecipientsPerDay: 50, hasWatermark: false, maxAIGenerationsPerDay: 1 },
+  regular: { maxCampaigns: 5, maxRecipientsPerDay: 100, hasWatermark: false, maxAIGenerationsPerDay: 2 },
+  pro: { maxCampaigns: 10, maxRecipientsPerDay: 500, hasWatermark: false, maxAIGenerationsPerDay: 5 },
 } as const
 
 export type SubscriptionTier = keyof typeof TIER_LIMITS
@@ -70,7 +70,16 @@ export async function GET() {
       .eq('usage_date', today)
       .single()
 
+    // Get today's AI generation usage
+    const { data: aiUsageData } = await client
+      .from('ai_generation_daily_usage')
+      .select('generations_count')
+      .eq('organization_id', profile.organization_id)
+      .eq('usage_date', today)
+      .single()
+
     const emailsToday = usageData?.emails_sent || 0
+    const aiGenerationsToday = aiUsageData?.generations_count || 0
     const currentCampaigns = campaignCount || 0
 
     return NextResponse.json({
@@ -82,11 +91,14 @@ export async function GET() {
         usage: {
           campaigns: currentCampaigns,
           emailsToday,
+          aiGenerationsToday,
         },
         canCreateCampaign: currentCampaigns < limits.maxCampaigns,
         canSendEmails: emailsToday < limits.maxRecipientsPerDay,
+        canGenerateAIEmail: aiGenerationsToday < limits.maxAIGenerationsPerDay,
         remainingEmails: Math.max(0, limits.maxRecipientsPerDay - emailsToday),
         remainingCampaigns: Math.max(0, limits.maxCampaigns - currentCampaigns),
+        remainingAIGenerations: Math.max(0, limits.maxAIGenerationsPerDay - aiGenerationsToday),
       }
     })
   } catch (error) {

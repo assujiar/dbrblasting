@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   X,
   User,
+  Sparkles,
 } from 'lucide-react'
 
 const navigation = [
@@ -19,6 +20,7 @@ const navigation = [
   { name: 'Leads', href: '/app/leads', icon: Users },
   { name: 'Groups', href: '/app/groups', icon: FolderKanban },
   { name: 'Templates', href: '/app/templates', icon: FileText },
+  { name: 'AI Email', href: '/app/ai-email', icon: Sparkles },
   { name: 'Campaigns', href: '/app/campaigns', icon: Send },
   { name: 'Profile', href: '/app/profile', icon: User },
 ]

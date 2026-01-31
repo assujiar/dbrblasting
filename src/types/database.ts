@@ -9,6 +9,44 @@ export type Json =
 // Role types
 export type UserRole = 'super_admin' | 'org_admin' | 'user'
 
+// Subscription tier type
+export type SubscriptionTier = 'free' | 'basic' | 'regular' | 'pro'
+
+// AI Email Generation types
+export interface AIEmailDesignSpec {
+  layout: string
+  colorScheme: string
+  primaryColor: string
+  secondaryColor: string
+  fontFamily: string
+  fontSize: string
+  headerStyle: string
+  footerStyle: string
+  buttonStyle: string
+  imagePosition: string
+  spacing: string
+  borderStyle: string
+  shadowStyle: string
+  responsiveDesign: boolean
+  darkModeSupport: boolean
+}
+
+export interface AIEmailPurpose {
+  emailType: string
+  industry: string
+  targetAudience: string
+  primaryGoal: string
+  callToAction: string
+  urgencyLevel: string
+  personalization: string[]
+  language: string
+  writingStyle: string
+  tone: string
+  formality: string
+  contentLength: string
+  includeElements: string[]
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -298,6 +336,85 @@ export interface Database {
           updated_at?: string
         }
       }
+      ai_email_generations: {
+        Row: {
+          id: string
+          user_id: string
+          organization_id: string
+          design_spec: AIEmailDesignSpec
+          email_purpose: AIEmailPurpose
+          additional_notes: string | null
+          logo_url: string | null
+          generated_subject: string | null
+          generated_html: string | null
+          status: 'generating' | 'generated' | 'saved' | 'failed'
+          saved_template_id: string | null
+          error_message: string | null
+          created_at: string
+          updated_at: string
+          expires_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          organization_id: string
+          design_spec: AIEmailDesignSpec
+          email_purpose: AIEmailPurpose
+          additional_notes?: string | null
+          logo_url?: string | null
+          generated_subject?: string | null
+          generated_html?: string | null
+          status?: 'generating' | 'generated' | 'saved' | 'failed'
+          saved_template_id?: string | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+          expires_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          organization_id?: string
+          design_spec?: AIEmailDesignSpec
+          email_purpose?: AIEmailPurpose
+          additional_notes?: string | null
+          logo_url?: string | null
+          generated_subject?: string | null
+          generated_html?: string | null
+          status?: 'generating' | 'generated' | 'saved' | 'failed'
+          saved_template_id?: string | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+          expires_at?: string
+        }
+      }
+      ai_generation_daily_usage: {
+        Row: {
+          id: string
+          organization_id: string
+          usage_date: string
+          generations_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          usage_date?: string
+          generations_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          usage_date?: string
+          generations_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -391,3 +508,18 @@ export interface OrganizationWithUsers extends Organization {
 
 // Function result types
 export type CampaignWithCounts = Database['public']['Functions']['campaigns_with_counts']['Returns'][number]
+
+// AI Email Generation types
+export type AIEmailGeneration = Database['public']['Tables']['ai_email_generations']['Row']
+export type AIEmailGenerationInsert = Database['public']['Tables']['ai_email_generations']['Insert']
+export type AIEmailGenerationUpdate = Database['public']['Tables']['ai_email_generations']['Update']
+
+export type AIGenerationDailyUsage = Database['public']['Tables']['ai_generation_daily_usage']['Row']
+
+// AI Generation tier limits
+export const AI_GENERATION_LIMITS: Record<SubscriptionTier, number> = {
+  free: 0,
+  basic: 1,
+  regular: 2,
+  pro: 5,
+}
