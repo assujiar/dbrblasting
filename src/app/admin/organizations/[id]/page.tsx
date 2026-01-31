@@ -348,19 +348,19 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 animate-slide-up">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/organizations">
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <Link href="/admin/organizations" className="shrink-0">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-error-100 to-error-50">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-error-100 to-error-50 shrink-0">
               <Building2 className="h-6 w-6 text-error-600" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-neutral-900">{organization.name}</h1>
-              <p className="text-sm text-neutral-500">{organization.slug}</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-bold text-neutral-900 break-words line-clamp-2">{organization.name}</h1>
+              <p className="text-sm text-neutral-500 truncate">{organization.slug}</p>
             </div>
           </div>
         </div>

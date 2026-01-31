@@ -233,15 +233,15 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 animate-slide-up">
-        <div className="flex items-center gap-4">
-          <Link href="/app/campaigns">
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <Link href="/app/campaigns" className="shrink-0">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-neutral-900">{campaign.name}</h1>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-bold text-neutral-900 break-words line-clamp-2">{campaign.name}</h1>
               {getCampaignStatusBadge()}
             </div>
             <p className="text-sm text-neutral-500 mt-1">
