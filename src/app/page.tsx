@@ -265,6 +265,8 @@ export default function Home() {
             <img
               src={APP_LOGO_URL}
               alt={APP_NAME}
+              width={167}
+              height={40}
               className="h-8 lg:h-10 w-auto object-contain"
             />
           </Link>
@@ -297,6 +299,8 @@ export default function Home() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 text-pink-400 hover:text-white"
+              aria-label={mobileMenuOpen ? 'Tutup menu' : 'Buka menu'}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -766,6 +770,8 @@ export default function Home() {
                 <img
                   src={APP_LOGO_URL}
                   alt={APP_NAME}
+                  width={134}
+                  height={32}
                   className="h-8 w-auto object-contain"
                 />
                 <span className="text-sm text-pink-400">by SAIKI Group</span>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <defs>
+    <!-- Gradient for back arrow (purple) -->
+    <linearGradient id="gradientBackH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <!-- Gradient for front arrow (pink) -->
+    <linearGradient id="gradientFrontH" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f472b6"/>
+      <stop offset="40%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#db2777"/>
+    </linearGradient>
+    <!-- Text gradient -->
+    <linearGradient id="textGradH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Logo icon -->
+  <g transform="translate(4, 6) scale(0.3)">
+    <!-- Back chevron -->
+    <path d="M25 15 L70 60 L25 105 L40 105 L85 60 L40 15 Z" fill="url(#gradientBackH)"/>
+    <!-- Front chevron -->
+    <path d="M15 25 L60 70 L15 115 L30 115 L75 70 L30 25 Z" fill="url(#gradientFrontH)"/>
+  </g>
+
+  <!-- BlastMail text -->
+  <text x="48" y="32" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="url(#textGradH)">BlastMail</text>
+</svg>

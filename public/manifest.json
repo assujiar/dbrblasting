@@ -13,22 +13,16 @@
   "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/blastmail_saiki_mainlogo-02-01.svg",
+      "src": "/logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/blastmail_saiki_mainlogo-02-01.png",
-      "sizes": "192x192",
-      "type": "image/png",
+      "src": "/logo-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/blastmail_saiki_mainlogo-01.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
     }
   ],
   "screenshots": [],
@@ -38,21 +32,21 @@
       "short_name": "Dashboard",
       "description": "Buka dashboard BlastMail",
       "url": "/app",
-      "icons": [{ "src": "/blastmail_saiki_mainlogo-02-01.svg", "sizes": "any" }]
+      "icons": [{ "src": "/logo-icon.svg", "sizes": "any" }]
     },
     {
       "name": "Campaigns",
       "short_name": "Campaigns",
       "description": "Kelola campaign email",
       "url": "/app/campaigns",
-      "icons": [{ "src": "/blastmail_saiki_mainlogo-02-01.svg", "sizes": "any" }]
+      "icons": [{ "src": "/logo-icon.svg", "sizes": "any" }]
     },
     {
       "name": "Leads",
       "short_name": "Leads",
       "description": "Kelola kontak dan leads",
       "url": "/app/leads",
-      "icons": [{ "src": "/blastmail_saiki_mainlogo-02-01.svg", "sizes": "any" }]
+      "icons": [{ "src": "/logo-icon.svg", "sizes": "any" }]
     }
   ]
 }
