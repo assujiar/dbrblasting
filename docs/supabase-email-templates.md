@@ -382,9 +382,16 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
 
 ---
 
-## 4. Password Changed Notification
+## 4. Password Changed Notification (Security)
 
-Template ini untuk notifikasi keamanan ketika password berhasil diubah. Bisa dikirim via aplikasi menggunakan Supabase atau SMTP.
+Template ini untuk notifikasi keamanan ketika password berhasil diubah. Supabase menyediakan fitur bawaan untuk template ini di section **Security**.
+
+### Cara Setting
+1. Buka **Authentication** → **Email Templates**
+2. Scroll ke section **Security**
+3. Pastikan **Password changed** toggle aktif (ON)
+4. Klik pada template untuk mengedit
+5. Paste HTML di bawah ini
 
 ```html
 <!DOCTYPE html>
@@ -533,42 +540,7 @@ Template ini untuk notifikasi keamanan ketika password berhasil diubah. Bisa dik
 
 **Subject:** Password Akun Anda Telah Diubah - BlastMail 🔑
 
-### Cara Implementasi
-
-Karena Supabase tidak menyediakan template bawaan untuk notifikasi password changed, Anda perlu mengirim email ini secara manual dari aplikasi setelah password berhasil diubah.
-
-**Contoh implementasi di Next.js:**
-
-```typescript
-// lib/email.ts
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export async function sendPasswordChangedEmail(email: string) {
-  const timestamp = new Date().toLocaleString('id-ID', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-    timeZone: 'Asia/Jakarta'
-  });
-
-  const html = `<!-- Paste template HTML di atas, ganti {{ .Email }} dengan ${email} dan {{ .Timestamp }} dengan ${timestamp} -->`;
-
-  await resend.emails.send({
-    from: 'BlastMail <noreply@yourdomain.com>',
-    to: email,
-    subject: 'Password Akun Anda Telah Diubah - BlastMail 🔑',
-    html: html
-  });
-}
-```
-
-**Panggil fungsi setelah password berubah:**
-
-```typescript
-// Setelah berhasil update password
-await sendPasswordChangedEmail(user.email);
-```
+> **Note:** Email ini akan dikirim otomatis oleh Supabase setiap kali user berhasil mengubah password mereka.
 
 ---
 

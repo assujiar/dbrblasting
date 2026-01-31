@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/components/ui/use-toast'
-import { User, Building2, Briefcase, Phone, Mail, Loader2, Save, Shield } from 'lucide-react'
+import { User, Building2, Briefcase, Phone, Mail, Loader2, Save, Shield, Key, Eye, EyeOff } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import type { UserRole } from '@/types/database'
 
@@ -29,8 +30,18 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
+  const supabase = createClient()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  })
   const [profile, setProfile] = useState<ProfileData>({
     user_id: '',
     full_name: '',
@@ -99,6 +110,79 @@ export default function ProfilePage() {
       })
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Validation
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: 'Password terlalu pendek',
+        description: 'Password baru minimal 6 karakter.',
+        variant: 'error',
+      })
+      return
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: 'Password tidak cocok',
+        description: 'Pastikan password baru dan konfirmasi sama.',
+        variant: 'error',
+      })
+      return
+    }
+
+    setIsChangingPassword(true)
+
+    try {
+      // Verify current password by re-authenticating
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: profile.email,
+        password: passwordData.currentPassword,
+      })
+
+      if (signInError) {
+        toast({
+          title: 'Password saat ini salah',
+          description: 'Silakan masukkan password saat ini yang benar.',
+          variant: 'error',
+        })
+        setIsChangingPassword(false)
+        return
+      }
+
+      // Update password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: passwordData.newPassword,
+      })
+
+      if (updateError) {
+        throw updateError
+      }
+
+      // Clear form
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      })
+
+      toast({
+        title: 'Password berhasil diubah',
+        description: 'Password Anda telah berhasil diperbarui.',
+        variant: 'success',
+      })
+    } catch (error) {
+      toast({
+        title: 'Gagal mengubah password',
+        description: error instanceof Error ? error.message : 'Terjadi kesalahan',
+        variant: 'error',
+      })
+    } finally {
+      setIsChangingPassword(false)
     }
   }
 
@@ -346,6 +430,109 @@ export default function ProfilePage() {
                     Contact your Super Admin to change your role or organization assignment.
                     SMTP settings are managed at the organization level.
                   </p>
+                </CardContent>
+              </Card>
+
+              {/* Change Password */}
+              <Card className="w-full max-w-2xl animate-slide-up" style={{ animationDelay: '200ms' }}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-warning-100 to-warning-50">
+                      <Key className="h-4 w-4 text-warning-600" />
+                    </div>
+                    Ubah Password
+                  </CardTitle>
+                  <CardDescription>
+                    Perbarui password akun Anda untuk keamanan yang lebih baik
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleChangePassword} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPassword">Password Saat Ini</Label>
+                      <div className="relative">
+                        <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                        <Input
+                          id="currentPassword"
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          placeholder="Masukkan password saat ini"
+                          value={passwordData.currentPassword}
+                          onChange={(e) =>
+                            setPasswordData((prev) => ({ ...prev, currentPassword: e.target.value }))
+                          }
+                          disabled={isChangingPassword}
+                          className="pl-10 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                        >
+                          {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="newPassword">Password Baru</Label>
+                      <div className="relative">
+                        <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                        <Input
+                          id="newPassword"
+                          type={showNewPassword ? 'text' : 'password'}
+                          placeholder="Min. 6 karakter"
+                          value={passwordData.newPassword}
+                          onChange={(e) =>
+                            setPasswordData((prev) => ({ ...prev, newPassword: e.target.value }))
+                          }
+                          disabled={isChangingPassword}
+                          className="pl-10 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                        >
+                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+                      <div className="relative">
+                        <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                        <Input
+                          id="confirmPassword"
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          placeholder="Ulangi password baru"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) =>
+                            setPasswordData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                          }
+                          disabled={isChangingPassword}
+                          className="pl-10 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      loading={isChangingPassword}
+                      variant="secondary"
+                      className="w-full"
+                    >
+                      <Key className="h-4 w-4" />
+                      Ubah Password
+                    </Button>
+                  </form>
                 </CardContent>
               </Card>
             </div>
