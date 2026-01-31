@@ -132,6 +132,20 @@ const DESIGN_OPTIONS = {
     { value: 'medium', label: 'Medium Shadow' },
     { value: 'strong', label: 'Strong Shadow' },
   ],
+  visualEffects: [
+    { value: 'none', label: 'None (Flat/Clean)' },
+    { value: 'glassmorphism', label: 'Glassmorphism (Frosted Glass)' },
+    { value: 'neumorphism', label: 'Neumorphism (Soft UI)' },
+    { value: 'gradient-mesh', label: 'Gradient Mesh' },
+    { value: 'aurora', label: 'Aurora/Northern Lights' },
+    { value: 'grain-texture', label: 'Grain/Noise Texture' },
+    { value: 'blur-shapes', label: 'Blurred Background Shapes' },
+    { value: 'neon-glow', label: 'Neon Glow' },
+    { value: 'retro-wave', label: 'Retro/Synthwave' },
+    { value: 'material-design', label: 'Material Design 3' },
+    { value: 'paper-cutout', label: 'Paper Cutout/Layered' },
+    { value: 'duotone', label: 'Duotone Effect' },
+  ],
 }
 
 // Email purpose options
@@ -291,6 +305,9 @@ const DEFAULT_DESIGN_SPEC: AIEmailDesignSpec = {
   colorScheme: 'light',
   primaryColor: '#2563eb',
   secondaryColor: '#64748b',
+  accentColor1: '#10b981',
+  accentColor2: '#f59e0b',
+  accentColor3: '#ec4899',
   fontFamily: 'arial',
   fontSize: 'medium',
   headerStyle: 'centered',
@@ -300,6 +317,7 @@ const DEFAULT_DESIGN_SPEC: AIEmailDesignSpec = {
   spacing: 'normal',
   borderStyle: 'none',
   shadowStyle: 'subtle',
+  visualEffects: 'none',
   responsiveDesign: true,
   darkModeSupport: false,
 }
@@ -327,6 +345,7 @@ export default function AIEmailPage() {
   const [designSpec, setDesignSpec] = useState<AIEmailDesignSpec>(DEFAULT_DESIGN_SPEC)
   const [emailPurpose, setEmailPurpose] = useState<AIEmailPurpose>(DEFAULT_EMAIL_PURPOSE)
   const [additionalNotes, setAdditionalNotes] = useState('')
+  const [productDescription, setProductDescription] = useState('')
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
@@ -453,13 +472,22 @@ export default function AIEmailPage() {
         uploadedLogoUrl = await uploadLogo()
       }
 
+      // Combine product description with additional notes
+      let fullNotes = ''
+      if (productDescription) {
+        fullNotes += `Product/Service/Company: ${productDescription}`
+      }
+      if (additionalNotes) {
+        fullNotes += fullNotes ? `\n\nAdditional Notes: ${additionalNotes}` : additionalNotes
+      }
+
       const res = await fetch('/api/ai-email/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           designSpec,
           emailPurpose,
-          additionalNotes: additionalNotes || undefined,
+          additionalNotes: fullNotes || undefined,
           logoUrl: uploadedLogoUrl || undefined,
         }),
       })
@@ -770,6 +798,66 @@ export default function AIEmailPage() {
               </div>
             </div>
 
+            {/* Accent Colors */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Accent Color #1</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={designSpec.accentColor1}
+                    onChange={(e) => setDesignSpec({ ...designSpec, accentColor1: e.target.value })}
+                    className="w-10 h-10 rounded border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={designSpec.accentColor1}
+                    onChange={(e) => setDesignSpec({ ...designSpec, accentColor1: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-md text-sm"
+                    placeholder="#10b981"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Accent Color #2</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={designSpec.accentColor2}
+                    onChange={(e) => setDesignSpec({ ...designSpec, accentColor2: e.target.value })}
+                    className="w-10 h-10 rounded border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={designSpec.accentColor2}
+                    onChange={(e) => setDesignSpec({ ...designSpec, accentColor2: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-md text-sm"
+                    placeholder="#f59e0b"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Accent Color #3</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={designSpec.accentColor3}
+                    onChange={(e) => setDesignSpec({ ...designSpec, accentColor3: e.target.value })}
+                    className="w-10 h-10 rounded border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={designSpec.accentColor3}
+                    onChange={(e) => setDesignSpec({ ...designSpec, accentColor3: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-md text-sm"
+                    placeholder="#ec4899"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Typography */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -951,6 +1039,29 @@ export default function AIEmailPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Visual Effects */}
+            <div className="space-y-2">
+              <Label>Visual Effects</Label>
+              <p className="text-xs text-neutral-500 mb-2">
+                Choose a design style/effect for your email
+              </p>
+              <Select
+                value={designSpec.visualEffects}
+                onValueChange={(v) => setDesignSpec({ ...designSpec, visualEffects: v })}
+              >
+                <SelectTrigger className="max-w-md">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {DESIGN_OPTIONS.visualEffects.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Checkboxes */}
@@ -1323,12 +1434,29 @@ export default function AIEmailPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
+              <Label>Describe Your Product/Service/Company</Label>
+              <p className="text-xs text-neutral-500">
+                Brief description to help AI understand your business context
+              </p>
+              <textarea
+                value={productDescription}
+                onChange={(e) => setProductDescription(e.target.value.slice(0, 150))}
+                placeholder="e.g., TechCorp is a B2B SaaS company providing cloud-based project management solutions for enterprises..."
+                className="w-full h-24 px-4 py-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                maxLength={150}
+              />
+              <p className="text-xs text-neutral-500 text-right">
+                {productDescription.length}/150 characters
+              </p>
+            </div>
+
+            <div className="space-y-2">
               <Label>Additional Instructions (Optional)</Label>
               <textarea
                 value={additionalNotes}
                 onChange={(e) => setAdditionalNotes(e.target.value.slice(0, 100))}
-                placeholder="e.g., Include company name 'TechCorp' in the header, mention 20% discount..."
-                className="w-full h-32 px-4 py-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Mention 20% discount, include specific product name, use certain tagline..."
+                className="w-full h-24 px-4 py-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 maxLength={100}
               />
               <p className="text-xs text-neutral-500 text-right">

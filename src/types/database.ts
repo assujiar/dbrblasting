@@ -18,6 +18,9 @@ export interface AIEmailDesignSpec {
   colorScheme: string
   primaryColor: string
   secondaryColor: string
+  accentColor1: string
+  accentColor2: string
+  accentColor3: string
   fontFamily: string
   fontSize: string
   headerStyle: string
@@ -27,6 +30,7 @@ export interface AIEmailDesignSpec {
   spacing: string
   borderStyle: string
   shadowStyle: string
+  visualEffects: string
   responsiveDesign: boolean
   darkModeSupport: boolean
 }

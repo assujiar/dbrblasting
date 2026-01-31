@@ -24,6 +24,9 @@ function buildPrompt(spec: GenerateRequest): string {
 - Color Scheme: ${designSpec.colorScheme}
 - Primary Color: ${designSpec.primaryColor}
 - Secondary Color: ${designSpec.secondaryColor}
+- Accent Color #1: ${designSpec.accentColor1}
+- Accent Color #2: ${designSpec.accentColor2}
+- Accent Color #3: ${designSpec.accentColor3}
 - Font Family: ${designSpec.fontFamily}
 - Font Size: ${designSpec.fontSize}
 - Header Style: ${designSpec.headerStyle}
@@ -33,6 +36,7 @@ function buildPrompt(spec: GenerateRequest): string {
 - Spacing: ${designSpec.spacing}
 - Border Style: ${designSpec.borderStyle}
 - Shadow Style: ${designSpec.shadowStyle}
+- Visual Effects: ${designSpec.visualEffects}
 - Responsive Design: ${designSpec.responsiveDesign ? 'Yes' : 'No'}
 - Dark Mode Support: ${designSpec.darkModeSupport ? 'Yes' : 'No'}
 
