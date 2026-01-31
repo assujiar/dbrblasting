@@ -36,12 +36,7 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <h2 style="margin: 0 0 8px; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">
-                      BlastMail
-                    </h2>
-                    <p style="margin: 0 0 16px; color: rgba(255,255,255,0.8); font-size: 13px;">
-                      Email Marketing Made Simple
-                    </p>
+                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
                   </td>
                 </tr>
                 <tr>
@@ -164,12 +159,7 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <h2 style="margin: 0 0 8px; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">
-                      BlastMail
-                    </h2>
-                    <p style="margin: 0 0 16px; color: rgba(255,255,255,0.8); font-size: 13px;">
-                      Email Marketing Made Simple
-                    </p>
+                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
                   </td>
                 </tr>
                 <tr>
@@ -304,12 +294,7 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <h2 style="margin: 0 0 8px; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">
-                      BlastMail
-                    </h2>
-                    <p style="margin: 0 0 16px; color: rgba(255,255,255,0.8); font-size: 13px;">
-                      Email Marketing Made Simple
-                    </p>
+                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
                   </td>
                 </tr>
                 <tr>
