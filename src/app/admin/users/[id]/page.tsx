@@ -189,19 +189,19 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 animate-slide-up">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/users">
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <Link href="/admin/users" className="shrink-0">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-xl font-semibold">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-xl font-semibold shrink-0">
               {user.full_name?.charAt(0).toUpperCase() || 'U'}
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-neutral-900">{user.full_name}</h1>
-              <p className="text-sm text-neutral-500">{user.email}</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-bold text-neutral-900 break-words line-clamp-2">{user.full_name}</h1>
+              <p className="text-sm text-neutral-500 truncate">{user.email}</p>
             </div>
           </div>
         </div>
