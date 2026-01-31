@@ -132,19 +132,47 @@ export function EmailEditor({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const visualEditorRef = useRef<HTMLDivElement>(null)
   const [isVisualFocused, setIsVisualFocused] = useState(false)
+  const isInternalChange = useRef(false)
 
   // Responsive height
   const mobileHeight = Math.min(height, 350)
 
-  // Sync visual editor content when value changes externally
-  useEffect(() => {
-    if (visualEditorRef.current && !isVisualFocused) {
-      const currentContent = visualEditorRef.current.innerHTML
-      if (currentContent !== value) {
-        visualEditorRef.current.innerHTML = value
+  // Save and restore cursor position
+  const saveCursorPosition = useCallback(() => {
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      return selection.getRangeAt(0).cloneRange()
+    }
+    return null
+  }, [])
+
+  const restoreCursorPosition = useCallback((range: Range | null) => {
+    if (range) {
+      const selection = window.getSelection()
+      if (selection) {
+        selection.removeAllRanges()
+        selection.addRange(range)
       }
     }
+  }, [])
+
+  // Sync visual editor content when value changes externally (not from visual editor)
+  useEffect(() => {
+    if (visualEditorRef.current && !isVisualFocused && !isInternalChange.current) {
+      const currentContent = visualEditorRef.current.innerHTML
+      if (currentContent !== value) {
+        visualEditorRef.current.innerHTML = value || ''
+      }
+    }
+    isInternalChange.current = false
   }, [value, isVisualFocused])
+
+  // Initialize visual editor content on mount
+  useEffect(() => {
+    if (visualEditorRef.current && value) {
+      visualEditorRef.current.innerHTML = value
+    }
+  }, [])
 
   // Execute command for visual editor
   const execCommand = useCallback((command: string, value?: string) => {
@@ -158,6 +186,7 @@ export function EmailEditor({
   // Handle visual editor input
   const handleVisualInput = useCallback(() => {
     if (visualEditorRef.current) {
+      isInternalChange.current = true
       onChange(visualEditorRef.current.innerHTML)
     }
   }, [onChange])
@@ -524,7 +553,6 @@ export function EmailEditor({
                     lineHeight: '1.6',
                     fontSize: '14px',
                   }}
-                  dangerouslySetInnerHTML={{ __html: value }}
                   suppressContentEditableWarning
                 />
               </div>
