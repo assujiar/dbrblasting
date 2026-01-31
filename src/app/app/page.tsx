@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -45,6 +45,30 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { UserRole } from '@/types/database'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  ChartEvent,
+  ActiveElement,
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+)
 
 // Types
 interface OverviewData {
@@ -134,15 +158,8 @@ interface UserProfile {
   organization_id: string | null
 }
 
-// Chart tooltip state
-interface ChartTooltip {
-  visible: boolean
-  x: number
-  y: number
-  date: string
-  sent: number
-  failed: number
-}
+// Chart reference type
+type ChartRef = ChartJS<'line', number[], string> | null
 
 export default function DashboardPage() {
   const [overview, setOverview] = useState<OverviewData | null>(null)
@@ -167,16 +184,8 @@ export default function DashboardPage() {
   const [showFilters, setShowFilters] = useState(false)
 
   // Chart interaction state
-  const [chartTooltip, setChartTooltip] = useState<ChartTooltip>({
-    visible: false,
-    x: 0,
-    y: 0,
-    date: '',
-    sent: 0,
-    failed: 0,
-  })
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const chartRef = useState<HTMLDivElement | null>(null)
+  const chartRef = useRef<ChartRef>(null)
 
   // Determine role capabilities
   const isSuperAdmin = userProfile?.role === 'super_admin'
@@ -900,191 +909,162 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="pt-0">
             {dailyActivity.length > 0 ? (
-              <div className="space-y-4">
-                {/* Line Chart */}
-                <div className="relative h-48">
+              <div className="space-y-2">
+                {/* Line Chart using Chart.js */}
+                <div className="h-48">
                   {(() => {
                     const data = [...dailyActivity].reverse()
-                    const maxValue = Math.max(
-                      ...data.map(d => Math.max(d.emails_sent, d.emails_failed)),
-                      1
+                    const labels = data.map(d =>
+                      new Date(d.activity_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                     )
-                    const chartWidth = 100
-                    const chartHeight = 100
-                    const padding = 5
 
-                    // Calculate points for sent line
-                    const sentPoints = data.map((d, i) => {
-                      const x = padding + (i / (data.length - 1 || 1)) * (chartWidth - padding * 2)
-                      const y = chartHeight - padding - (d.emails_sent / maxValue) * (chartHeight - padding * 2)
-                      return { x, y, data: d }
-                    })
-
-                    // Calculate points for failed line
-                    const failedPoints = data.map((d, i) => {
-                      const x = padding + (i / (data.length - 1 || 1)) * (chartWidth - padding * 2)
-                      const y = chartHeight - padding - (d.emails_failed / maxValue) * (chartHeight - padding * 2)
-                      return { x, y, data: d }
-                    })
-
-                    // Create line path
-                    const createLinePath = (points: typeof sentPoints) => {
-                      if (points.length === 0) return ''
-                      return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+                    const chartData = {
+                      labels,
+                      datasets: [
+                        {
+                          label: 'Sent',
+                          data: data.map(d => d.emails_sent),
+                          borderColor: '#10b981',
+                          backgroundColor: (context: { chart: ChartJS }) => {
+                            const ctx = context.chart.ctx
+                            const gradient = ctx.createLinearGradient(0, 0, 0, context.chart.height)
+                            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)')
+                            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.02)')
+                            return gradient
+                          },
+                          fill: true,
+                          tension: 0.4,
+                          pointRadius: 5,
+                          pointBackgroundColor: 'white',
+                          pointBorderColor: '#10b981',
+                          pointBorderWidth: 2,
+                          pointHoverRadius: 7,
+                          pointHoverBackgroundColor: 'white',
+                          pointHoverBorderColor: '#10b981',
+                          pointHoverBorderWidth: 3,
+                        },
+                        {
+                          label: 'Failed',
+                          data: data.map(d => d.emails_failed),
+                          borderColor: '#ef4444',
+                          backgroundColor: (context: { chart: ChartJS }) => {
+                            const ctx = context.chart.ctx
+                            const gradient = ctx.createLinearGradient(0, 0, 0, context.chart.height)
+                            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)')
+                            gradient.addColorStop(1, 'rgba(239, 68, 68, 0.02)')
+                            return gradient
+                          },
+                          fill: true,
+                          tension: 0.4,
+                          pointRadius: 4,
+                          pointBackgroundColor: 'white',
+                          pointBorderColor: '#ef4444',
+                          pointBorderWidth: 2,
+                          pointHoverRadius: 6,
+                          pointHoverBackgroundColor: 'white',
+                          pointHoverBorderColor: '#ef4444',
+                          pointHoverBorderWidth: 3,
+                        },
+                      ],
                     }
 
-                    // Create area path (for gradient fill)
-                    const createAreaPath = (points: typeof sentPoints) => {
-                      if (points.length === 0) return ''
-                      const linePath = createLinePath(points)
-                      const firstX = points[0].x
-                      const lastX = points[points.length - 1].x
-                      return `${linePath} L ${lastX} ${chartHeight - padding} L ${firstX} ${chartHeight - padding} Z`
+                    const options = {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      interaction: {
+                        mode: 'index' as const,
+                        intersect: false,
+                      },
+                      plugins: {
+                        legend: {
+                          display: true,
+                          position: 'bottom' as const,
+                          labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 20,
+                            font: {
+                              size: 12,
+                            },
+                          },
+                        },
+                        tooltip: {
+                          backgroundColor: 'white',
+                          titleColor: '#374151',
+                          bodyColor: '#374151',
+                          borderColor: '#e5e7eb',
+                          borderWidth: 1,
+                          padding: 12,
+                          displayColors: true,
+                          usePointStyle: true,
+                          callbacks: {
+                            title: (items: { dataIndex: number }[]) => {
+                              const idx = items[0]?.dataIndex
+                              if (idx !== undefined) {
+                                return new Date(data[idx].activity_date).toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })
+                              }
+                              return ''
+                            },
+                          },
+                        },
+                      },
+                      scales: {
+                        x: {
+                          display: true,
+                          grid: {
+                            display: false,
+                          },
+                          ticks: {
+                            font: {
+                              size: 10,
+                            },
+                            color: '#9ca3af',
+                            maxRotation: 0,
+                            callback: function(val: string | number, index: number) {
+                              // Show first, middle, and last labels
+                              const total = data.length
+                              if (index === 0 || index === Math.floor(total / 2) || index === total - 1) {
+                                return labels[index]
+                              }
+                              return ''
+                            },
+                          },
+                        },
+                        y: {
+                          display: true,
+                          grid: {
+                            display: false,
+                          },
+                          ticks: {
+                            font: {
+                              size: 10,
+                            },
+                            color: '#9ca3af',
+                          },
+                          beginAtZero: true,
+                        },
+                      },
+                      onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
+                        if (elements.length > 0) {
+                          const idx = elements[0].index
+                          setSelectedDate(data[idx].activity_date)
+                        }
+                      },
                     }
 
                     return (
-                      <svg
-                        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-                        className="w-full h-full"
-                        preserveAspectRatio="none"
-                      >
-                        <defs>
-                          {/* Gradient for sent area */}
-                          <linearGradient id="sentGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
-                            <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
-                          </linearGradient>
-                          {/* Gradient for failed area */}
-                          <linearGradient id="failedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
-                            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.05" />
-                          </linearGradient>
-                        </defs>
-
-                        {/* Sent Area Fill */}
-                        <path
-                          d={createAreaPath(sentPoints)}
-                          fill="url(#sentGradient)"
-                        />
-
-                        {/* Failed Area Fill */}
-                        <path
-                          d={createAreaPath(failedPoints)}
-                          fill="url(#failedGradient)"
-                        />
-
-                        {/* Sent Line */}
-                        <path
-                          d={createLinePath(sentPoints)}
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="0.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-
-                        {/* Failed Line */}
-                        <path
-                          d={createLinePath(failedPoints)}
-                          fill="none"
-                          stroke="#ef4444"
-                          strokeWidth="0.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-
-                        {/* Sent Points */}
-                        {sentPoints.map((point, i) => (
-                          <circle
-                            key={`sent-${i}`}
-                            cx={point.x}
-                            cy={point.y}
-                            r="1"
-                            fill="white"
-                            stroke="#10b981"
-                            strokeWidth="0.5"
-                            className="cursor-pointer hover:r-[1.5] transition-all"
-                            onClick={() => {
-                              setChartTooltip({
-                                visible: true,
-                                x: point.x,
-                                y: point.y,
-                                date: point.data.activity_date,
-                                sent: point.data.emails_sent,
-                                failed: point.data.emails_failed,
-                              })
-                            }}
-                            onDoubleClick={() => setSelectedDate(point.data.activity_date)}
-                          />
-                        ))}
-
-                        {/* Failed Points */}
-                        {failedPoints.map((point, i) => (
-                          <circle
-                            key={`failed-${i}`}
-                            cx={point.x}
-                            cy={point.y}
-                            r="1"
-                            fill="white"
-                            stroke="#ef4444"
-                            strokeWidth="0.5"
-                            className="cursor-pointer hover:r-[1.5] transition-all"
-                            onClick={() => {
-                              setChartTooltip({
-                                visible: true,
-                                x: point.x,
-                                y: point.y,
-                                date: point.data.activity_date,
-                                sent: point.data.emails_sent,
-                                failed: point.data.emails_failed,
-                              })
-                            }}
-                            onDoubleClick={() => setSelectedDate(point.data.activity_date)}
-                          />
-                        ))}
-                      </svg>
+                      <Line
+                        ref={chartRef}
+                        data={chartData}
+                        options={options}
+                      />
                     )
                   })()}
-
-                  {/* Tooltip */}
-                  {chartTooltip.visible && (
-                    <div
-                      className="absolute z-10 bg-white rounded-lg shadow-lg border border-neutral-200 p-3 pointer-events-none transform -translate-x-1/2 -translate-y-full"
-                      style={{
-                        left: `${chartTooltip.x}%`,
-                        top: `${chartTooltip.y - 5}%`,
-                      }}
-                    >
-                      <p className="text-xs font-semibold text-neutral-700 mb-1">
-                        {new Date(chartTooltip.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </p>
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="text-emerald-600">Sent: {chartTooltip.sent}</span>
-                        <span className="text-red-600">Failed: {chartTooltip.failed}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* X-axis labels */}
-                <div className="flex justify-between px-2 text-[10px] text-neutral-400">
-                  {[...dailyActivity].reverse().filter((_, i, arr) => i === 0 || i === Math.floor(arr.length / 2) || i === arr.length - 1).map((day) => (
-                    <span key={day.activity_date}>
-                      {new Date(day.activity_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Legend */}
-                <div className="flex items-center justify-center gap-6 pt-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-0.5 bg-emerald-500 rounded-full" />
-                    <span className="text-xs text-neutral-500">Sent</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-0.5 bg-red-500 rounded-full" />
-                    <span className="text-xs text-neutral-500">Failed</span>
-                  </div>
                 </div>
               </div>
             ) : (
