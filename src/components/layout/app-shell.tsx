@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { APP_LOGO_URL, APP_ICON_URL, APP_LOGO_HORIZONTAL_URL, APP_NAME } from '@/lib/constants'
+import { APP_LOGO_URL, APP_ICON_URL, APP_NAME } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -350,7 +350,7 @@ function SidebarContent({
                 <span className="text-[10px] uppercase tracking-wider text-neutral-400">Powered by</span>
               )}
               <img
-                src={APP_LOGO_HORIZONTAL_URL}
+                src={APP_LOGO_URL}
                 alt={APP_NAME}
                 className={cn(
                   'object-contain transition-all duration-300',

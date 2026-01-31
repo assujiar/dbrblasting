@@ -3,13 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 import {
   Users,
   FolderKanban,
   FileText,
   Send,
   LayoutDashboard,
-  Mail,
   X,
   User,
 } from 'lucide-react'
@@ -35,17 +35,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 border-b border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
-            <Mail className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              BlastMail
-            </h1>
-            <p className="text-[10px] text-gray-500 -mt-0.5">Email Marketing</p>
-          </div>
-        </div>
+        <Link href="/app" className="flex items-center">
+          <img
+            src={APP_LOGO_URL}
+            alt={APP_NAME}
+            className="h-10 w-auto object-contain"
+          />
+        </Link>
         {/* Close button - mobile only */}
         <button
           onClick={onClose}
@@ -90,11 +86,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Footer */}
       <div className="p-4 border-t border-gray-100">
-        <div className="rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-          <p className="text-xs font-medium text-gray-700">Need help?</p>
-          <p className="text-[10px] text-gray-500 mt-1">
-            Check our documentation for guides and tips.
-          </p>
+        <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
+          <span>Powered by</span>
+          <img
+            src={APP_LOGO_URL}
+            alt={APP_NAME}
+            className="h-5 w-auto object-contain"
+          />
         </div>
       </div>
     </div>
