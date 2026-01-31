@@ -5,6 +5,10 @@ import { Toaster } from '@/components/ui/toaster'
 export const metadata: Metadata = {
   title: 'BlastMail - Email Marketing Platform',
   description: 'Professional email blasting and marketing platform for your business',
+  icons: {
+    icon: '/blastmail_saiki_mainlogo-02-01.svg',
+    apple: '/blastmail_saiki_mainlogo-02-01.png',
+  },
 }
 
 export default function RootLayout({
