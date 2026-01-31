@@ -674,41 +674,506 @@ input[type="number"] {
 }
 
 /* ============================================================================
-   LANDING PAGE TEXT COLORS
-   For dark backgrounds - ensures high contrast and readability
+   LANDING PAGE DESIGN SYSTEM
+   Complete styling for dark background LP using white, pink, magenta, purple
    ============================================================================ */
 
-/* Primary body text - descriptions, paragraphs */
-.lp-text {
-  color: #fbcfe8; /* pink-200 equivalent */
+/* -----------------------------------------------------------------------------
+   LP COLOR PALETTE (CSS Variables)
+   ----------------------------------------------------------------------------- */
+:root {
+  /* White shades */
+  --lp-white: #ffffff;
+  --lp-white-90: rgba(255, 255, 255, 0.9);
+  --lp-white-80: rgba(255, 255, 255, 0.8);
+  --lp-white-70: rgba(255, 255, 255, 0.7);
+  --lp-white-60: rgba(255, 255, 255, 0.6);
+  --lp-white-50: rgba(255, 255, 255, 0.5);
+  --lp-white-40: rgba(255, 255, 255, 0.4);
+  --lp-white-20: rgba(255, 255, 255, 0.2);
+  --lp-white-10: rgba(255, 255, 255, 0.1);
+  --lp-white-05: rgba(255, 255, 255, 0.05);
+
+  /* Pink shades */
+  --lp-pink-50: #fdf2f8;
+  --lp-pink-100: #fce7f3;
+  --lp-pink-200: #fbcfe8;
+  --lp-pink-300: #f9a8d4;
+  --lp-pink-400: #f472b6;
+  --lp-pink-500: #ec4899;
+  --lp-pink-600: #db2777;
+
+  /* Magenta/Primary shades */
+  --lp-magenta-300: #f0abfc;
+  --lp-magenta-400: #e879f9;
+  --lp-magenta-500: #d946ef;
+  --lp-magenta-600: #c026d3;
+
+  /* Purple shades */
+  --lp-purple-300: #c4b5fd;
+  --lp-purple-400: #a78bfa;
+  --lp-purple-500: #8b5cf6;
+  --lp-purple-600: #7c3aed;
+
+  /* Accent (coral/orange) */
+  --lp-accent-400: #fb7185;
+  --lp-accent-500: #f43f5e;
+
+  /* Background */
+  --lp-bg: #0a0a0f;
+  --lp-bg-light: rgba(255, 255, 255, 0.02);
+  --lp-bg-card: rgba(255, 255, 255, 0.05);
+  --lp-bg-card-hover: rgba(255, 255, 255, 0.1);
 }
 
-/* Muted text - secondary information */
-.lp-text-muted {
-  color: #f9a8d4; /* pink-300 equivalent */
-}
+/* -----------------------------------------------------------------------------
+   LP TEXT STYLES
+   ----------------------------------------------------------------------------- */
 
-/* Subtle text - tertiary information, hints */
-.lp-text-subtle {
-  color: #f472b6; /* pink-400 equivalent */
-}
-
-/* Headings - maximum contrast */
+/* Headings - Pure white for maximum contrast */
 .lp-heading {
-  color: #ffffff;
+  color: var(--lp-white);
 }
 
-/* Accent/highlight text - lighter pink for emphasis */
+.lp-heading-gradient {
+  background: linear-gradient(to right, var(--lp-magenta-400), var(--lp-accent-400), var(--lp-magenta-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+}
+
+/* Primary body text - Light pink, highly readable */
+.lp-text {
+  color: var(--lp-pink-200);
+}
+
+/* Secondary text - Slightly dimmer pink */
+.lp-text-muted {
+  color: var(--lp-pink-300);
+}
+
+/* Tertiary text - More subtle pink */
+.lp-text-subtle {
+  color: var(--lp-pink-400);
+}
+
+/* Accent text - Lightest pink for emphasis */
 .lp-text-accent {
-  color: #fce7f3; /* pink-100 equivalent */
+  color: var(--lp-pink-100);
 }
 
-/* Link text - interactive elements */
+/* Purple text variants */
+.lp-text-purple {
+  color: var(--lp-purple-400);
+}
+
+.lp-text-purple-light {
+  color: var(--lp-purple-300);
+}
+
+/* Magenta text variants */
+.lp-text-magenta {
+  color: var(--lp-magenta-400);
+}
+
+.lp-text-magenta-light {
+  color: var(--lp-magenta-300);
+}
+
+/* White text with opacity */
+.lp-text-white {
+  color: var(--lp-white);
+}
+
+.lp-text-white-80 {
+  color: var(--lp-white-80);
+}
+
+.lp-text-white-60 {
+  color: var(--lp-white-60);
+}
+
+.lp-text-white-50 {
+  color: var(--lp-white-50);
+}
+
+.lp-text-white-40 {
+  color: var(--lp-white-40);
+}
+
+/* Success/Error text for LP */
+.lp-text-success {
+  color: #4ade80;
+}
+
+.lp-text-error {
+  color: #f87171;
+}
+
+/* -----------------------------------------------------------------------------
+   LP LINK STYLES
+   ----------------------------------------------------------------------------- */
 .lp-link {
-  color: #f472b6; /* pink-400 */
+  color: var(--lp-pink-400);
   transition: color 150ms ease;
 }
 
 .lp-link:hover {
-  color: #ffffff;
+  color: var(--lp-white);
+}
+
+.lp-link-white {
+  color: var(--lp-white-60);
+  transition: color 150ms ease;
+}
+
+.lp-link-white:hover {
+  color: var(--lp-white);
+}
+
+/* -----------------------------------------------------------------------------
+   LP BACKGROUND STYLES
+   ----------------------------------------------------------------------------- */
+.lp-bg {
+  background-color: var(--lp-bg);
+}
+
+.lp-bg-subtle {
+  background-color: var(--lp-bg-light);
+}
+
+.lp-bg-card {
+  background-color: var(--lp-bg-card);
+}
+
+.lp-bg-card-hover:hover {
+  background-color: var(--lp-bg-card-hover);
+}
+
+.lp-bg-gradient {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), transparent, rgba(168, 85, 247, 0.1));
+}
+
+.lp-bg-pink-glow {
+  background: radial-gradient(circle at center, rgba(236, 72, 153, 0.2), transparent 70%);
+}
+
+.lp-bg-purple-glow {
+  background: radial-gradient(circle at center, rgba(168, 85, 247, 0.2), transparent 70%);
+}
+
+/* -----------------------------------------------------------------------------
+   LP BORDER STYLES
+   ----------------------------------------------------------------------------- */
+.lp-border {
+  border-color: var(--lp-white-10);
+}
+
+.lp-border-subtle {
+  border-color: var(--lp-white-05);
+}
+
+.lp-border-pink {
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.lp-border-purple {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* -----------------------------------------------------------------------------
+   LP CARD STYLES
+   ----------------------------------------------------------------------------- */
+.lp-card {
+  background-color: var(--lp-bg-card);
+  border: 1px solid var(--lp-white-10);
+  border-radius: 1rem;
+  transition: all 200ms ease;
+}
+
+.lp-card:hover {
+  background-color: var(--lp-bg-card-hover);
+  border-color: var(--lp-white-20);
+  transform: translateY(-2px);
+}
+
+.lp-card-static {
+  background-color: var(--lp-bg-card);
+  border: 1px solid var(--lp-white-10);
+  border-radius: 1rem;
+}
+
+/* -----------------------------------------------------------------------------
+   LP BUTTON STYLES
+   ----------------------------------------------------------------------------- */
+.lp-btn-primary {
+  background: linear-gradient(to right, var(--lp-magenta-500), var(--lp-accent-500));
+  color: var(--lp-white);
+  border: none;
+  box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.3);
+  transition: all 200ms ease;
+}
+
+.lp-btn-primary:hover {
+  background: linear-gradient(to right, var(--lp-magenta-400), var(--lp-accent-400));
+  box-shadow: 0 15px 30px -5px rgba(236, 72, 153, 0.4);
+}
+
+.lp-btn-outline {
+  background: transparent;
+  color: var(--lp-pink-300);
+  border: 1px solid var(--lp-pink-400);
+  transition: all 200ms ease;
+}
+
+.lp-btn-outline:hover {
+  background: rgba(236, 72, 153, 0.1);
+  color: var(--lp-pink-200);
+}
+
+.lp-btn-ghost {
+  background: var(--lp-white-10);
+  color: var(--lp-white);
+  border: 1px solid var(--lp-white-10);
+  transition: all 200ms ease;
+}
+
+.lp-btn-ghost:hover {
+  background: var(--lp-white-20);
+}
+
+.lp-btn-white {
+  background: var(--lp-white);
+  color: var(--lp-magenta-600);
+  transition: all 200ms ease;
+}
+
+.lp-btn-white:hover {
+  background: var(--lp-white-90);
+}
+
+/* -----------------------------------------------------------------------------
+   LP BADGE STYLES
+   ----------------------------------------------------------------------------- */
+.lp-badge {
+  background: rgba(236, 72, 153, 0.1);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  color: var(--lp-magenta-300);
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.lp-badge-success {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
+/* -----------------------------------------------------------------------------
+   LP ICON STYLES
+   ----------------------------------------------------------------------------- */
+.lp-icon {
+  color: var(--lp-magenta-400);
+}
+
+.lp-icon-muted {
+  color: var(--lp-white-50);
+}
+
+.lp-icon-pink {
+  color: var(--lp-pink-400);
+}
+
+.lp-icon-purple {
+  color: var(--lp-purple-400);
+}
+
+.lp-icon-box {
+  background: linear-gradient(to bottom right, var(--lp-magenta-500), var(--lp-accent-500));
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-icon-box-subtle {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2));
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* -----------------------------------------------------------------------------
+   LP DIVIDER STYLES
+   ----------------------------------------------------------------------------- */
+.lp-divider {
+  border-color: var(--lp-white-05);
+}
+
+/* -----------------------------------------------------------------------------
+   LP SECTION STYLES
+   ----------------------------------------------------------------------------- */
+.lp-section {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.lp-section-alt {
+  background: linear-gradient(to bottom, transparent, var(--lp-bg-light), transparent);
+}
+
+/* -----------------------------------------------------------------------------
+   LP GRADIENT CTA BOX
+   ----------------------------------------------------------------------------- */
+.lp-cta-box {
+  background: linear-gradient(to bottom right, var(--lp-magenta-600), var(--lp-magenta-500), var(--lp-accent-500));
+  border-radius: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.lp-cta-text {
+  color: var(--lp-pink-100);
+}
+
+/* -----------------------------------------------------------------------------
+   LP FORM ELEMENTS
+   ----------------------------------------------------------------------------- */
+.lp-input {
+  background: var(--lp-white-05);
+  border: 1px solid var(--lp-white-10);
+  color: var(--lp-white);
+  border-radius: 0.5rem;
+  transition: all 200ms ease;
+}
+
+.lp-input:focus {
+  border-color: var(--lp-magenta-500);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+}
+
+.lp-input::placeholder {
+  color: var(--lp-white-40);
+}
+
+/* -----------------------------------------------------------------------------
+   LP TOGGLE/SWITCH STYLES
+   ----------------------------------------------------------------------------- */
+.lp-toggle {
+  background: var(--lp-bg-card);
+  border: 1px solid var(--lp-white-10);
+  border-radius: 9999px;
+  padding: 0.375rem;
+}
+
+.lp-toggle-active {
+  background: linear-gradient(to right, var(--lp-magenta-500), var(--lp-accent-500));
+  color: var(--lp-white);
+  box-shadow: 0 4px 12px -2px rgba(236, 72, 153, 0.4);
+}
+
+.lp-toggle-inactive {
+  color: var(--lp-pink-200);
+}
+
+.lp-toggle-inactive:hover {
+  color: var(--lp-white);
+}
+
+/* -----------------------------------------------------------------------------
+   LP AVATAR STYLES
+   ----------------------------------------------------------------------------- */
+.lp-avatar {
+  background: linear-gradient(to bottom right, var(--lp-magenta-500), var(--lp-accent-500));
+  color: var(--lp-white);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* -----------------------------------------------------------------------------
+   LP STAR RATING
+   ----------------------------------------------------------------------------- */
+.lp-star {
+  color: #facc15;
+  fill: #facc15;
+}
+
+/* -----------------------------------------------------------------------------
+   LP PROGRESS BAR
+   ----------------------------------------------------------------------------- */
+.lp-progress {
+  background: var(--lp-white-10);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.lp-progress-bar {
+  background: linear-gradient(to right, var(--lp-magenta-500), var(--lp-accent-500));
+  border-radius: 9999px;
+}
+
+/* -----------------------------------------------------------------------------
+   LP FAQ ACCORDION
+   ----------------------------------------------------------------------------- */
+.lp-accordion {
+  background: var(--lp-bg-card);
+  border: 1px solid var(--lp-white-10);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.lp-accordion-trigger {
+  color: var(--lp-white);
+  width: 100%;
+  text-align: left;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lp-accordion-content {
+  color: var(--lp-pink-200);
+  padding: 0 1.25rem 1.25rem;
+  line-height: 1.6;
+}
+
+.lp-accordion-icon {
+  color: var(--lp-white-50);
+  transition: transform 200ms ease;
+}
+
+/* -----------------------------------------------------------------------------
+   LP ANIMATIONS
+   ----------------------------------------------------------------------------- */
+.lp-animate-gradient {
+  animation: lp-gradient 3s ease infinite;
+  background-size: 200% auto;
+}
+
+@keyframes lp-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.lp-animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.lp-animate-float {
+  animation: lp-float 6s ease-in-out infinite;
+}
+
+@keyframes lp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
