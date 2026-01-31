@@ -30,8 +30,9 @@ import {
   MessageSquare,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/utils'
-import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
+import { APP_NAME } from '@/lib/constants'
 
 // Animated counter hook
 function useCountUp(end: number, duration: number = 2000, start: boolean = true) {
@@ -262,13 +263,7 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 lg:h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
           <Link href="/" className="flex items-center">
-            <img
-              src={APP_LOGO_URL}
-              alt={APP_NAME}
-              width={167}
-              height={40}
-              className="h-8 lg:h-10 w-auto object-contain"
-            />
+            <Logo className="h-8 lg:h-10" />
           </Link>
 
           {/* Desktop nav */}
@@ -767,13 +762,7 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <img
-                  src={APP_LOGO_URL}
-                  alt={APP_NAME}
-                  width={134}
-                  height={32}
-                  className="h-8 w-auto object-contain"
-                />
+                <Logo className="h-8" />
                 <span className="text-sm text-pink-400">by SAIKI Group</span>
               </div>
 
