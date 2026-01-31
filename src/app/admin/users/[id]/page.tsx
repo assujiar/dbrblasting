@@ -453,9 +453,19 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 {user.organization ? (
                   <Link href={`/admin/organizations/${user.organization.id}`}>
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-neutral-100 transition-colors cursor-pointer">
-                      <div className="p-2 rounded-lg bg-error-50">
-                        <Building2 className="h-5 w-5 text-error-600" />
-                      </div>
+                      {user.organization.logo_url ? (
+                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-neutral-200 bg-white flex items-center justify-center">
+                          <img
+                            src={user.organization.logo_url}
+                            alt={user.organization.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="p-2 rounded-lg bg-error-50">
+                          <Building2 className="h-5 w-5 text-error-600" />
+                        </div>
+                      )}
                       <div>
                         <p className="font-medium">{user.organization.name}</p>
                         <p className="text-xs text-neutral-500">{user.organization.slug}</p>

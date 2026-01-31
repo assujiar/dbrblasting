@@ -112,10 +112,14 @@ function SidebarContent({
               </div>
             ) : (
               <div className={cn(
-                'flex items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-500/30 transition-all duration-300',
+                'flex items-center justify-center rounded-xl overflow-hidden bg-white shadow-lg shadow-primary-500/30 transition-all duration-300',
                 collapsed ? 'w-10 h-10' : 'w-10 h-10'
               )}>
-                <Mail className="w-5 h-5 text-white" />
+                <img
+                  src="/logo-icon.svg"
+                  alt="BlastMail"
+                  className="w-full h-full object-contain p-1"
+                />
               </div>
             )}
             <span className={cn(
@@ -321,12 +325,45 @@ function SidebarContent({
           </div>
         )}
 
+        {/* Powered by BlastMail - shown when org has custom logo */}
+        {organization?.logo_url && (
+          <div className={cn(
+            'shrink-0 border-t border-neutral-100 transition-all duration-300',
+            collapsed ? 'p-2' : 'px-4 py-3'
+          )}>
+            <div className={cn(
+              'flex items-center gap-2 text-neutral-400 transition-all duration-300',
+              collapsed ? 'justify-center' : 'justify-start'
+            )}>
+              <div className={cn(
+                'flex items-center justify-center rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-300',
+                collapsed ? 'w-8 h-8' : 'w-6 h-6'
+              )}>
+                <img
+                  src="/logo-icon.svg"
+                  alt="BlastMail"
+                  className="w-full h-full object-contain p-0.5"
+                />
+              </div>
+              {!collapsed && (
+                <span className="text-xs">
+                  Powered by <span className="font-semibold text-neutral-500">BlastMail</span>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Help card (only when expanded, mobile only) */}
         {!collapsed && !onToggleCollapse && (
           <div className="shrink-0 p-4">
             <div className="p-4 rounded-2xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100/50">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/80 shadow-sm mb-2">
-                <Mail className="w-4 h-4 text-primary-600" />
+                <img
+                  src="/logo-icon.svg"
+                  alt="BlastMail"
+                  className="w-5 h-5 object-contain"
+                />
               </div>
               <p className="text-sm font-semibold text-neutral-900">
                 Need help?
@@ -486,8 +523,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25">
-                      <Mail className="w-4 h-4 text-white" />
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden bg-white shadow-md shadow-primary-500/25">
+                      <img
+                        src="/logo-icon.svg"
+                        alt="BlastMail"
+                        className="w-full h-full object-contain p-0.5"
+                      />
                     </div>
                   )}
                   <span className="font-bold text-neutral-900">{organization?.name || 'BlastMail'}</span>
