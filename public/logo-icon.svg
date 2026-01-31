@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Blast effect - simplified -->
+  <path d="M20 2L22 12L26 4L24 13L34 8L25 15L38 14L26 18L39 22L26 22L38 28L25 25L34 34L24 27L26 38L22 28L20 40L18 28L14 38L16 27L6 34L15 25L2 28L14 22L1 22L14 18L2 14L15 15L6 8L16 13L14 4L18 12L20 2Z" fill="#1a1a1a"/>
+
+  <!-- Envelope -->
+  <rect x="10" y="14" width="20" height="14" rx="2" fill="white" stroke="#1a1a1a" stroke-width="1.5"/>
+  <path d="M10 16L20 24L30 16" fill="white" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Speed lines -->
+  <line x1="6" y1="19" x2="2" y2="19" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="7" y1="22" x2="3" y2="22" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="6" y1="25" x2="2" y2="25" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

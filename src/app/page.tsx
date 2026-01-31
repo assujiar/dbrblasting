@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Menu, Mail, Send, Users, FileText, Zap, Shield, BarChart3, CheckCircle2, ArrowRight, Sparkles, Check, X, Crown, Star, Rocket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -149,10 +150,14 @@ export default function Home() {
       {/* Header */}
       <header className="relative z-10 border-b border-neutral-100 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-500/25">
-              <Mail className="w-5 h-5 text-white" />
-            </div>
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/logo-icon.svg"
+              alt="BlastMail"
+              width={36}
+              height={36}
+              className="w-9 h-9"
+            />
             <span className="text-xl font-bold text-neutral-900">BlastMail</span>
           </Link>
 
@@ -594,10 +599,14 @@ export default function Home() {
         <footer className="border-t border-neutral-100 bg-white py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-2.5">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700">
-                  <Mail className="w-4 h-4 text-white" />
-                </div>
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/logo-icon.svg"
+                  alt="BlastMail"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8"
+                />
                 <span className="text-lg font-bold text-neutral-900">BlastMail</span>
               </div>
               <p className="text-sm text-neutral-500">
