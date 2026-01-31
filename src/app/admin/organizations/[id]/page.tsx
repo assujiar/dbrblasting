@@ -51,6 +51,9 @@ import {
   ChevronRight,
   Crown,
   Mail,
+  ImageIcon,
+  Upload,
+  X,
 } from 'lucide-react'
 import { cn, formatDateShort } from '@/lib/utils'
 import type { Organization, UserProfile } from '@/types/database'
@@ -76,6 +79,8 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
   const [smtpTestResult, setSmtpTestResult] = useState<'success' | 'error' | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [organization, setOrganization] = useState<OrganizationDetail | null>(null)
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
+  const [isDeletingLogo, setIsDeletingLogo] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -239,6 +244,93 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
     }
   }
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload a JPEG, PNG, GIF, WebP, or SVG image',
+        variant: 'error',
+      })
+      return
+    }
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Maximum file size is 2MB',
+        variant: 'error',
+      })
+      return
+    }
+
+    setIsUploadingLogo(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('organization_id', id)
+
+      const response = await fetch('/api/organization/logo', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Upload failed')
+
+      toast({
+        title: 'Logo uploaded',
+        description: 'Organization logo has been updated',
+        variant: 'success',
+      })
+      fetchOrganization()
+    } catch (error) {
+      toast({
+        title: 'Upload failed',
+        description: error instanceof Error ? error.message : 'Failed to upload logo',
+        variant: 'error',
+      })
+    } finally {
+      setIsUploadingLogo(false)
+      // Reset input
+      e.target.value = ''
+    }
+  }
+
+  const handleDeleteLogo = async () => {
+    setIsDeletingLogo(true)
+    try {
+      const response = await fetch(`/api/organization/logo?organization_id=${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const result = await response.json()
+        throw new Error(result.error || 'Delete failed')
+      }
+
+      toast({
+        title: 'Logo removed',
+        description: 'Organization logo has been deleted',
+        variant: 'success',
+      })
+      fetchOrganization()
+    } catch (error) {
+      toast({
+        title: 'Delete failed',
+        description: error instanceof Error ? error.message : 'Failed to delete logo',
+        variant: 'error',
+      })
+    } finally {
+      setIsDeletingLogo(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -343,6 +435,90 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
           </CardContent>
         </Card>
       </div>
+
+      {/* Logo Upload Section */}
+      <Card className="animate-slide-up" style={{ animationDelay: '75ms' }}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ImageIcon className="h-5 w-5 text-primary-500" />
+            Organization Logo
+          </CardTitle>
+          <CardDescription>Upload a logo for this organization (max 2MB)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            {/* Logo Preview */}
+            <div className="relative">
+              {organization.logo_url ? (
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-2xl border-2 border-neutral-200 overflow-hidden bg-white shadow-lg">
+                    <img
+                      src={organization.logo_url}
+                      alt={organization.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  {/* Delete button overlay */}
+                  <button
+                    onClick={handleDeleteLogo}
+                    disabled={isDeletingLogo}
+                    className="absolute -top-2 -right-2 p-1.5 rounded-full bg-error-500 text-white shadow-lg hover:bg-error-600 transition-colors disabled:opacity-50"
+                  >
+                    {isDeletingLogo ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <X className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50 flex items-center justify-center">
+                  <ImageIcon className="h-8 w-8 text-neutral-400" />
+                </div>
+              )}
+            </div>
+
+            {/* Upload Controls */}
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-sm text-neutral-600 mb-3">
+                {organization.logo_url
+                  ? 'Click the X button to remove the current logo, or upload a new one to replace it.'
+                  : 'Upload a logo to display in the sidebar and header for users in this organization.'}
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                    onChange={handleLogoUpload}
+                    disabled={isUploadingLogo}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isUploadingLogo}
+                    asChild
+                  >
+                    <span>
+                      {isUploadingLogo ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      {isUploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                    </span>
+                  </Button>
+                </label>
+              </div>
+              <p className="text-xs text-neutral-400 mt-2">
+                Supported: JPEG, PNG, GIF, WebP, SVG
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Basic Info */}
