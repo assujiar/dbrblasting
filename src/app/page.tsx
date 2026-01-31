@@ -341,7 +341,7 @@ export default function Home() {
               </h1>
 
               {/* Subheadline */}
-              <p className="text-lg sm:text-xl text-neutral-200 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
+              <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
                 Bukan sekadar kirim email massal. BlastMail membantu Anda membangun{' '}
                 <span className="text-white font-semibold">koneksi nyata</span> dengan audiens melalui email yang personal dan tepat sasaran.
               </p>
@@ -361,7 +361,7 @@ export default function Home() {
               </div>
 
               {/* Trust indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-300 animate-fade-in" style={{ animationDelay: '300ms' }}>
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/80 animate-fade-in" style={{ animationDelay: '300ms' }}>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-400" />
                   <span>Setup 5 menit</span>
@@ -440,7 +440,7 @@ export default function Home() {
                     <p className="text-4xl lg:text-5xl font-black text-white mb-2">
                       {count}{stat.suffix}
                     </p>
-                    <p className="text-sm text-neutral-300">{stat.label}</p>
+                    <p className="text-sm text-white/80">{stat.label}</p>
                   </div>
                 )
               })}
@@ -461,7 +461,7 @@ export default function Home() {
                   Dalam Satu Platform
                 </span>
               </h2>
-              <p className="text-lg text-neutral-300 max-w-2xl mx-auto">
+              <p className="text-lg text-white/80 max-w-2xl mx-auto">
                 Dari lead management hingga analytics, BlastMail menyediakan semua tools untuk email marketing yang sukses.
               </p>
             </div>
@@ -486,7 +486,7 @@ export default function Home() {
                   </div>
 
                   <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-neutral-300 leading-relaxed">{feature.description}</p>
+                  <p className="text-white/80 leading-relaxed">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -516,7 +516,7 @@ export default function Home() {
                 >
                   <Quote className="h-8 w-8 text-primary-500/30 mb-4" />
 
-                  <p className="text-neutral-200 mb-6 leading-relaxed">
+                  <p className="text-white/90 mb-6 leading-relaxed">
                     "{testimonial.content}"
                   </p>
 
@@ -526,7 +526,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="font-semibold text-white">{testimonial.name}</p>
-                      <p className="text-sm text-neutral-300">{testimonial.role}, {testimonial.company}</p>
+                      <p className="text-sm text-white/80">{testimonial.role}, {testimonial.company}</p>
                     </div>
                   </div>
 
@@ -554,7 +554,7 @@ export default function Home() {
                   Masuk Akal
                 </span>
               </h2>
-              <p className="text-lg text-neutral-300 max-w-2xl mx-auto mb-8">
+              <p className="text-lg text-white/80 max-w-2xl mx-auto mb-8">
                 Mulai gratis, upgrade sesuai pertumbuhan bisnis Anda.
               </p>
 
@@ -566,7 +566,7 @@ export default function Home() {
                     'px-6 py-2.5 rounded-full text-sm font-medium transition-all',
                     billingPeriod === 'monthly'
                       ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-                      : 'text-neutral-200 hover:text-white'
+                      : 'text-white/90 hover:text-white'
                   )}
                 >
                   Bulanan
@@ -577,7 +577,7 @@ export default function Home() {
                     'px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2',
                     billingPeriod === 'yearly'
                       ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-                      : 'text-neutral-200 hover:text-white'
+                      : 'text-white/90 hover:text-white'
                   )}
                 >
                   Tahunan
@@ -614,12 +614,12 @@ export default function Home() {
                     <div className="mb-6">
                       <p className={cn(
                         'text-xs font-medium uppercase tracking-wider mb-2',
-                        plan.popular ? 'text-primary-400' : 'text-neutral-300'
+                        plan.popular ? 'text-primary-400' : 'text-white/80'
                       )}>
                         {plan.highlight}
                       </p>
                       <h3 className="text-2xl font-bold text-white mb-1">{plan.name}</h3>
-                      <p className="text-sm text-neutral-300">{plan.description}</p>
+                      <p className="text-sm text-white/80">{plan.description}</p>
                     </div>
 
                     <div className="mb-6">
@@ -628,7 +628,7 @@ export default function Home() {
                           {price === 0 ? 'Gratis' : formatRupiah(price)}
                         </span>
                         {price > 0 && (
-                          <span className="text-neutral-300">
+                          <span className="text-white/80">
                             /{billingPeriod === 'monthly' ? 'bln' : 'thn'}
                           </span>
                         )}
@@ -637,7 +637,7 @@ export default function Home() {
 
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3 text-sm text-neutral-200">
+                        <li key={feature} className="flex items-center gap-3 text-sm text-white/90">
                           <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
                           {feature}
                         </li>
@@ -703,7 +703,7 @@ export default function Home() {
                     )} />
                   </button>
                   {openFaq === index && (
-                    <div className="px-5 pb-5 text-neutral-200 leading-relaxed">
+                    <div className="px-5 pb-5 text-white/90 leading-relaxed">
                       {faq.a}
                     </div>
                   )}
@@ -757,14 +757,14 @@ export default function Home() {
                   alt={APP_NAME}
                   className="h-8 w-auto object-contain"
                 />
-                <span className="text-sm text-neutral-400">by SAIKI Group</span>
+                <span className="text-sm text-white/70">by SAIKI Group</span>
               </div>
 
-              <p className="text-sm text-neutral-300">
+              <p className="text-sm text-white/80">
                 &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
               </p>
 
-              <div className="flex items-center gap-6 text-sm text-neutral-300">
+              <div className="flex items-center gap-6 text-sm text-white/80">
                 <a href="#" className="hover:text-white transition-colors">Privacy</a>
                 <a href="#" className="hover:text-white transition-colors">Terms</a>
                 <a href="#" className="hover:text-white transition-colors">Contact</a>
