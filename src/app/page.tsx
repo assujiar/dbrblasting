@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, Mail, Send, Users, FileText, Zap, Shield, BarChart3, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react'
+import { Menu, Mail, Send, Users, FileText, Zap, Shield, BarChart3, CheckCircle2, ArrowRight, Sparkles, Check, X, Crown, Star, Rocket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const features = [
   {
@@ -36,7 +38,105 @@ const benefits = [
   'Filter campaign berdasarkan tanggal',
 ]
 
+const pricingPlans = [
+  {
+    name: 'Free',
+    description: 'Untuk mencoba platform',
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    campaigns: 1,
+    recipientsPerDay: 5,
+    emailsPerDay: 5,
+    features: [
+      { text: '1 campaign aktif', included: true },
+      { text: 'Maks. 5 penerima/hari', included: true },
+      { text: 'Template email dasar', included: true },
+      { text: 'Import leads dari Excel', included: true },
+      { text: 'Watermark BlastMail', included: true, note: 'Ada watermark' },
+      { text: 'SMTP kustom', included: false },
+      { text: 'Priority support', included: false },
+    ],
+    popular: false,
+    icon: Sparkles,
+    color: 'neutral',
+  },
+  {
+    name: 'Basic',
+    description: 'Untuk bisnis kecil',
+    monthlyPrice: 74900,
+    yearlyPrice: 800000,
+    campaigns: 3,
+    recipientsPerDay: 50,
+    emailsPerDay: 150,
+    features: [
+      { text: '3 campaign aktif', included: true },
+      { text: 'Maks. 50 penerima/hari', included: true },
+      { text: '150 email/hari', included: true },
+      { text: 'Template email lengkap', included: true },
+      { text: 'Tanpa watermark', included: true },
+      { text: 'SMTP kustom', included: true },
+      { text: 'Priority support', included: false },
+    ],
+    popular: false,
+    icon: Star,
+    color: 'primary',
+  },
+  {
+    name: 'Regular',
+    description: 'Untuk bisnis berkembang',
+    monthlyPrice: 124900,
+    yearlyPrice: 1350000,
+    campaigns: 5,
+    recipientsPerDay: 100,
+    emailsPerDay: 500,
+    features: [
+      { text: '5 campaign aktif', included: true },
+      { text: 'Maks. 100 penerima/hari', included: true },
+      { text: '500 email/hari', included: true },
+      { text: 'Template email lengkap', included: true },
+      { text: 'Tanpa watermark', included: true },
+      { text: 'SMTP kustom', included: true },
+      { text: 'Priority support', included: true },
+    ],
+    popular: true,
+    icon: Rocket,
+    color: 'accent',
+  },
+  {
+    name: 'Pro',
+    description: 'Untuk bisnis besar',
+    monthlyPrice: 349000,
+    yearlyPrice: 3599000,
+    campaigns: 10,
+    recipientsPerDay: 500,
+    emailsPerDay: 5000,
+    features: [
+      { text: '10 campaign aktif', included: true },
+      { text: 'Maks. 500 penerima/hari', included: true },
+      { text: '5.000 email/hari', included: true },
+      { text: 'Template email lengkap', included: true },
+      { text: 'Tanpa watermark', included: true },
+      { text: 'SMTP kustom', included: true },
+      { text: 'Priority support', included: true },
+    ],
+    popular: false,
+    icon: Crown,
+    color: 'warning',
+  },
+]
+
+function formatRupiah(amount: number): string {
+  if (amount === 0) return 'Gratis'
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
+
 export default function Home() {
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
   return (
     <div className="relative overflow-hidden bg-white">
       {/* Background decorations */}
@@ -72,7 +172,7 @@ export default function Home() {
             <Link href="/login" className="hidden sm:block text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors">
               Masuk
             </Link>
-            <Link href="/login">
+            <Link href="/signup">
               <Button size="sm" className="shadow-lg shadow-primary-500/25">
                 Mulai Gratis
               </Button>
@@ -109,15 +209,15 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link href="/login">
+                <Link href="/signup">
                   <Button size="lg" className="w-full sm:w-auto shadow-xl shadow-primary-500/25">
                     Mulai Sekarang
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="#features">
+                <Link href="#pricing">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    Lihat Fitur
+                    Lihat Harga
                   </Button>
                 </Link>
               </div>
@@ -274,7 +374,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-8">
-                  <Link href="/login">
+                  <Link href="/signup">
                     <Button size="lg" className="shadow-lg shadow-primary-500/25">
                       Coba Sekarang - Gratis
                       <ArrowRight className="h-4 w-4" />
@@ -309,6 +409,169 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Pricing Section */}
+        <section id="pricing" className="bg-gradient-to-b from-neutral-50 to-white py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+            <div className="text-center mb-12">
+              <p className="text-sm font-semibold text-primary-600 uppercase tracking-wide mb-3">Harga Terjangkau</p>
+              <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl">
+                Pilih Paket yang Sesuai untuk Bisnis Anda
+              </h2>
+              <p className="mt-4 text-lg text-neutral-600 max-w-2xl mx-auto">
+                Mulai gratis dan upgrade kapan saja sesuai kebutuhan bisnis Anda.
+              </p>
+
+              {/* Billing Toggle */}
+              <div className="mt-8 inline-flex items-center gap-4 rounded-full bg-neutral-100 p-1.5">
+                <button
+                  onClick={() => setBillingPeriod('monthly')}
+                  className={cn(
+                    'px-6 py-2 rounded-full text-sm font-medium transition-all',
+                    billingPeriod === 'monthly'
+                      ? 'bg-white text-neutral-900 shadow-sm'
+                      : 'text-neutral-600 hover:text-neutral-900'
+                  )}
+                >
+                  Bulanan
+                </button>
+                <button
+                  onClick={() => setBillingPeriod('yearly')}
+                  className={cn(
+                    'px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2',
+                    billingPeriod === 'yearly'
+                      ? 'bg-white text-neutral-900 shadow-sm'
+                      : 'text-neutral-600 hover:text-neutral-900'
+                  )}
+                >
+                  Tahunan
+                  <span className="text-xs bg-success-100 text-success-700 px-2 py-0.5 rounded-full">
+                    Hemat 10%
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-4 md:grid-cols-2">
+              {pricingPlans.map((plan) => {
+                const price = billingPeriod === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice
+                const IconComponent = plan.icon
+
+                return (
+                  <div
+                    key={plan.name}
+                    className={cn(
+                      'relative rounded-2xl border-2 bg-white p-6 transition-all duration-300 hover:shadow-xl',
+                      plan.popular
+                        ? 'border-primary-500 shadow-lg shadow-primary-500/10'
+                        : 'border-neutral-200 hover:border-neutral-300'
+                    )}
+                  >
+                    {plan.popular && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 px-4 py-1.5 text-xs font-semibold text-white shadow-lg">
+                        <Star className="h-3 w-3" />
+                        Paling Populer
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={cn(
+                        'flex items-center justify-center w-10 h-10 rounded-xl',
+                        plan.color === 'neutral' && 'bg-neutral-100',
+                        plan.color === 'primary' && 'bg-primary-100',
+                        plan.color === 'accent' && 'bg-accent-100',
+                        plan.color === 'warning' && 'bg-warning-100',
+                      )}>
+                        <IconComponent className={cn(
+                          'h-5 w-5',
+                          plan.color === 'neutral' && 'text-neutral-600',
+                          plan.color === 'primary' && 'text-primary-600',
+                          plan.color === 'accent' && 'text-accent-600',
+                          plan.color === 'warning' && 'text-warning-600',
+                        )} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-neutral-900">{plan.name}</h3>
+                        <p className="text-xs text-neutral-500">{plan.description}</p>
+                      </div>
+                    </div>
+
+                    <div className="mb-6">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-bold text-neutral-900">
+                          {formatRupiah(price)}
+                        </span>
+                        {price > 0 && (
+                          <span className="text-sm text-neutral-500">
+                            /{billingPeriod === 'monthly' ? 'bulan' : 'tahun'}
+                          </span>
+                        )}
+                      </div>
+                      {billingPeriod === 'yearly' && price > 0 && (
+                        <p className="text-xs text-success-600 mt-1">
+                          Hemat {formatRupiah((plan.monthlyPrice * 12) - plan.yearlyPrice)}/tahun
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Quick Stats */}
+                    <div className="grid grid-cols-2 gap-3 mb-6 p-3 rounded-xl bg-neutral-50">
+                      <div className="text-center">
+                        <p className="text-xl font-bold text-neutral-900">{plan.campaigns}</p>
+                        <p className="text-xs text-neutral-500">Campaign</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xl font-bold text-neutral-900">{plan.emailsPerDay.toLocaleString('id-ID')}</p>
+                        <p className="text-xs text-neutral-500">Email/Hari</p>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-3 mb-6">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2.5">
+                          {feature.included ? (
+                            <Check className="h-4 w-4 text-success-500 mt-0.5 flex-shrink-0" />
+                          ) : (
+                            <X className="h-4 w-4 text-neutral-300 mt-0.5 flex-shrink-0" />
+                          )}
+                          <span className={cn(
+                            'text-sm',
+                            feature.included ? 'text-neutral-700' : 'text-neutral-400'
+                          )}>
+                            {feature.text}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link href={plan.monthlyPrice === 0 ? '/signup' : '/login'}>
+                      <Button
+                        className={cn(
+                          'w-full',
+                          plan.popular && 'shadow-lg shadow-primary-500/25'
+                        )}
+                        variant={plan.popular ? 'default' : 'outline'}
+                      >
+                        {plan.monthlyPrice === 0 ? 'Mulai Gratis' : 'Pilih Paket'}
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Money Back Guarantee */}
+            <div className="mt-12 text-center">
+              <div className="inline-flex items-center gap-3 rounded-full bg-success-50 px-6 py-3">
+                <Shield className="h-5 w-5 text-success-600" />
+                <span className="text-sm text-success-700 font-medium">
+                  Garansi 7 hari uang kembali untuk semua paket berbayar
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="bg-gradient-to-br from-primary-600 to-primary-700 py-16 lg:py-20">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10 text-center">
@@ -318,7 +581,7 @@ export default function Home() {
             <p className="text-lg text-primary-100 mb-8">
               Mulai gratis hari ini dan rasakan kemudahan mengirim email massal dengan BlastMail.
             </p>
-            <Link href="/login">
+            <Link href="/signup">
               <Button size="lg" variant="secondary" className="shadow-xl">
                 Mulai Gratis Sekarang
                 <ArrowRight className="h-4 w-4" />
