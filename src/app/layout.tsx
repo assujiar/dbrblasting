@@ -140,13 +140,13 @@ export const metadata: Metadata = {
     },
   },
 
-  // Icons - using optimized SVGs (1.3KB instead of 3.3MB)
+  // Icons
   icons: {
     icon: [
-      { url: '/logo-icon.svg', type: 'image/svg+xml' },
+      { url: '/blastmail_saiki_mainlogo-horizontal-01.svg', type: 'image/svg+xml' },
     ],
     apple: '/blastmail_saiki_mainlogo-02-01.png',
-    shortcut: '/logo-icon.svg',
+    shortcut: '/blastmail_saiki_mainlogo-horizontal-01.svg',
   },
 
   // Manifest
@@ -230,7 +230,7 @@ const jsonLd = {
   description:
     'Platform email marketing dan email blasting profesional untuk bisnis. Kirim email massal, kelola leads, buat template email, dan pantau campaign. Professional email marketing and blasting platform.',
   url: siteUrl,
-  image: `${siteUrl}/logo.svg`,
+  image: `${siteUrl}/blastmail_saiki_mainlogo-01.png`,
   author: {
     '@type': 'Organization',
     name: 'SAIKI Group',
@@ -272,7 +272,7 @@ const organizationJsonLd = {
   '@type': 'Organization',
   name: 'SAIKI Group',
   url: 'https://saiki.id',
-  logo: `${siteUrl}/logo.svg`,
+  logo: `${siteUrl}/blastmail_saiki_mainlogo-01.png`,
   description:
     'SAIKI Group adalah perusahaan teknologi yang mengembangkan BlastMail, platform email marketing dan email blasting terbaik di Indonesia. SAIKI Group is a technology company that develops BlastMail, the best email marketing and email blasting platform.',
   sameAs: [],

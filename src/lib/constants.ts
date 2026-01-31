@@ -1,15 +1,13 @@
 // App-wide constants
 
-// BlastMail Logo - Main logo with text (horizontal, ratio ~4.2:1)
-// Using optimized SVG (1.4KB instead of 3.3MB)
-export const APP_LOGO_URL = '/logo-horizontal.svg'
+// BlastMail Logo - Main logo with text (horizontal, ratio ~3.33:1)
+export const APP_LOGO_URL = '/blastmail_saiki_mainlogo-01.svg'
 
 // BlastMail Icon - Square icon without text (ratio 1:1)
-// Using optimized SVG (1.6KB instead of 3.3MB)
-export const APP_ICON_URL = '/logo.svg'
+export const APP_ICON_URL = '/blastmail_saiki_mainlogo-02-01.svg'
 
-// BlastMail Horizontal Logo - Compact horizontal logo
-export const APP_LOGO_HORIZONTAL_URL = '/logo-horizontal.svg'
+// BlastMail Horizontal Logo - Compact horizontal logo (ratio 1:1)
+export const APP_LOGO_HORIZONTAL_URL = '/blastmail_saiki_mainlogo-horizontal-01.svg'
 
 // App name
 export const APP_NAME = 'BlastMail'
