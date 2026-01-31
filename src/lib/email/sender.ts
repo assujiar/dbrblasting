@@ -44,7 +44,17 @@ interface EmailOptions {
   }
   senderData?: SenderData
   smtpConfig?: OrganizationSmtpConfig // Optional user SMTP config
+  addWatermark?: boolean // Add watermark for free tier
 }
+
+// Watermark HTML for free tier
+const FREE_TIER_WATERMARK = `
+<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+  <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+    Sent from <a href="https://blast-mail.saiki.id" style="color: #6366f1; text-decoration: none;">blast-mail.saiki.id</a>
+  </p>
+</div>
+`
 
 function getEmailConfig(userConfig?: OrganizationSmtpConfig): EmailConfig | null {
   // Use user's SMTP config if available
@@ -105,6 +115,11 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     if (options.senderData && options.senderData.name) {
       const signature = generateEmailSignature(options.senderData)
       personalizedBody += signature
+    }
+
+    // Add watermark for free tier
+    if (options.addWatermark) {
+      personalizedBody += FREE_TIER_WATERMARK
     }
 
     // Determine from name and email

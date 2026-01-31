@@ -73,8 +73,9 @@ export async function POST(request: NextRequest) {
 
     // Get SMTP config from user's organization
     let smtpConfig: OrganizationSmtpConfig | undefined = undefined
-    let organizationTier: SubscriptionTier = 'basic'
-    let maxRecipientsPerDay = TIER_LIMITS.basic.maxRecipientsPerDay
+    let organizationTier: SubscriptionTier = 'free'
+    let maxRecipientsPerDay = TIER_LIMITS.free.maxRecipientsPerDay
+    let addWatermark = TIER_LIMITS.free.hasWatermark
 
     if (userProfile?.organization_id) {
       const { data: organization } = await adminClient
@@ -85,8 +86,9 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (organization) {
-        organizationTier = (organization.subscription_tier || 'basic') as SubscriptionTier
+        organizationTier = (organization.subscription_tier || 'free') as SubscriptionTier
         maxRecipientsPerDay = TIER_LIMITS[organizationTier].maxRecipientsPerDay
+        addWatermark = TIER_LIMITS[organizationTier].hasWatermark
 
         if (organization.smtp_host) {
           smtpConfig = {
@@ -176,6 +178,7 @@ export async function POST(request: NextRequest) {
           recipientData,
           senderData,
           smtpConfig,
+          addWatermark,
         })
 
         // Update recipient status

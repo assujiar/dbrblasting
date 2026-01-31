@@ -81,7 +81,7 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
     slug: '',
     description: '',
     is_active: true,
-    subscription_tier: 'basic' as 'basic' | 'regular' | 'pro',
+    subscription_tier: 'free' as 'free' | 'basic' | 'regular' | 'pro',
     smtp_host: '',
     smtp_port: 587,
     smtp_user: '',
@@ -93,9 +93,10 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
 
   // Tier limits configuration
   const TIER_LIMITS = {
-    basic: { maxCampaigns: 3, maxRecipientsPerDay: 50 },
-    regular: { maxCampaigns: 5, maxRecipientsPerDay: 100 },
-    pro: { maxCampaigns: 10, maxRecipientsPerDay: 500 },
+    free: { maxCampaigns: 1, maxRecipientsPerDay: 5, hasWatermark: true },
+    basic: { maxCampaigns: 3, maxRecipientsPerDay: 50, hasWatermark: false },
+    regular: { maxCampaigns: 5, maxRecipientsPerDay: 100, hasWatermark: false },
+    pro: { maxCampaigns: 10, maxRecipientsPerDay: 500, hasWatermark: false },
   }
 
   const fetchOrganization = useCallback(async () => {
@@ -413,7 +414,7 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
               <Label htmlFor="subscription_tier">Current Plan</Label>
               <Select
                 value={formData.subscription_tier}
-                onValueChange={(value: 'basic' | 'regular' | 'pro') =>
+                onValueChange={(value: 'free' | 'basic' | 'regular' | 'pro') =>
                   setFormData((prev) => ({ ...prev, subscription_tier: value }))
                 }
                 disabled={isSaving}
@@ -422,6 +423,12 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
                   <SelectValue placeholder="Select a plan" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="free">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Free</span>
+                      <span className="text-neutral-500 text-xs">- 1 campaign, 5 emails/day, watermark</span>
+                    </div>
+                  </SelectItem>
                   <SelectItem value="basic">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">Basic</span>

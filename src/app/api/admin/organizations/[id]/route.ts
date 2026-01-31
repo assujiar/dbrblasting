@@ -154,7 +154,7 @@ export async function PUT(
     if (is_active !== undefined) updateData.is_active = is_active
     if (subscription_tier !== undefined) {
       // Validate tier value
-      if (!['basic', 'regular', 'pro'].includes(subscription_tier)) {
+      if (!['free', 'basic', 'regular', 'pro'].includes(subscription_tier)) {
         return NextResponse.json({ error: 'Invalid subscription tier' }, { status: 400 })
       }
       updateData.subscription_tier = subscription_tier

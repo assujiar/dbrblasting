@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
         .eq('id', profile.organization_id)
         .single()
 
-      const tier = (org?.subscription_tier || 'basic') as SubscriptionTier
+      const tier = (org?.subscription_tier || 'free') as SubscriptionTier
       const maxCampaigns = TIER_LIMITS[tier].maxCampaigns
 
       // Count existing campaigns

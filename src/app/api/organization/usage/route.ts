@@ -2,13 +2,15 @@ import { NextResponse } from 'next/server'
 import { getClientForUser } from '@/lib/supabase/admin'
 
 // Tier limits configuration
+// - free: 1 campaign, 5 recipients/day (includes watermark)
 // - basic: 3 campaigns, 50 recipients/day
 // - regular: 5 campaigns, 100 recipients/day
 // - pro: 10 campaigns, 500 recipients/day
 export const TIER_LIMITS = {
-  basic: { maxCampaigns: 3, maxRecipientsPerDay: 50 },
-  regular: { maxCampaigns: 5, maxRecipientsPerDay: 100 },
-  pro: { maxCampaigns: 10, maxRecipientsPerDay: 500 },
+  free: { maxCampaigns: 1, maxRecipientsPerDay: 5, hasWatermark: true },
+  basic: { maxCampaigns: 3, maxRecipientsPerDay: 50, hasWatermark: false },
+  regular: { maxCampaigns: 5, maxRecipientsPerDay: 100, hasWatermark: false },
+  pro: { maxCampaigns: 10, maxRecipientsPerDay: 500, hasWatermark: false },
 } as const
 
 export type SubscriptionTier = keyof typeof TIER_LIMITS
@@ -26,7 +28,7 @@ export async function GET() {
       return NextResponse.json({
         error: 'No organization assigned',
         data: {
-          tier: 'basic',
+          tier: 'free',
           limits: TIER_LIMITS.basic,
           usage: {
             campaigns: 0,
@@ -50,7 +52,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
     }
 
-    const tier = (org.subscription_tier || 'basic') as SubscriptionTier
+    const tier = (org.subscription_tier || 'free') as SubscriptionTier
     const limits = TIER_LIMITS[tier]
 
     // Get current campaign count

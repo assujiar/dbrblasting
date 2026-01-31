@@ -2,6 +2,7 @@
 -- Organization Subscription Tiers
 -- =============================================================================
 -- This migration adds subscription tiering for organizations with feature limits:
+-- - free: 1 campaign, 5 recipients/day (includes watermark)
 -- - basic: 3 campaigns, 50 recipients/day
 -- - regular: 5 campaigns, 100 recipients/day
 -- - pro: 10 campaigns, 500 recipients/day
@@ -9,14 +10,14 @@
 
 -- Create subscription tier enum
 DO $$ BEGIN
-  CREATE TYPE subscription_tier AS ENUM ('basic', 'regular', 'pro');
+  CREATE TYPE subscription_tier AS ENUM ('free', 'basic', 'regular', 'pro');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
 
 -- Add subscription_tier column to organizations
 ALTER TABLE public.organizations
-ADD COLUMN IF NOT EXISTS subscription_tier subscription_tier DEFAULT 'basic';
+ADD COLUMN IF NOT EXISTS subscription_tier subscription_tier DEFAULT 'free';
 
 -- Create table to track daily email usage per organization
 CREATE TABLE IF NOT EXISTS public.organization_daily_usage (
@@ -54,24 +55,26 @@ CREATE POLICY "Org admins can view own org usage" ON public.organization_daily_u
 
 -- Function to get tier limits
 CREATE OR REPLACE FUNCTION public.get_tier_limits(tier subscription_tier)
-RETURNS TABLE(max_campaigns INTEGER, max_recipients_per_day INTEGER) AS $$
+RETURNS TABLE(max_campaigns INTEGER, max_recipients_per_day INTEGER, has_watermark BOOLEAN) AS $$
 BEGIN
   CASE tier
+    WHEN 'free' THEN
+      RETURN QUERY SELECT 1, 5, true;
     WHEN 'basic' THEN
-      RETURN QUERY SELECT 3, 50;
+      RETURN QUERY SELECT 3, 50, false;
     WHEN 'regular' THEN
-      RETURN QUERY SELECT 5, 100;
+      RETURN QUERY SELECT 5, 100, false;
     WHEN 'pro' THEN
-      RETURN QUERY SELECT 10, 500;
+      RETURN QUERY SELECT 10, 500, false;
     ELSE
-      RETURN QUERY SELECT 3, 50; -- Default to basic
+      RETURN QUERY SELECT 1, 5, true; -- Default to free
   END CASE;
 END;
 $$ LANGUAGE plpgsql STABLE;
 
 -- Function to get organization's current tier limits
 CREATE OR REPLACE FUNCTION public.get_organization_tier_limits(org_id UUID)
-RETURNS TABLE(max_campaigns INTEGER, max_recipients_per_day INTEGER) AS $$
+RETURNS TABLE(max_campaigns INTEGER, max_recipients_per_day INTEGER, has_watermark BOOLEAN) AS $$
 DECLARE
   org_tier subscription_tier;
 BEGIN
@@ -80,7 +83,7 @@ BEGIN
   WHERE id = org_id;
 
   IF org_tier IS NULL THEN
-    org_tier := 'basic';
+    org_tier := 'free';
   END IF;
 
   RETURN QUERY SELECT * FROM public.get_tier_limits(org_tier);
@@ -152,6 +155,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
+-- Function to check if organization tier has watermark
+CREATE OR REPLACE FUNCTION public.organization_has_watermark(org_id UUID)
+RETURNS BOOLEAN AS $$
+DECLARE
+  watermark BOOLEAN;
+BEGIN
+  SELECT has_watermark INTO watermark
+  FROM public.get_organization_tier_limits(org_id);
+
+  RETURN COALESCE(watermark, true);
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
 -- Function to increment daily email count (call after sending emails)
 CREATE OR REPLACE FUNCTION public.increment_daily_email_count(org_id UUID, count INTEGER)
 RETURNS VOID AS $$
@@ -176,6 +192,7 @@ SELECT
   o.subscription_tier,
   tl.max_campaigns,
   tl.max_recipients_per_day,
+  tl.has_watermark,
   COALESCE(public.get_organization_campaign_count(o.id), 0) AS current_campaign_count,
   COALESCE(public.get_organization_daily_email_count(o.id), 0) AS today_email_count
 FROM public.organizations o
