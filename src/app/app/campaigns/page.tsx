@@ -32,7 +32,7 @@ function CampaignsContent() {
   const [processingCampaignId, setProcessingCampaignId] = useState<string | null>(null)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'failed' | 'running'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'has_sent' | 'has_failed' | 'completed' | 'running' | 'draft'>('all')
 
   const fetchCampaigns = useCallback(async () => {
     setIsLoading(true)
@@ -147,11 +147,22 @@ function CampaignsContent() {
     { total: 0, sent: 0, failed: 0, recipients: 0 }
   )
 
-  // Filter campaigns by status
+  // Filter campaigns by status or email status
   const filteredCampaigns = campaigns.filter((campaign) => {
     if (statusFilter === 'all') return true
+    if (statusFilter === 'has_sent') return campaign.recipientCounts.sent > 0
+    if (statusFilter === 'has_failed') return campaign.recipientCounts.failed > 0
     return campaign.status === statusFilter
   })
+
+  // Get filter label for display
+  const getFilterLabel = () => {
+    switch (statusFilter) {
+      case 'has_sent': return 'with sent emails'
+      case 'has_failed': return 'with failed emails'
+      default: return statusFilter
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -189,9 +200,9 @@ function CampaignsContent() {
         <Card
           className={cn(
             'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-success-50/50 to-white',
-            statusFilter === 'completed' && 'ring-2 ring-success-500 shadow-md'
+            statusFilter === 'has_sent' && 'ring-2 ring-success-500 shadow-md'
           )}
-          onClick={() => setStatusFilter('completed')}
+          onClick={() => setStatusFilter('has_sent')}
         >
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
@@ -208,9 +219,9 @@ function CampaignsContent() {
         <Card
           className={cn(
             'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-error-50/50 to-white',
-            statusFilter === 'failed' && 'ring-2 ring-error-500 shadow-md'
+            statusFilter === 'has_failed' && 'ring-2 ring-error-500 shadow-md'
           )}
-          onClick={() => setStatusFilter('failed')}
+          onClick={() => setStatusFilter('has_failed')}
         >
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
@@ -219,18 +230,12 @@ function CampaignsContent() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-error-600">{stats.failed}</p>
-                <p className="text-xs text-neutral-500">Failed</p>
+                <p className="text-xs text-neutral-500">Emails Failed</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card
-          className={cn(
-            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-accent-50/50 to-white',
-            statusFilter === 'running' && 'ring-2 ring-accent-500 shadow-md'
-          )}
-          onClick={() => setStatusFilter('running')}
-        >
+        <Card className="bg-gradient-to-br from-accent-50/50 to-white">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-accent-100">
@@ -299,7 +304,7 @@ function CampaignsContent() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <p className="text-sm text-primary-700">
                 Showing {filteredCampaigns.length} of {campaigns.length} campaigns
-                {statusFilter !== 'all' && ` (${statusFilter})`}
+                {statusFilter !== 'all' && ` (${getFilterLabel()})`}
               </p>
               <Button variant="ghost" size="sm" onClick={() => { setStatusFilter('all'); clearFilters(); }} className="self-start sm:self-auto">
                 <X className="h-4 w-4" />
@@ -370,35 +375,57 @@ function CampaignsContent() {
                     </div>
                   </div>
 
+                  {/* Detailed Stats Grid */}
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    <div className="text-center p-2 rounded-lg bg-neutral-50">
+                      <p className="text-lg font-bold text-neutral-900">{campaign.recipientCounts.total}</p>
+                      <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Recipients</p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-success-50">
+                      <p className="text-lg font-bold text-success-600">{campaign.recipientCounts.sent}</p>
+                      <p className="text-[10px] text-success-600 uppercase tracking-wide">Sent</p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-error-50">
+                      <p className="text-lg font-bold text-error-600">{campaign.recipientCounts.failed}</p>
+                      <p className="text-[10px] text-error-600 uppercase tracking-wide">Failed</p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-warning-50">
+                      <p className="text-lg font-bold text-warning-600">{campaign.recipientCounts.pending}</p>
+                      <p className="text-[10px] text-warning-600 uppercase tracking-wide">Pending</p>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-neutral-500">Progress</span>
-                      <span className="font-medium">
-                        <span className="text-success-600">{campaign.recipientCounts.sent}</span>
-                        {campaign.recipientCounts.failed > 0 && (
-                          <span className="text-error-600"> / {campaign.recipientCounts.failed} failed</span>
-                        )}
-                        {campaign.recipientCounts.pending > 0 && (
-                          <span className="text-neutral-400"> / {campaign.recipientCounts.pending} pending</span>
-                        )}
+                      <span className="font-medium text-neutral-700">
+                        {Math.round(progress)}%
                       </span>
                     </div>
                     <Progress
                       value={progress}
                       className="h-2"
                       indicatorClassName={
-                        campaign.status === 'failed'
+                        campaign.recipientCounts.failed > 0 && campaign.recipientCounts.sent === 0
                           ? 'from-error-500 to-error-600'
-                          : campaign.status === 'completed'
-                          ? 'from-success-500 to-success-600'
-                          : undefined
+                          : campaign.recipientCounts.failed > 0
+                          ? 'from-warning-500 to-warning-600'
+                          : 'from-success-500 to-success-600'
                       }
                     />
                   </div>
 
                   <div className="flex items-center justify-between mt-3 text-xs text-neutral-400">
                     <span>{formatDate(campaign.created_at)}</span>
-                    <span>{campaign.recipientCounts.total} recipients</span>
+                    <span className="font-medium">
+                      {campaign.recipientCounts.sent > 0 && (
+                        <span className="text-success-600">{Math.round((campaign.recipientCounts.sent / campaign.recipientCounts.total) * 100)}% success</span>
+                      )}
+                      {campaign.recipientCounts.failed > 0 && campaign.recipientCounts.sent > 0 && ' · '}
+                      {campaign.recipientCounts.failed > 0 && (
+                        <span className="text-error-600">{Math.round((campaign.recipientCounts.failed / campaign.recipientCounts.total) * 100)}% failed</span>
+                      )}
+                    </span>
                   </div>
 
                   {processingCampaignId === campaign.id && (
