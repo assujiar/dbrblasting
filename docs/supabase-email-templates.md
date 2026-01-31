@@ -548,7 +548,7 @@ Template ini untuk notifikasi keamanan ketika password berhasil diubah. Supabase
 
 ### 1. Redirect URL
 Di **Authentication** → **URL Configuration**:
-- **Site URL:** `https://blast-mail.vercel.app` (URL production Anda)
+- **Site URL:** `https://blastmail.saiki.id` (URL production Anda)
 - **Redirect URLs:** Tambahkan URL yang diizinkan untuk redirect setelah konfirmasi
 
 ### 2. SMTP Settings (Opsional untuk Custom Domain)

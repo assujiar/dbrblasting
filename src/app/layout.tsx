@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blast-mail.vercel.app'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blastmail.saiki.id'
 
 export const metadata: Metadata = {
   // Basic metadata

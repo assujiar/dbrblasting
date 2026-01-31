@@ -1,5 +1,5 @@
 # BlastMail - Email Marketing Platform
-# https://blast-mail.vercel.app
+# https://blastmail.saiki.id
 
 User-agent: *
 Allow: /
@@ -10,7 +10,7 @@ Disallow: /reset-password
 Disallow: /forgot-password
 
 # Sitemaps
-Sitemap: https://blast-mail.vercel.app/sitemap.xml
+Sitemap: https://blastmail.saiki.id/sitemap.xml
 
 # Crawl-delay (optional, some crawlers respect this)
 Crawl-delay: 1

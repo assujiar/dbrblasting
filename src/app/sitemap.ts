@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blast-mail.vercel.app'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blastmail.saiki.id'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
