@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Bell, X, CheckCheck, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,8 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -39,6 +41,35 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
     const interval = setInterval(fetchNotifications, 30000)
     return () => clearInterval(interval)
   }, [fetchNotifications])
+
+  // Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        panelRef.current &&
+        buttonRef.current &&
+        !panelRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    // Close on escape key
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isOpen])
 
   const handleDismiss = async (id: string) => {
     try {
@@ -111,17 +142,19 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
     <div className={cn('relative', className)}>
       {/* Bell Button */}
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           'relative p-2 rounded-xl transition-all',
           'hover:bg-neutral-100 active:scale-95',
-          isOpen && 'bg-neutral-100'
+          isOpen && 'bg-primary-50 text-primary-600'
         )}
         aria-label="Notifications"
+        aria-expanded={isOpen}
       >
-        <Bell className="h-5 w-5 text-neutral-600" />
+        <Bell className={cn('h-5 w-5', isOpen ? 'text-primary-600' : 'text-neutral-600')} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center px-1 text-[10px] font-bold text-white bg-primary-500 rounded-full">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center px-1 text-[10px] font-bold text-white bg-primary-500 rounded-full animate-pulse">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -130,38 +163,41 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
       {/* Panel */}
       {isOpen && (
         <>
-          {/* Backdrop for mobile */}
+          {/* Backdrop - visible on all screens */}
           <div
-            className="fixed inset-0 bg-black/20 z-40 sm:hidden"
+            className="fixed inset-0 bg-black/20 z-40"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Panel Content */}
-          <div className={cn(
-            'fixed sm:absolute z-50',
-            // Mobile: full width bottom sheet
-            'inset-x-0 bottom-0 sm:inset-auto sm:right-0 sm:top-full sm:mt-2',
-            'w-full sm:w-96 max-h-[70vh] sm:max-h-[500px]',
-            'bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-neutral-200',
-            'flex flex-col overflow-hidden',
-            'animate-slide-up sm:animate-fade-in'
-          )}>
+          <div
+            ref={panelRef}
+            className={cn(
+              'fixed sm:absolute z-50',
+              // Mobile: full width bottom sheet
+              'inset-x-0 bottom-0 sm:inset-auto sm:right-0 sm:top-full sm:mt-2',
+              'w-full sm:w-96 max-h-[70vh] sm:max-h-[500px]',
+              'bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-neutral-200',
+              'flex flex-col overflow-hidden',
+              'animate-slide-up sm:animate-fade-in'
+            )}>
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 bg-gradient-to-r from-primary-50/50 to-white">
               <div className="flex items-center gap-2">
                 <Bell className="h-5 w-5 text-primary-500" />
                 <h3 className="font-semibold text-neutral-900">Notifikasi</h3>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 text-xs font-medium text-primary-600 bg-primary-50 rounded-full">
+                  <span className="px-2 py-0.5 text-xs font-medium text-primary-600 bg-primary-100 rounded-full">
                     {unreadCount} baru
                   </span>
                 )}
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-800 transition-colors"
               >
-                <X className="h-5 w-5" />
+                <span className="text-xs font-medium sm:hidden">Tutup</span>
+                <X className="h-4 w-4" />
               </button>
             </div>
 
