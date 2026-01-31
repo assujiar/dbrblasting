@@ -578,14 +578,14 @@ export default function UsersPage() {
               <div className="space-y-2">
                 <Label htmlFor="organization">Organization</Label>
                 <Select
-                  value={newUser.organization_id}
-                  onValueChange={(value) => setNewUser({ ...newUser, organization_id: value })}
+                  value={newUser.organization_id || '__none__'}
+                  onValueChange={(value) => setNewUser({ ...newUser, organization_id: value === '__none__' ? '' : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select organization" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No Organization</SelectItem>
+                    <SelectItem value="__none__">No Organization</SelectItem>
                     {organizations.map((org) => (
                       <SelectItem key={org.id} value={org.id}>
                         {org.name}
