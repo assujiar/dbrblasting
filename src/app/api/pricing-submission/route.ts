@@ -302,10 +302,10 @@ function generateAdminNotificationEmail(data: {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { fullName, email, phone, companyName, message, planName, planPrice } = body
+    const { fullName, email, phone, companyName, message, planKey, planName, planPrice } = body
 
     // Validate required fields
-    if (!fullName || !email || !phone || !planName) {
+    if (!fullName || !email || !phone || !planKey || !planName) {
       return NextResponse.json(
         { error: 'Nama, email, telepon, dan paket harus diisi' },
         { status: 400 }
@@ -344,6 +344,7 @@ export async function POST(request: NextRequest) {
           phone: phone,
           company_name: companyName || null,
           message: message || null,
+          plan_key: planKey,  // Database tier key
           plan_name: planName,
           plan_price: planPrice || 0,
           status: 'pending',

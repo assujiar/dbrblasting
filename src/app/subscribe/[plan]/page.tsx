@@ -6,35 +6,37 @@ import Link from 'next/link'
 import { ArrowLeft, Send, CheckCircle2, Loader2, Building2, User, Mail, Phone, MessageSquare } from 'lucide-react'
 import { APP_NAME } from '@/lib/constants'
 
+// Tier keys must match database enum: free, basic, regular, pro
 const pricingPlans: Record<string, {
   name: string
   description: string
   monthlyPrice: number
   features: string[]
 }> = {
-  starter: {
-    name: 'Starter',
+  // Note: 'free' tier is redirected to signup, but kept here for completeness
+  free: {
+    name: 'Free',
     description: 'Perfect untuk memulai',
     monthlyPrice: 0,
-    features: ['1 campaign aktif', '50 email/hari', 'Template dasar', 'Import Excel', 'Email support'],
+    features: ['1 campaign aktif', '5 email/hari', 'Template dasar', 'Import Excel', 'Email support', 'Watermark'],
   },
   basic: {
     name: 'Basic',
     description: 'Untuk pemula serius',
     monthlyPrice: 74900,
-    features: ['3 campaign aktif', '500 email/hari', 'All templates', 'Basic analytics', 'Email support'],
+    features: ['3 campaign aktif', '50 email/hari', 'All templates', 'Basic analytics', 'Email support', 'Tanpa watermark'],
   },
-  growth: {
-    name: 'Growth',
+  regular: {
+    name: 'Regular',
     description: 'Untuk bisnis berkembang',
     monthlyPrice: 149000,
-    features: ['5 campaign aktif', '1,000 email/hari', 'All templates', 'SMTP custom', 'Priority support', 'Analytics dashboard'],
+    features: ['5 campaign aktif', '100 email/hari', 'All templates', 'SMTP custom', 'Priority support', 'Analytics dashboard'],
   },
-  scale: {
-    name: 'Scale',
+  pro: {
+    name: 'Pro',
     description: 'Untuk bisnis besar',
     monthlyPrice: 499000,
-    features: ['Unlimited campaign', '10,000 email/hari', 'White-label', 'API access', 'Dedicated support', 'Custom integrations'],
+    features: ['10 campaign aktif', '500 email/hari', 'White-label', 'API access', 'Dedicated support', 'Custom integrations'],
   },
 }
 
@@ -89,6 +91,7 @@ export default function SubscribePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          planKey: planKey,  // Database tier key (free, basic, regular, pro)
           planName: plan.name,
           planPrice: plan.monthlyPrice,
         }),

@@ -138,45 +138,50 @@ const testimonials = [
   },
 ]
 
+// Tier keys must match database enum: free, basic, regular, pro
 const pricingPlans = [
   {
-    name: 'Starter',
+    key: 'free',  // Database tier key
+    name: 'Free',
     description: 'Perfect untuk memulai',
     monthlyPrice: 0,
     yearlyPrice: 0,
     highlight: 'Gratis Selamanya',
-    features: ['1 campaign aktif', '50 email/hari', 'Template dasar', 'Import Excel', 'Email support'],
+    features: ['1 campaign aktif', '5 email/hari', 'Template dasar', 'Import Excel', 'Email support', 'Watermark'],
     cta: 'Mulai Gratis',
     popular: false,
   },
   {
+    key: 'basic',  // Database tier key
     name: 'Basic',
     description: 'Untuk pemula serius',
     monthlyPrice: 74900,
     yearlyPrice: 749000,
     highlight: 'Terjangkau',
-    features: ['3 campaign aktif', '500 email/hari', 'All templates', 'Basic analytics', 'Email support'],
+    features: ['3 campaign aktif', '50 email/hari', 'All templates', 'Basic analytics', 'Email support', 'Tanpa watermark'],
     cta: 'Pilih Basic',
     popular: false,
   },
   {
-    name: 'Growth',
+    key: 'regular',  // Database tier key
+    name: 'Regular',
     description: 'Untuk bisnis berkembang',
     monthlyPrice: 149000,
     yearlyPrice: 1490000,
     highlight: 'Best Value',
-    features: ['5 campaign aktif', '1,000 email/hari', 'All templates', 'SMTP custom', 'Priority support', 'Analytics dashboard'],
-    cta: 'Pilih Growth',
+    features: ['5 campaign aktif', '100 email/hari', 'All templates', 'SMTP custom', 'Priority support', 'Analytics dashboard'],
+    cta: 'Pilih Regular',
     popular: true,
   },
   {
-    name: 'Scale',
+    key: 'pro',  // Database tier key
+    name: 'Pro',
     description: 'Untuk bisnis besar',
     monthlyPrice: 499000,
     yearlyPrice: 4990000,
     highlight: 'Most Powerful',
-    features: ['Unlimited campaign', '10,000 email/hari', 'White-label', 'API access', 'Dedicated support', 'Custom integrations'],
-    cta: 'Pilih Scale',
+    features: ['10 campaign aktif', '500 email/hari', 'White-label', 'API access', 'Dedicated support', 'Custom integrations'],
+    cta: 'Pilih Pro',
     popular: false,
   },
 ]
@@ -620,7 +625,7 @@ export default function Home() {
                       ))}
                     </ul>
 
-                    <Link href={plan.monthlyPrice === 0 ? '/signup' : `/subscribe/${plan.name.toLowerCase()}`}>
+                    <Link href={plan.key === 'free' ? '/signup' : `/subscribe/${plan.key}`}>
                       <button
                         className={cn(
                           'w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2',

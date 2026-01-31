@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS public.pricing_submissions (
   message TEXT,
 
   -- Plan Information
-  plan_name VARCHAR(50) NOT NULL,
+  plan_key VARCHAR(20) NOT NULL,  -- Database tier key: free, basic, regular, pro
+  plan_name VARCHAR(50) NOT NULL,  -- Display name: Free, Basic, Regular, Pro
   plan_price INTEGER NOT NULL DEFAULT 0,
 
   -- Status tracking
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS public.pricing_submissions (
 -- Create indexes for common queries
 CREATE INDEX IF NOT EXISTS idx_pricing_submissions_email ON public.pricing_submissions(email);
 CREATE INDEX IF NOT EXISTS idx_pricing_submissions_status ON public.pricing_submissions(status);
+CREATE INDEX IF NOT EXISTS idx_pricing_submissions_plan_key ON public.pricing_submissions(plan_key);
 CREATE INDEX IF NOT EXISTS idx_pricing_submissions_plan ON public.pricing_submissions(plan_name);
 CREATE INDEX IF NOT EXISTS idx_pricing_submissions_created ON public.pricing_submissions(created_at DESC);
 
