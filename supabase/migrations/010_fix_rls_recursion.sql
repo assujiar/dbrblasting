@@ -8,7 +8,26 @@
 -- run with elevated privileges and bypass RLS, preventing recursion.
 -- =============================================================================
 
--- First, ensure helper functions exist and are SECURITY DEFINER
+-- =============================================================================
+-- STEP 1: Add missing columns FIRST (before creating policies that reference them)
+-- =============================================================================
+
+-- Add organization_id column to contact_group_members if not exists
+ALTER TABLE public.contact_group_members
+ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id) ON DELETE SET NULL;
+
+-- Add organization_id column to email_campaign_recipients if not exists
+ALTER TABLE public.email_campaign_recipients
+ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id) ON DELETE SET NULL;
+
+-- Create indexes for the new columns
+CREATE INDEX IF NOT EXISTS idx_contact_group_members_organization ON public.contact_group_members(organization_id);
+CREATE INDEX IF NOT EXISTS idx_email_campaign_recipients_organization ON public.email_campaign_recipients(organization_id);
+
+-- =============================================================================
+-- STEP 2: Create helper functions with SECURITY DEFINER
+-- =============================================================================
+
 CREATE OR REPLACE FUNCTION public.is_super_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
@@ -62,13 +81,14 @@ RETURNS BOOLEAN AS $$
 BEGIN
   RETURN (
     public.get_user_role() = 'org_admin'
+    AND resource_org_id IS NOT NULL
     AND resource_org_id = public.get_user_organization_id()
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
 -- =============================================================================
--- Fix user_profiles RLS (the main source of infinite recursion)
+-- STEP 3: Fix user_profiles RLS (the main source of infinite recursion)
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Users can view profiles" ON public.user_profiles;
@@ -110,7 +130,7 @@ CREATE POLICY "Users can update profiles" ON public.user_profiles
   );
 
 -- =============================================================================
--- Fix organizations RLS
+-- STEP 4: Fix organizations RLS
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Super admins can view all organizations" ON public.organizations;
@@ -139,7 +159,7 @@ CREATE POLICY "Super admins can delete organizations" ON public.organizations
   USING (public.is_super_admin());
 
 -- =============================================================================
--- Fix leads RLS
+-- STEP 5: Fix leads RLS
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Users can view leads" ON public.leads;
@@ -150,7 +170,7 @@ CREATE POLICY "Users can view leads" ON public.leads
     OR
     user_id = auth.uid()
     OR
-    organization_id = public.get_user_organization_id()
+    (organization_id IS NOT NULL AND organization_id = public.get_user_organization_id())
   );
 
 DROP POLICY IF EXISTS "Users can insert leads" ON public.leads;
@@ -181,7 +201,7 @@ CREATE POLICY "Users can delete leads" ON public.leads
   );
 
 -- =============================================================================
--- Fix contact_groups RLS
+-- STEP 6: Fix contact_groups RLS
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Users can view groups" ON public.contact_groups;
@@ -192,7 +212,7 @@ CREATE POLICY "Users can view groups" ON public.contact_groups
     OR
     user_id = auth.uid()
     OR
-    organization_id = public.get_user_organization_id()
+    (organization_id IS NOT NULL AND organization_id = public.get_user_organization_id())
   );
 
 DROP POLICY IF EXISTS "Users can insert groups" ON public.contact_groups;
@@ -223,10 +243,11 @@ CREATE POLICY "Users can delete groups" ON public.contact_groups
   );
 
 -- =============================================================================
--- Fix contact_group_members RLS
+-- STEP 7: Fix contact_group_members RLS
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Group members: user can view their memberships" ON public.contact_group_members;
+DROP POLICY IF EXISTS "Users can view group members" ON public.contact_group_members;
 CREATE POLICY "Users can view group members" ON public.contact_group_members
   FOR SELECT
   USING (
@@ -234,15 +255,17 @@ CREATE POLICY "Users can view group members" ON public.contact_group_members
     OR
     user_id = auth.uid()
     OR
-    organization_id = public.get_user_organization_id()
+    (organization_id IS NOT NULL AND organization_id = public.get_user_organization_id())
   );
 
 DROP POLICY IF EXISTS "Group members: user can insert memberships" ON public.contact_group_members;
+DROP POLICY IF EXISTS "Users can insert group members" ON public.contact_group_members;
 CREATE POLICY "Users can insert group members" ON public.contact_group_members
   FOR INSERT
   WITH CHECK (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "Group members: user can update their memberships" ON public.contact_group_members;
+DROP POLICY IF EXISTS "Users can update group members" ON public.contact_group_members;
 CREATE POLICY "Users can update group members" ON public.contact_group_members
   FOR UPDATE
   USING (
@@ -254,6 +277,7 @@ CREATE POLICY "Users can update group members" ON public.contact_group_members
   );
 
 DROP POLICY IF EXISTS "Group members: user can delete their memberships" ON public.contact_group_members;
+DROP POLICY IF EXISTS "Users can delete group members" ON public.contact_group_members;
 CREATE POLICY "Users can delete group members" ON public.contact_group_members
   FOR DELETE
   USING (
@@ -265,7 +289,7 @@ CREATE POLICY "Users can delete group members" ON public.contact_group_members
   );
 
 -- =============================================================================
--- Fix email_templates RLS
+-- STEP 8: Fix email_templates RLS
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Users can view templates" ON public.email_templates;
@@ -276,7 +300,7 @@ CREATE POLICY "Users can view templates" ON public.email_templates
     OR
     user_id = auth.uid()
     OR
-    organization_id = public.get_user_organization_id()
+    (organization_id IS NOT NULL AND organization_id = public.get_user_organization_id())
   );
 
 DROP POLICY IF EXISTS "Users can insert templates" ON public.email_templates;
@@ -307,7 +331,7 @@ CREATE POLICY "Users can delete templates" ON public.email_templates
   );
 
 -- =============================================================================
--- Fix email_campaigns RLS
+-- STEP 9: Fix email_campaigns RLS
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Users can view campaigns" ON public.email_campaigns;
@@ -318,7 +342,7 @@ CREATE POLICY "Users can view campaigns" ON public.email_campaigns
     OR
     user_id = auth.uid()
     OR
-    organization_id = public.get_user_organization_id()
+    (organization_id IS NOT NULL AND organization_id = public.get_user_organization_id())
   );
 
 DROP POLICY IF EXISTS "Users can insert campaigns" ON public.email_campaigns;
@@ -349,10 +373,11 @@ CREATE POLICY "Users can delete campaigns" ON public.email_campaigns
   );
 
 -- =============================================================================
--- Fix email_campaign_recipients RLS
+-- STEP 10: Fix email_campaign_recipients RLS
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Recipients: user can view their campaign recipients" ON public.email_campaign_recipients;
+DROP POLICY IF EXISTS "Users can view recipients" ON public.email_campaign_recipients;
 CREATE POLICY "Users can view recipients" ON public.email_campaign_recipients
   FOR SELECT
   USING (
@@ -360,15 +385,17 @@ CREATE POLICY "Users can view recipients" ON public.email_campaign_recipients
     OR
     user_id = auth.uid()
     OR
-    organization_id = public.get_user_organization_id()
+    (organization_id IS NOT NULL AND organization_id = public.get_user_organization_id())
   );
 
 DROP POLICY IF EXISTS "Recipients: user can insert recipients for their campaigns" ON public.email_campaign_recipients;
+DROP POLICY IF EXISTS "Users can insert recipients" ON public.email_campaign_recipients;
 CREATE POLICY "Users can insert recipients" ON public.email_campaign_recipients
   FOR INSERT
   WITH CHECK (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "Recipients: user can update recipients for their campaigns" ON public.email_campaign_recipients;
+DROP POLICY IF EXISTS "Users can update recipients" ON public.email_campaign_recipients;
 CREATE POLICY "Users can update recipients" ON public.email_campaign_recipients
   FOR UPDATE
   USING (
@@ -380,6 +407,7 @@ CREATE POLICY "Users can update recipients" ON public.email_campaign_recipients
   );
 
 DROP POLICY IF EXISTS "Recipients: user can delete recipients for their campaigns" ON public.email_campaign_recipients;
+DROP POLICY IF EXISTS "Users can delete recipients" ON public.email_campaign_recipients;
 CREATE POLICY "Users can delete recipients" ON public.email_campaign_recipients
   FOR DELETE
   USING (
@@ -389,15 +417,3 @@ CREATE POLICY "Users can delete recipients" ON public.email_campaign_recipients
     OR
     public.can_manage_in_org(organization_id)
   );
-
--- Add organization_id column to contact_group_members if not exists
-ALTER TABLE public.contact_group_members
-ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id) ON DELETE SET NULL;
-
--- Add organization_id column to email_campaign_recipients if not exists
-ALTER TABLE public.email_campaign_recipients
-ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id) ON DELETE SET NULL;
-
--- Create indexes for the new columns
-CREATE INDEX IF NOT EXISTS idx_contact_group_members_organization ON public.contact_group_members(organization_id);
-CREATE INDEX IF NOT EXISTS idx_email_campaign_recipients_organization ON public.email_campaign_recipients(organization_id);
