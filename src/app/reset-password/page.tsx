@@ -10,7 +10,8 @@ import { toast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Mail, Lock, ArrowLeft, ArrowRight, Loader2, CheckCircle } from 'lucide-react'
+import { Lock, ArrowLeft, ArrowRight, Loader2, CheckCircle } from 'lucide-react'
+import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -66,12 +67,11 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mb-4">
-              <Mail className="h-7 w-7 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              BlastMail
-            </h1>
+            <img
+              src={APP_LOGO_URL}
+              alt={APP_NAME}
+              className="h-16 w-auto mx-auto mb-4 object-contain"
+            />
           </div>
 
           <div className="glass-strong rounded-2xl p-5 sm:p-6 text-center">
@@ -104,12 +104,11 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mb-4">
-            <Mail className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            BlastMail
-          </h1>
+          <img
+            src={APP_LOGO_URL}
+            alt={APP_NAME}
+            className="h-16 w-auto mx-auto mb-4 object-contain"
+          />
           <p className="text-sm text-gray-500 mt-1">Email Marketing Platform</p>
         </div>
 

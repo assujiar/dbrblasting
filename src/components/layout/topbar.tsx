@@ -12,9 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { LogOut, User, Settings, Menu } from 'lucide-react'
+import { LogOut, User, Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 
 interface TopbarProps {
   onMenuClick: () => void
@@ -42,7 +43,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   return (
     <header className="fixed top-0 left-0 right-0 md:left-64 z-30 h-16 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
       <div className="flex h-full items-center justify-between px-4 sm:px-6">
-        {/* Left section - Menu button on mobile */}
+        {/* Left section - Menu button and logo on mobile */}
         <div className="flex items-center gap-3">
           <button
             onClick={onMenuClick}
@@ -50,6 +51,14 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           >
             <Menu className="h-5 w-5 text-gray-600" />
           </button>
+          {/* Logo - visible on mobile when sidebar is hidden */}
+          <Link href="/app" className="md:hidden">
+            <img
+              src={APP_LOGO_URL}
+              alt={APP_NAME}
+              className="h-8 w-auto object-contain"
+            />
+          </Link>
         </div>
 
         {/* Right section - User menu */}

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Mail, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
 import { isValidEmail } from '@/lib/utils'
+import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 
 export default function ForgotPasswordPage() {
   const supabase = createClient()
@@ -42,12 +43,11 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mb-4">
-            <Mail className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            BlastMail
-          </h1>
+          <img
+            src={APP_LOGO_URL}
+            alt={APP_NAME}
+            className="h-16 w-auto mx-auto mb-4 object-contain"
+          />
           <p className="text-sm text-gray-500 mt-1">Email Marketing Platform</p>
         </div>
 
