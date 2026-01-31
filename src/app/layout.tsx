@@ -143,10 +143,10 @@ export const metadata: Metadata = {
   // Icons
   icons: {
     icon: [
-      { url: '/logo-icon.svg', type: 'image/svg+xml' },
+      { url: '/blastmail_saiki_mainlogo-horizontal-01.svg', type: 'image/svg+xml' },
     ],
     apple: '/blastmail_saiki_mainlogo-02-01.png',
-    shortcut: '/logo-icon.svg',
+    shortcut: '/blastmail_saiki_mainlogo-horizontal-01.svg',
   },
 
   // Manifest
