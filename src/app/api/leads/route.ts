@@ -21,8 +21,12 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
 
-    // For super_admin with org, filter by org; otherwise admin client shows all
-    if (profile?.role === 'super_admin' && profile.organization_id) {
+    // Filter by organization:
+    // - super_admin without org: see all
+    // - super_admin with org: see only that org
+    // - org_admin/user: see only their org
+    const isSuperAdminWithoutOrg = profile?.role === 'super_admin' && !profile.organization_id
+    if (!isSuperAdminWithoutOrg && profile?.organization_id) {
       query = query.eq('organization_id', profile.organization_id)
     }
 
