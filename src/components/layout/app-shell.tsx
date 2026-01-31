@@ -49,6 +49,14 @@ import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import type { UserRole } from '@/types/database'
 
+interface Organization {
+  id: string
+  name: string
+  slug: string
+  logo_url?: string | null
+  is_active: boolean
+}
+
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
   { name: 'Leads', href: '/app/leads', icon: Users },
@@ -63,11 +71,13 @@ function SidebarContent({
   collapsed = false,
   onToggleCollapse,
   userRole,
+  organization,
 }: {
   onNavigate?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
   userRole?: UserRole
+  organization?: Organization | null
 }) {
   const pathname = usePathname()
   const isSuperAdmin = userRole === 'super_admin'
@@ -88,17 +98,30 @@ function SidebarContent({
               collapsed ? 'gap-0' : 'gap-3'
             )}
           >
-            <div className={cn(
-              'flex items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-500/30 transition-all duration-300',
-              collapsed ? 'w-10 h-10' : 'w-10 h-10'
-            )}>
-              <Mail className="w-5 h-5 text-white" />
-            </div>
+            {organization?.logo_url ? (
+              <div className={cn(
+                'flex items-center justify-center rounded-xl overflow-hidden bg-white shadow-lg transition-all duration-300',
+                collapsed ? 'w-10 h-10' : 'w-10 h-10'
+              )}>
+                <img
+                  src={organization.logo_url}
+                  alt={organization.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className={cn(
+                'flex items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-500/30 transition-all duration-300',
+                collapsed ? 'w-10 h-10' : 'w-10 h-10'
+              )}>
+                <Mail className="w-5 h-5 text-white" />
+              </div>
+            )}
             <span className={cn(
               'text-lg font-bold text-neutral-900 transition-all duration-300 overflow-hidden whitespace-nowrap',
               collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
             )}>
-              BlastMail
+              {organization?.name || 'BlastMail'}
             </span>
           </Link>
         </div>
@@ -326,6 +349,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [userRole, setUserRole] = useState<UserRole | undefined>(undefined)
+  const [organization, setOrganization] = useState<Organization | null>(null)
 
   // Load collapsed state from localStorage
   useEffect(() => {
@@ -353,7 +377,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       } = await supabase.auth.getUser()
       setUser(user)
 
-      // Fetch user profile to get role via API (server-side)
+      // Fetch user profile to get role and organization via API (server-side)
       if (user) {
         try {
           const response = await fetch('/api/profile')
@@ -361,6 +385,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           if (response.ok && result.data?.role) {
             setUserRole(result.data.role as UserRole)
+          }
+          if (response.ok && result.data?.organization) {
+            setOrganization(result.data.organization as Organization)
           }
         } catch (err) {
           console.error('Profile fetch error:', err)
@@ -406,7 +433,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <X className="w-5 h-5" />
             </button>
-            <SidebarContent onNavigate={() => setDrawerOpen(false)} userRole={userRole} />
+            <SidebarContent onNavigate={() => setDrawerOpen(false)} userRole={userRole} organization={organization} />
           </DialogPrimitive.Content>
         </DialogPortal>
       </Dialog>
@@ -420,7 +447,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
         style={{ width: sidebarWidth }}
       >
-        <SidebarContent collapsed={collapsed} onToggleCollapse={toggleCollapse} userRole={userRole} />
+        <SidebarContent collapsed={collapsed} onToggleCollapse={toggleCollapse} userRole={userRole} organization={organization} />
       </aside>
 
       {/* Main content wrapper - Offset by sidebar width on desktop */}
@@ -449,10 +476,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   href="/app"
                   className="flex items-center gap-2.5 md:hidden"
                 >
-                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25">
-                    <Mail className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="font-bold text-neutral-900">BlastMail</span>
+                  {organization?.logo_url ? (
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden bg-white shadow-md">
+                      <img
+                        src={organization.logo_url}
+                        alt={organization.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25">
+                      <Mail className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  <span className="font-bold text-neutral-900">{organization?.name || 'BlastMail'}</span>
                 </Link>
               </div>
 
