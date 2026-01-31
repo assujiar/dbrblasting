@@ -4,6 +4,13 @@ import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Users,
   FolderOpen,
   FileText,
@@ -22,10 +29,15 @@ import {
   ArrowDownRight,
   Loader2,
   RefreshCw,
+  Filter,
+  Building2,
+  User,
+  CalendarDays,
 } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import type { UserRole } from '@/types/database'
 
 // Types
 interface OverviewData {
@@ -102,6 +114,19 @@ interface DailyActivity {
   emails_failed: number
 }
 
+interface Organization {
+  id: string
+  name: string
+}
+
+interface UserProfile {
+  id: string
+  email: string
+  full_name: string | null
+  role: UserRole
+  organization_id: string | null
+}
+
 export default function DashboardPage() {
   const [overview, setOverview] = useState<OverviewData | null>(null)
   const [campaignStats, setCampaignStats] = useState<CampaignStats | null>(null)
@@ -112,10 +137,41 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
+  // User profile and filtering
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [users, setUsers] = useState<UserProfile[]>([])
+
+  // Filter state
+  const [selectedOrgId, setSelectedOrgId] = useState<string>('all')
+  const [selectedUserId, setSelectedUserId] = useState<string>('all')
+  const [dateFrom, setDateFrom] = useState<string>('')
+  const [dateTo, setDateTo] = useState<string>('')
+  const [showFilters, setShowFilters] = useState(false)
+
+  // Determine role capabilities
+  const isSuperAdmin = userProfile?.role === 'super_admin'
+  const isOrgAdmin = userProfile?.role === 'org_admin'
+  const canFilterOrg = isSuperAdmin
+  const canFilterUser = isSuperAdmin || isOrgAdmin
+
+  // Build filter query string
+  const getFilterParams = useCallback(() => {
+    const params = new URLSearchParams()
+    if (selectedOrgId !== 'all') params.set('organization_id', selectedOrgId)
+    if (selectedUserId !== 'all') params.set('user_id', selectedUserId)
+    if (dateFrom) params.set('date_from', dateFrom)
+    if (dateTo) params.set('date_to', dateTo)
+    return params.toString()
+  }, [selectedOrgId, selectedUserId, dateFrom, dateTo])
+
   const fetchAnalytics = useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true)
       else setLoading(true)
+
+      const filterParams = getFilterParams()
+      const filterSuffix = filterParams ? `&${filterParams}` : ''
 
       const [
         overviewRes,
@@ -125,12 +181,12 @@ export default function DashboardPage() {
         recentRes,
         activityRes,
       ] = await Promise.all([
-        fetch('/api/analytics?type=overview'),
-        fetch('/api/analytics?type=campaign_stats'),
-        fetch('/api/analytics?type=email_stats'),
-        fetch('/api/analytics?type=weekly_comparison'),
-        fetch('/api/analytics?type=recent_campaigns&limit=5'),
-        fetch('/api/analytics?type=daily_activity&days=14'),
+        fetch(`/api/analytics?type=overview${filterSuffix}`),
+        fetch(`/api/analytics?type=campaign_stats${filterSuffix}`),
+        fetch(`/api/analytics?type=email_stats${filterSuffix}`),
+        fetch(`/api/analytics?type=weekly_comparison${filterSuffix}`),
+        fetch(`/api/analytics?type=recent_campaigns&limit=5${filterSuffix}`),
+        fetch(`/api/analytics?type=daily_activity&days=14${filterSuffix}`),
       ])
 
       const [overviewData, campaignData, emailData, weeklyData, recentData, activityData] = await Promise.all([
@@ -154,11 +210,54 @@ export default function DashboardPage() {
       setLoading(false)
       setRefreshing(false)
     }
+  }, [getFilterParams])
+
+  // Fetch user profile and filter options on mount
+  useEffect(() => {
+    const fetchUserAndOptions = async () => {
+      try {
+        // Fetch user profile
+        const profileRes = await fetch('/api/profile')
+        const profileData = await profileRes.json()
+        if (profileRes.ok && profileData.data) {
+          setUserProfile(profileData.data)
+
+          // If superadmin, fetch organizations
+          if (profileData.data.role === 'super_admin') {
+            const orgsRes = await fetch('/api/organizations')
+            const orgsData = await orgsRes.json()
+            if (orgsRes.ok && orgsData.data) {
+              setOrganizations(orgsData.data)
+            }
+          }
+
+          // If superadmin or org_admin, fetch users
+          if (profileData.data.role === 'super_admin' || profileData.data.role === 'org_admin') {
+            const usersRes = await fetch('/api/users')
+            const usersData = await usersRes.json()
+            if (usersRes.ok && usersData.data) {
+              setUsers(usersData.data)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error)
+      }
+    }
+
+    fetchUserAndOptions()
   }, [])
 
   useEffect(() => {
     fetchAnalytics()
   }, [fetchAnalytics])
+
+  // Refetch when filters change
+  useEffect(() => {
+    if (userProfile) {
+      fetchAnalytics(true)
+    }
+  }, [selectedOrgId, selectedUserId, dateFrom, dateTo])
 
   const statCards = [
     {
@@ -210,26 +309,169 @@ export default function DashboardPage() {
     )
   }
 
+  // Check if any filter is active
+  const hasActiveFilters = selectedOrgId !== 'all' || selectedUserId !== 'all' || dateFrom || dateTo
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSelectedOrgId('all')
+    setSelectedUserId('all')
+    setDateFrom('')
+    setDateTo('')
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="animate-slide-up">
-          <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            Email marketing analytics & performance overview
-          </p>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="animate-slide-up">
+            <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
+            <p className="text-sm text-neutral-500 mt-1">
+              Email marketing analytics & performance overview
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={showFilters ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className="gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+              {hasActiveFilters && (
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-primary-100 text-primary-700">
+                  {[selectedOrgId !== 'all', selectedUserId !== 'all', dateFrom || dateTo].filter(Boolean).length}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchAnalytics(true)}
+              disabled={refreshing}
+              className="gap-2"
+            >
+              <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
+              Refresh
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fetchAnalytics(true)}
-          disabled={refreshing}
-          className="gap-2"
-        >
-          <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
-          Refresh
-        </Button>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <Card className="animate-slide-up border-primary-200 bg-primary-50/30">
+            <CardContent className="py-4">
+              <div className="flex flex-wrap items-end gap-4">
+                {/* Organization Filter (Super Admin only) */}
+                {canFilterOrg && (
+                  <div className="flex flex-col gap-1.5 min-w-[200px]">
+                    <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      Organization
+                    </label>
+                    <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
+                      <SelectTrigger className="h-9 bg-white">
+                        <SelectValue placeholder="All Organizations" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Organizations</SelectItem>
+                        {organizations.map((org) => (
+                          <SelectItem key={org.id} value={org.id}>
+                            {org.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* User Filter (Super Admin & Org Admin) */}
+                {canFilterUser && (
+                  <div className="flex flex-col gap-1.5 min-w-[200px]">
+                    <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      User
+                    </label>
+                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                      <SelectTrigger className="h-9 bg-white">
+                        <SelectValue placeholder="All Users" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Users</SelectItem>
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.full_name || user.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Date Range Filter (All roles) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                    <CalendarDays className="h-3 w-3" />
+                    Date Range
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm"
+                      placeholder="From"
+                    />
+                    <span className="text-neutral-400">to</span>
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm"
+                      placeholder="To"
+                    />
+                  </div>
+                </div>
+
+                {/* Clear Filters Button */}
+                {hasActiveFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="h-9 text-neutral-500 hover:text-neutral-700"
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </div>
+
+              {/* Active Filters Summary */}
+              {hasActiveFilters && (
+                <div className="mt-3 pt-3 border-t border-primary-200 flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-neutral-500">Active filters:</span>
+                  {selectedOrgId !== 'all' && (
+                    <Badge variant="secondary" className="text-xs">
+                      Org: {organizations.find(o => o.id === selectedOrgId)?.name || selectedOrgId}
+                    </Badge>
+                  )}
+                  {selectedUserId !== 'all' && (
+                    <Badge variant="secondary" className="text-xs">
+                      User: {users.find(u => u.id === selectedUserId)?.full_name || users.find(u => u.id === selectedUserId)?.email || selectedUserId}
+                    </Badge>
+                  )}
+                  {(dateFrom || dateTo) && (
+                    <Badge variant="secondary" className="text-xs">
+                      Date: {dateFrom || 'any'} - {dateTo || 'any'}
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Stats Grid */}
