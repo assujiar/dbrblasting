@@ -37,6 +37,13 @@ import {
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import type { UserRole } from '@/types/database'
 
 // Types
@@ -127,6 +134,16 @@ interface UserProfile {
   organization_id: string | null
 }
 
+// Chart tooltip state
+interface ChartTooltip {
+  visible: boolean
+  x: number
+  y: number
+  date: string
+  sent: number
+  failed: number
+}
+
 export default function DashboardPage() {
   const [overview, setOverview] = useState<OverviewData | null>(null)
   const [campaignStats, setCampaignStats] = useState<CampaignStats | null>(null)
@@ -148,6 +165,18 @@ export default function DashboardPage() {
   const [dateFrom, setDateFrom] = useState<string>('')
   const [dateTo, setDateTo] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
+
+  // Chart interaction state
+  const [chartTooltip, setChartTooltip] = useState<ChartTooltip>({
+    visible: false,
+    x: 0,
+    y: 0,
+    date: '',
+    sent: 0,
+    failed: 0,
+  })
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const chartRef = useState<HTMLDivElement | null>(null)
 
   // Determine role capabilities
   const isSuperAdmin = userProfile?.role === 'super_admin'
@@ -858,7 +887,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Daily Activity Chart */}
+        {/* Daily Activity Chart - Line Chart with Points */}
         <Card className="animate-slide-up lg:col-span-2" style={{ animationDelay: '50ms' }}>
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5">
@@ -872,49 +901,188 @@ export default function DashboardPage() {
           <CardContent className="pt-0">
             {dailyActivity.length > 0 ? (
               <div className="space-y-4">
-                {/* Simple Bar Chart */}
-                <div className="flex items-end gap-1 h-32">
-                  {[...dailyActivity].reverse().map((day, index) => {
-                    const maxSent = Math.max(...dailyActivity.map(d => d.emails_sent), 1)
-                    const sentHeight = (day.emails_sent / maxSent) * 100
-                    const failedHeight = (day.emails_failed / maxSent) * 100
+                {/* Line Chart */}
+                <div className="relative h-48">
+                  {(() => {
+                    const data = [...dailyActivity].reverse()
+                    const maxValue = Math.max(
+                      ...data.map(d => Math.max(d.emails_sent, d.emails_failed)),
+                      1
+                    )
+                    const chartWidth = 100
+                    const chartHeight = 100
+                    const padding = 5
+
+                    // Calculate points for sent line
+                    const sentPoints = data.map((d, i) => {
+                      const x = padding + (i / (data.length - 1 || 1)) * (chartWidth - padding * 2)
+                      const y = chartHeight - padding - (d.emails_sent / maxValue) * (chartHeight - padding * 2)
+                      return { x, y, data: d }
+                    })
+
+                    // Calculate points for failed line
+                    const failedPoints = data.map((d, i) => {
+                      const x = padding + (i / (data.length - 1 || 1)) * (chartWidth - padding * 2)
+                      const y = chartHeight - padding - (d.emails_failed / maxValue) * (chartHeight - padding * 2)
+                      return { x, y, data: d }
+                    })
+
+                    // Create line path
+                    const createLinePath = (points: typeof sentPoints) => {
+                      if (points.length === 0) return ''
+                      return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+                    }
+
+                    // Create area path (for gradient fill)
+                    const createAreaPath = (points: typeof sentPoints) => {
+                      if (points.length === 0) return ''
+                      const linePath = createLinePath(points)
+                      const firstX = points[0].x
+                      const lastX = points[points.length - 1].x
+                      return `${linePath} L ${lastX} ${chartHeight - padding} L ${firstX} ${chartHeight - padding} Z`
+                    }
 
                     return (
-                      <div
-                        key={day.activity_date}
-                        className="flex-1 flex flex-col items-center gap-0.5 group"
-                        style={{ animationDelay: `${index * 30}ms` }}
+                      <svg
+                        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+                        className="w-full h-full"
+                        preserveAspectRatio="none"
                       >
-                        <div className="w-full flex flex-col gap-0.5" style={{ height: '100px' }}>
-                          <div className="flex-1 flex flex-col justify-end gap-0.5">
-                            {day.emails_failed > 0 && (
-                              <div
-                                className="w-full bg-red-400 rounded-t transition-all duration-300 group-hover:bg-red-500"
-                                style={{ height: `${failedHeight}%`, minHeight: failedHeight > 0 ? '2px' : 0 }}
-                              />
-                            )}
-                            <div
-                              className="w-full bg-emerald-400 rounded-t transition-all duration-300 group-hover:bg-emerald-500"
-                              style={{ height: `${sentHeight}%`, minHeight: sentHeight > 0 ? '2px' : 0 }}
-                            />
-                          </div>
-                        </div>
-                        <span className="text-[10px] text-neutral-400 transform -rotate-45 origin-center mt-2">
-                          {new Date(day.activity_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </span>
-                      </div>
+                        <defs>
+                          {/* Gradient for sent area */}
+                          <linearGradient id="sentGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+                            <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+                          </linearGradient>
+                          {/* Gradient for failed area */}
+                          <linearGradient id="failedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
+                            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.05" />
+                          </linearGradient>
+                        </defs>
+
+                        {/* Sent Area Fill */}
+                        <path
+                          d={createAreaPath(sentPoints)}
+                          fill="url(#sentGradient)"
+                        />
+
+                        {/* Failed Area Fill */}
+                        <path
+                          d={createAreaPath(failedPoints)}
+                          fill="url(#failedGradient)"
+                        />
+
+                        {/* Sent Line */}
+                        <path
+                          d={createLinePath(sentPoints)}
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="0.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+
+                        {/* Failed Line */}
+                        <path
+                          d={createLinePath(failedPoints)}
+                          fill="none"
+                          stroke="#ef4444"
+                          strokeWidth="0.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+
+                        {/* Sent Points */}
+                        {sentPoints.map((point, i) => (
+                          <circle
+                            key={`sent-${i}`}
+                            cx={point.x}
+                            cy={point.y}
+                            r="1"
+                            fill="white"
+                            stroke="#10b981"
+                            strokeWidth="0.5"
+                            className="cursor-pointer hover:r-[1.5] transition-all"
+                            onClick={() => {
+                              setChartTooltip({
+                                visible: true,
+                                x: point.x,
+                                y: point.y,
+                                date: point.data.activity_date,
+                                sent: point.data.emails_sent,
+                                failed: point.data.emails_failed,
+                              })
+                            }}
+                            onDoubleClick={() => setSelectedDate(point.data.activity_date)}
+                          />
+                        ))}
+
+                        {/* Failed Points */}
+                        {failedPoints.map((point, i) => (
+                          <circle
+                            key={`failed-${i}`}
+                            cx={point.x}
+                            cy={point.y}
+                            r="1"
+                            fill="white"
+                            stroke="#ef4444"
+                            strokeWidth="0.5"
+                            className="cursor-pointer hover:r-[1.5] transition-all"
+                            onClick={() => {
+                              setChartTooltip({
+                                visible: true,
+                                x: point.x,
+                                y: point.y,
+                                date: point.data.activity_date,
+                                sent: point.data.emails_sent,
+                                failed: point.data.emails_failed,
+                              })
+                            }}
+                            onDoubleClick={() => setSelectedDate(point.data.activity_date)}
+                          />
+                        ))}
+                      </svg>
                     )
-                  })}
+                  })()}
+
+                  {/* Tooltip */}
+                  {chartTooltip.visible && (
+                    <div
+                      className="absolute z-10 bg-white rounded-lg shadow-lg border border-neutral-200 p-3 pointer-events-none transform -translate-x-1/2 -translate-y-full"
+                      style={{
+                        left: `${chartTooltip.x}%`,
+                        top: `${chartTooltip.y - 5}%`,
+                      }}
+                    >
+                      <p className="text-xs font-semibold text-neutral-700 mb-1">
+                        {new Date(chartTooltip.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="text-emerald-600">Sent: {chartTooltip.sent}</span>
+                        <span className="text-red-600">Failed: {chartTooltip.failed}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* X-axis labels */}
+                <div className="flex justify-between px-2 text-[10px] text-neutral-400">
+                  {[...dailyActivity].reverse().filter((_, i, arr) => i === 0 || i === Math.floor(arr.length / 2) || i === arr.length - 1).map((day) => (
+                    <span key={day.activity_date}>
+                      {new Date(day.activity_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  ))}
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center justify-center gap-6 pt-4 border-t border-neutral-100">
+                <div className="flex items-center justify-center gap-6 pt-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm bg-emerald-400" />
+                    <div className="w-3 h-0.5 bg-emerald-500 rounded-full" />
                     <span className="text-xs text-neutral-500">Sent</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm bg-red-400" />
+                    <div className="w-3 h-0.5 bg-red-500 rounded-full" />
                     <span className="text-xs text-neutral-500">Failed</span>
                   </div>
                 </div>
@@ -928,6 +1096,54 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Detail Modal for selected date */}
+      {selectedDate && (
+        <Dialog open={!!selectedDate} onOpenChange={(open) => !open && setSelectedDate(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                Email Activity - {new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+              </DialogTitle>
+              <DialogDescription>
+                Emails sent and failed on this date
+              </DialogDescription>
+            </DialogHeader>
+            {(() => {
+              const dayData = dailyActivity.find(d => d.activity_date === selectedDate)
+              if (!dayData) return null
+              return (
+                <div className="space-y-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                        <span className="text-sm font-medium text-emerald-700">Sent</span>
+                      </div>
+                      <p className="text-2xl font-bold text-emerald-900">{dayData.emails_sent}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-red-50 border border-red-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span className="text-sm font-medium text-red-700">Failed</span>
+                      </div>
+                      <p className="text-2xl font-bold text-red-900">{dayData.emails_failed}</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <Link href={`/app/campaigns?date=${selectedDate}`}>
+                      <Button variant="outline" className="gap-2">
+                        View Campaigns
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )
+            })()}
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Recent Campaigns */}
       <Card className="animate-slide-up">
