@@ -60,9 +60,12 @@ export const metadata: Metadata = {
   ],
 
   // Authors and creator
-  authors: [{ name: 'BlastMail', url: siteUrl }],
-  creator: 'BlastMail',
-  publisher: 'BlastMail',
+  authors: [
+    { name: 'SAIKI Group', url: 'https://saiki.id' },
+    { name: 'BlastMail', url: siteUrl },
+  ],
+  creator: 'SAIKI Group',
+  publisher: 'SAIKI Group',
 
   // Robots
   robots: {
@@ -171,8 +174,13 @@ const jsonLd = {
   image: `${siteUrl}/blastmail_saiki_mainlogo-01.png`,
   author: {
     '@type': 'Organization',
-    name: 'BlastMail',
-    url: siteUrl,
+    name: 'SAIKI Group',
+    url: 'https://saiki.id',
+  },
+  developer: {
+    '@type': 'Organization',
+    name: 'SAIKI Group',
+    url: 'https://saiki.id',
   },
   offers: {
     '@type': 'Offer',
@@ -203,16 +211,22 @@ const jsonLd = {
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'BlastMail',
-  url: siteUrl,
+  name: 'SAIKI Group',
+  url: 'https://saiki.id',
   logo: `${siteUrl}/blastmail_saiki_mainlogo-01.png`,
   description:
-    'BlastMail adalah platform email marketing dan email blasting terbaik di Indonesia. BlastMail is the best email marketing and email blasting platform.',
+    'SAIKI Group adalah perusahaan teknologi yang mengembangkan BlastMail, platform email marketing dan email blasting terbaik di Indonesia. SAIKI Group is a technology company that develops BlastMail, the best email marketing and email blasting platform.',
   sameAs: [],
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer service',
     availableLanguage: ['Indonesian', 'English'],
+  },
+  owns: {
+    '@type': 'Product',
+    name: 'BlastMail',
+    url: siteUrl,
+    description: 'Platform email marketing dan email blasting profesional',
   },
 }
 
@@ -224,6 +238,11 @@ const webSiteJsonLd = {
   description:
     'Platform email marketing dan email blasting profesional. Professional email marketing and blasting platform.',
   inLanguage: ['id', 'en'],
+  publisher: {
+    '@type': 'Organization',
+    name: 'SAIKI Group',
+    url: 'https://saiki.id',
+  },
   potentialAction: {
     '@type': 'SearchAction',
     target: {
