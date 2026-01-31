@@ -36,7 +36,7 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
+                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
                   </td>
                 </tr>
                 <tr>
@@ -159,7 +159,7 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
+                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
                   </td>
                 </tr>
                 <tr>
@@ -294,7 +294,7 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
+                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
                   </td>
                 </tr>
                 <tr>
