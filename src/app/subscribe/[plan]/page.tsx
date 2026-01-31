@@ -172,10 +172,17 @@ export default function SubscribePage() {
 
       {/* Header */}
       <header className="border-b lp-border-subtle lp-bg backdrop-blur-xl bg-opacity-80">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 h-16 flex items-center">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 lp-link">
             <ArrowLeft className="h-4 w-4" />
             <span className="text-sm font-medium">Kembali</span>
+          </Link>
+          <Link href="/">
+            <img
+              src="/lpblastmaillogo.svg"
+              alt={APP_NAME}
+              className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+            />
           </Link>
         </div>
       </header>

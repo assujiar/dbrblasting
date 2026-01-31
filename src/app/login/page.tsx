@@ -51,11 +51,13 @@ export default function LoginPage() {
       <div className="w-full max-w-sm relative z-10">
         {/* Logo */}
         <div className="text-center mb-8 animate-slide-up">
-          <img
-            src={APP_LOGO_URL}
-            alt={APP_NAME}
-            className="h-16 w-auto mx-auto mb-4 object-contain"
-          />
+          <Link href="/">
+            <img
+              src={APP_LOGO_URL}
+              alt={APP_NAME}
+              className="h-16 w-auto mx-auto mb-4 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+            />
+          </Link>
           <p className="text-sm text-neutral-500 flex items-center justify-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary-500" />
             Email marketing made simple
