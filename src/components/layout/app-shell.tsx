@@ -538,6 +538,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     />
                   )}
                 </Link>
+                {/* Desktop logo when sidebar collapsed */}
+                {collapsed && (
+                  <Link
+                    href="/app"
+                    className="hidden md:flex items-center"
+                  >
+                    <img
+                      src={APP_LOGO_URL}
+                      alt={APP_NAME}
+                      className="h-9 w-auto object-contain"
+                    />
+                  </Link>
+                )}
               </div>
 
               {/* Right section - Notifications & User menu */}

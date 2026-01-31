@@ -1,0 +1,30 @@
+# BlastMail - Email Marketing Platform
+# https://blastmail.saiki.id
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /app/
+Disallow: /admin/
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Sitemaps
+Sitemap: https://blastmail.saiki.id/sitemap.xml
+
+# Crawl-delay (optional, some crawlers respect this)
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /app/
+Disallow: /admin/
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /app/
+Disallow: /admin/
