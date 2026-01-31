@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Menu, Mail, Send, Users, FileText, Zap, Shield, BarChart3, CheckCircle2, ArrowRight, Sparkles, Check, X, Crown, Star, Rocket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 
 const features = [
   {
@@ -151,14 +151,12 @@ export default function Home() {
       <header className="relative z-10 border-b border-neutral-100 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
           <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/logo-icon.svg"
-              alt="BlastMail"
-              width={36}
-              height={36}
-              className="w-9 h-9"
+            <img
+              src={APP_LOGO_URL}
+              alt={APP_NAME}
+              className="w-9 h-9 object-contain"
             />
-            <span className="text-xl font-bold text-neutral-900">BlastMail</span>
+            <span className="text-xl font-bold text-neutral-900">{APP_NAME}</span>
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm font-medium text-neutral-600 md:flex">
@@ -600,17 +598,15 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-2">
-                <Image
-                  src="/logo-icon.svg"
-                  alt="BlastMail"
-                  width={32}
-                  height={32}
-                  className="w-8 h-8"
+                <img
+                  src={APP_LOGO_URL}
+                  alt={APP_NAME}
+                  className="w-8 h-8 object-contain"
                 />
-                <span className="text-lg font-bold text-neutral-900">BlastMail</span>
+                <span className="text-lg font-bold text-neutral-900">{APP_NAME}</span>
               </div>
               <p className="text-sm text-neutral-500">
-                &copy; {new Date().getFullYear()} BlastMail. All rights reserved.
+                &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
               </p>
               <div className="flex items-center gap-6 text-sm text-neutral-600">
                 <a href="#" className="hover:text-primary-600 transition-colors">Privacy</a>

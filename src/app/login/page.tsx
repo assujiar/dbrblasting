@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
@@ -13,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Mail, Lock, ArrowRight, Sparkles } from 'lucide-react'
 import { isValidEmail, cn } from '@/lib/utils'
+import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -51,15 +51,13 @@ export default function LoginPage() {
       <div className="w-full max-w-sm relative z-10">
         {/* Logo */}
         <div className="text-center mb-8 animate-slide-up">
-          <Image
-            src="/logo.svg"
-            alt="BlastMail"
-            width={80}
-            height={80}
-            className="w-20 h-20 mx-auto mb-4"
+          <img
+            src={APP_LOGO_URL}
+            alt={APP_NAME}
+            className="w-20 h-20 mx-auto mb-4 object-contain"
           />
           <h1 className="text-2xl font-bold text-neutral-900">
-            BlastMail
+            {APP_NAME}
           </h1>
           <p className="text-sm text-neutral-500 mt-1 flex items-center justify-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary-500" />
