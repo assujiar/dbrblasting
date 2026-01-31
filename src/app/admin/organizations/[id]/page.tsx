@@ -11,6 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -42,6 +49,8 @@ import {
   FileText,
   Send,
   ChevronRight,
+  Crown,
+  Mail,
 } from 'lucide-react'
 import { cn, formatDateShort } from '@/lib/utils'
 import type { Organization, UserProfile } from '@/types/database'
@@ -72,6 +81,7 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
     slug: '',
     description: '',
     is_active: true,
+    subscription_tier: 'basic' as 'basic' | 'regular' | 'pro',
     smtp_host: '',
     smtp_port: 587,
     smtp_user: '',
@@ -80,6 +90,13 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
     smtp_from_name: '',
     smtp_from_email: '',
   })
+
+  // Tier limits configuration
+  const TIER_LIMITS = {
+    basic: { maxCampaigns: 3, maxRecipientsPerDay: 50 },
+    regular: { maxCampaigns: 5, maxRecipientsPerDay: 100 },
+    pro: { maxCampaigns: 10, maxRecipientsPerDay: 500 },
+  }
 
   const fetchOrganization = useCallback(async () => {
     setIsLoading(true)
@@ -94,6 +111,7 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
         slug: result.data.slug || '',
         description: result.data.description || '',
         is_active: result.data.is_active ?? true,
+        subscription_tier: result.data.subscription_tier || 'basic',
         smtp_host: result.data.smtp_host || '',
         smtp_port: result.data.smtp_port || 587,
         smtp_user: result.data.smtp_user || '',
@@ -381,128 +399,209 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
           </CardContent>
         </Card>
 
-        {/* SMTP Configuration */}
-        <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
+        {/* Subscription Tier */}
+        <Card className="animate-slide-up" style={{ animationDelay: '125ms' }}>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Server className="h-5 w-5 text-success-500" />
-                  SMTP Configuration
-                </CardTitle>
-                <CardDescription>Email server settings for this organization</CardDescription>
-              </div>
-              {formData.smtp_host && (
-                <Badge variant={smtpTestResult === 'success' ? 'success' : smtpTestResult === 'error' ? 'error' : 'neutral'}>
-                  {smtpTestResult === 'success' && <CheckCircle2 className="h-3 w-3 mr-1" />}
-                  {smtpTestResult === 'error' && <AlertCircle className="h-3 w-3 mr-1" />}
-                  {smtpTestResult === 'success' ? 'Connected' : smtpTestResult === 'error' ? 'Failed' : 'Not tested'}
-                </Badge>
-              )}
-            </div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Crown className="h-5 w-5 text-warning-500" />
+              Subscription Tier
+            </CardTitle>
+            <CardDescription>Manage the subscription plan for this organization</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="smtp_host">SMTP Host</Label>
-                <Input
-                  id="smtp_host"
-                  placeholder="smtp.gmail.com"
-                  value={formData.smtp_host}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, smtp_host: e.target.value }))}
-                  disabled={isSaving}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="smtp_port">Port</Label>
-                <Input
-                  id="smtp_port"
-                  type="number"
-                  value={formData.smtp_port || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, smtp_port: parseInt(e.target.value) || 587 }))}
-                  disabled={isSaving}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="subscription_tier">Current Plan</Label>
+              <Select
+                value={formData.subscription_tier}
+                onValueChange={(value: 'basic' | 'regular' | 'pro') =>
+                  setFormData((prev) => ({ ...prev, subscription_tier: value }))
+                }
+                disabled={isSaving}
+              >
+                <SelectTrigger id="subscription_tier">
+                  <SelectValue placeholder="Select a plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="basic">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Basic</span>
+                      <span className="text-neutral-500 text-xs">- 3 campaigns, 50 emails/day</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="regular">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Regular</span>
+                      <span className="text-neutral-500 text-xs">- 5 campaigns, 100 emails/day</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="pro">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Pro</span>
+                      <span className="text-neutral-500 text-xs">- 10 campaigns, 500 emails/day</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="smtp_user">Username</Label>
-                <Input
-                  id="smtp_user"
-                  value={formData.smtp_user}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, smtp_user: e.target.value }))}
-                  disabled={isSaving}
-                />
+
+            {/* Current limits display */}
+            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-gradient-to-br from-warning-50 to-warning-100/50 border border-warning-200">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-white/80">
+                  <Send className="h-4 w-4 text-warning-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-warning-700">Max Campaigns</p>
+                  <p className="font-semibold text-warning-900">
+                    {TIER_LIMITS[formData.subscription_tier].maxCampaigns}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="smtp_pass">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="smtp_pass"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.smtp_pass}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, smtp_pass: e.target.value }))}
-                    disabled={isSaving}
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-white/80">
+                  <Mail className="h-4 w-4 text-warning-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-warning-700">Emails/Day</p>
+                  <p className="font-semibold text-warning-900">
+                    {TIER_LIMITS[formData.subscription_tier].maxRecipientsPerDay}
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="smtp_from_name">From Name</Label>
-                <Input
-                  id="smtp_from_name"
-                  value={formData.smtp_from_name}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, smtp_from_name: e.target.value }))}
-                  disabled={isSaving}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="smtp_from_email">From Email</Label>
-                <Input
-                  id="smtp_from_email"
-                  type="email"
-                  value={formData.smtp_from_email}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, smtp_from_email: e.target.value }))}
-                  disabled={isSaving}
-                />
-              </div>
+
+            {/* Usage info */}
+            <div className="text-xs text-neutral-500 p-3 rounded-lg bg-neutral-50 border border-neutral-200">
+              <p className="flex items-center gap-1.5">
+                <AlertCircle className="h-3.5 w-3.5" />
+                Current usage: {organization?.stats.campaigns || 0} campaigns created
+              </p>
             </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
-              <Switch
-                id="smtp_secure"
-                checked={formData.smtp_secure}
-                onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, smtp_secure: checked }))}
-                disabled={isSaving}
-              />
-              <div>
-                <Label htmlFor="smtp_secure" className="cursor-pointer">Use SSL/TLS</Label>
-                <p className="text-xs text-neutral-500">
-                  Enable for port 465, disable for port 587
-                </p>
-              </div>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleTestSmtp}
-              loading={isTesting}
-              disabled={!formData.smtp_host || !formData.smtp_user || !formData.smtp_pass}
-            >
-              <Server className="h-4 w-4" />
-              Test Connection
-            </Button>
           </CardContent>
         </Card>
       </div>
+
+      {/* SMTP Configuration */}
+      <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Server className="h-5 w-5 text-success-500" />
+                SMTP Configuration
+              </CardTitle>
+              <CardDescription>Email server settings for this organization</CardDescription>
+            </div>
+            {formData.smtp_host && (
+              <Badge variant={smtpTestResult === 'success' ? 'success' : smtpTestResult === 'error' ? 'error' : 'neutral'}>
+                {smtpTestResult === 'success' && <CheckCircle2 className="h-3 w-3 mr-1" />}
+                {smtpTestResult === 'error' && <AlertCircle className="h-3 w-3 mr-1" />}
+                {smtpTestResult === 'success' ? 'Connected' : smtpTestResult === 'error' ? 'Failed' : 'Not tested'}
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="smtp_host">SMTP Host</Label>
+              <Input
+                id="smtp_host"
+                placeholder="smtp.gmail.com"
+                value={formData.smtp_host}
+                onChange={(e) => setFormData((prev) => ({ ...prev, smtp_host: e.target.value }))}
+                disabled={isSaving}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="smtp_port">Port</Label>
+              <Input
+                id="smtp_port"
+                type="number"
+                value={formData.smtp_port || ''}
+                onChange={(e) => setFormData((prev) => ({ ...prev, smtp_port: parseInt(e.target.value) || 587 }))}
+                disabled={isSaving}
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="smtp_user">Username</Label>
+              <Input
+                id="smtp_user"
+                value={formData.smtp_user}
+                onChange={(e) => setFormData((prev) => ({ ...prev, smtp_user: e.target.value }))}
+                disabled={isSaving}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="smtp_pass">Password</Label>
+              <div className="relative">
+                <Input
+                  id="smtp_pass"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.smtp_pass}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, smtp_pass: e.target.value }))}
+                  disabled={isSaving}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="smtp_from_name">From Name</Label>
+              <Input
+                id="smtp_from_name"
+                value={formData.smtp_from_name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, smtp_from_name: e.target.value }))}
+                disabled={isSaving}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="smtp_from_email">From Email</Label>
+              <Input
+                id="smtp_from_email"
+                type="email"
+                value={formData.smtp_from_email}
+                onChange={(e) => setFormData((prev) => ({ ...prev, smtp_from_email: e.target.value }))}
+                disabled={isSaving}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+            <Switch
+              id="smtp_secure"
+              checked={formData.smtp_secure}
+              onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, smtp_secure: checked }))}
+              disabled={isSaving}
+            />
+            <div>
+              <Label htmlFor="smtp_secure" className="cursor-pointer">Use SSL/TLS</Label>
+              <p className="text-xs text-neutral-500">
+                Enable for port 465, disable for port 587
+              </p>
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleTestSmtp}
+            loading={isTesting}
+            disabled={!formData.smtp_host || !formData.smtp_user || !formData.smtp_pass}
+          >
+            <Server className="h-4 w-4" />
+            Test Connection
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Users Table */}
       <Card className="animate-slide-up" style={{ animationDelay: '200ms' }}>

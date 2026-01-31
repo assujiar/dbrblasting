@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getClientForUser } from '@/lib/supabase/admin'
 import { generateCampaignName } from '@/lib/utils'
+import { TIER_LIMITS, SubscriptionTier } from '@/app/api/organization/usage/route'
 
 export async function GET(request: NextRequest) {
   try {
@@ -150,6 +151,31 @@ export async function POST(request: NextRequest) {
 
     if (uniqueLeads.length === 0) {
       return NextResponse.json({ error: 'No recipients selected' }, { status: 400 })
+    }
+
+    // Check campaign limit for organization
+    if (profile?.organization_id) {
+      // Get organization tier
+      const { data: org } = await client
+        .from('organizations')
+        .select('subscription_tier')
+        .eq('id', profile.organization_id)
+        .single()
+
+      const tier = (org?.subscription_tier || 'basic') as SubscriptionTier
+      const maxCampaigns = TIER_LIMITS[tier].maxCampaigns
+
+      // Count existing campaigns
+      const { count: campaignCount } = await client
+        .from('email_campaigns')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', profile.organization_id)
+
+      if ((campaignCount || 0) >= maxCampaigns) {
+        return NextResponse.json({
+          error: `Batas campaign tercapai. Paket ${tier} Anda mengizinkan maksimal ${maxCampaigns} campaign. Silakan upgrade paket atau hapus campaign yang sudah ada.`
+        }, { status: 403 })
+      }
     }
 
     // Create campaign
