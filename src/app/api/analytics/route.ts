@@ -75,25 +75,86 @@ export async function GET(request: NextRequest) {
       }
 
       case 'campaign_stats': {
-        let query = client.from('email_campaigns').select('status')
+        // Get campaigns with their status
+        let campaignQuery = client.from('email_campaigns').select('id, status')
         if (orgId) {
-          query = query.eq('organization_id', orgId)
+          campaignQuery = campaignQuery.eq('organization_id', orgId)
         }
 
-        const { data, error } = await query
+        const { data: campaigns, error: campaignError } = await campaignQuery
 
-        if (error) {
-          return NextResponse.json({ error: error.message }, { status: 500 })
+        if (campaignError) {
+          return NextResponse.json({ error: campaignError.message }, { status: 500 })
         }
 
-        const campaigns = data || []
+        const campaignList = campaigns || []
+        const campaignIds = campaignList.map((c: { id: string }) => c.id)
+
+        // Get email stats per campaign
+        let recipientStats: { campaign_id: string; status: string }[] = []
+        if (campaignIds.length > 0) {
+          const { data: recipients } = await client
+            .from('email_campaign_recipients')
+            .select('campaign_id, status')
+            .in('campaign_id', campaignIds)
+          recipientStats = recipients || []
+        }
+
+        // Group recipient stats by campaign
+        const campaignRecipients: Record<string, { sent: number; failed: number; pending: number; total: number }> = {}
+        recipientStats.forEach((r) => {
+          if (!campaignRecipients[r.campaign_id]) {
+            campaignRecipients[r.campaign_id] = { sent: 0, failed: 0, pending: 0, total: 0 }
+          }
+          campaignRecipients[r.campaign_id].total++
+          if (r.status === 'sent') campaignRecipients[r.campaign_id].sent++
+          else if (r.status === 'failed') campaignRecipients[r.campaign_id].failed++
+          else if (r.status === 'pending') campaignRecipients[r.campaign_id].pending++
+        })
+
+        // Calculate stats per status
+        const statusStats: Record<string, { count: number; sent: number; failed: number; pending: number; total: number }> = {
+          completed: { count: 0, sent: 0, failed: 0, pending: 0, total: 0 },
+          running: { count: 0, sent: 0, failed: 0, pending: 0, total: 0 },
+          draft: { count: 0, sent: 0, failed: 0, pending: 0, total: 0 },
+          failed: { count: 0, sent: 0, failed: 0, pending: 0, total: 0 },
+        }
+
+        campaignList.forEach((c: { id: string; status: string }) => {
+          const status = c.status || 'draft'
+          if (statusStats[status]) {
+            statusStats[status].count++
+            const recipients = campaignRecipients[c.id] || { sent: 0, failed: 0, pending: 0, total: 0 }
+            statusStats[status].sent += recipients.sent
+            statusStats[status].failed += recipients.failed
+            statusStats[status].pending += recipients.pending
+            statusStats[status].total += recipients.total
+          }
+        })
+
+        // Calculate totals
+        const totalSent = Object.values(statusStats).reduce((sum, s) => sum + s.sent, 0)
+        const totalFailed = Object.values(statusStats).reduce((sum, s) => sum + s.failed, 0)
+        const totalRecipients = Object.values(statusStats).reduce((sum, s) => sum + s.total, 0)
+
         return NextResponse.json({
           data: {
-            total_campaigns: campaigns.length,
-            completed_campaigns: campaigns.filter((c: { status: string }) => c.status === 'completed').length,
-            running_campaigns: campaigns.filter((c: { status: string }) => c.status === 'running').length,
-            draft_campaigns: campaigns.filter((c: { status: string }) => c.status === 'draft').length,
-            failed_campaigns: campaigns.filter((c: { status: string }) => c.status === 'failed').length,
+            total_campaigns: campaignList.length,
+            completed_campaigns: statusStats.completed.count,
+            running_campaigns: statusStats.running.count,
+            draft_campaigns: statusStats.draft.count,
+            failed_campaigns: statusStats.failed.count,
+            // Detailed stats per status
+            status_details: {
+              completed: statusStats.completed,
+              running: statusStats.running,
+              draft: statusStats.draft,
+              failed: statusStats.failed,
+            },
+            // Totals
+            total_sent: totalSent,
+            total_failed: totalFailed,
+            total_recipients: totalRecipients,
           },
         })
       }

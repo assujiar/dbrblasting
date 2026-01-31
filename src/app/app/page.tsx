@@ -4,6 +4,13 @@ import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Users,
   FolderOpen,
   FileText,
@@ -22,10 +29,15 @@ import {
   ArrowDownRight,
   Loader2,
   RefreshCw,
+  Filter,
+  Building2,
+  User,
+  CalendarDays,
 } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import type { UserRole } from '@/types/database'
 
 // Types
 interface OverviewData {
@@ -39,12 +51,29 @@ interface OverviewData {
   campaigns_this_month: number
 }
 
+interface StatusDetail {
+  count: number
+  sent: number
+  failed: number
+  pending: number
+  total: number
+}
+
 interface CampaignStats {
   total_campaigns: number
   completed_campaigns: number
   running_campaigns: number
   draft_campaigns: number
   failed_campaigns: number
+  status_details?: {
+    completed: StatusDetail
+    running: StatusDetail
+    draft: StatusDetail
+    failed: StatusDetail
+  }
+  total_sent?: number
+  total_failed?: number
+  total_recipients?: number
 }
 
 interface EmailStats {
@@ -85,6 +114,19 @@ interface DailyActivity {
   emails_failed: number
 }
 
+interface Organization {
+  id: string
+  name: string
+}
+
+interface UserProfile {
+  id: string
+  email: string
+  full_name: string | null
+  role: UserRole
+  organization_id: string | null
+}
+
 export default function DashboardPage() {
   const [overview, setOverview] = useState<OverviewData | null>(null)
   const [campaignStats, setCampaignStats] = useState<CampaignStats | null>(null)
@@ -95,10 +137,41 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
+  // User profile and filtering
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [users, setUsers] = useState<UserProfile[]>([])
+
+  // Filter state
+  const [selectedOrgId, setSelectedOrgId] = useState<string>('all')
+  const [selectedUserId, setSelectedUserId] = useState<string>('all')
+  const [dateFrom, setDateFrom] = useState<string>('')
+  const [dateTo, setDateTo] = useState<string>('')
+  const [showFilters, setShowFilters] = useState(false)
+
+  // Determine role capabilities
+  const isSuperAdmin = userProfile?.role === 'super_admin'
+  const isOrgAdmin = userProfile?.role === 'org_admin'
+  const canFilterOrg = isSuperAdmin
+  const canFilterUser = isSuperAdmin || isOrgAdmin
+
+  // Build filter query string
+  const getFilterParams = useCallback(() => {
+    const params = new URLSearchParams()
+    if (selectedOrgId !== 'all') params.set('organization_id', selectedOrgId)
+    if (selectedUserId !== 'all') params.set('user_id', selectedUserId)
+    if (dateFrom) params.set('date_from', dateFrom)
+    if (dateTo) params.set('date_to', dateTo)
+    return params.toString()
+  }, [selectedOrgId, selectedUserId, dateFrom, dateTo])
+
   const fetchAnalytics = useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true)
       else setLoading(true)
+
+      const filterParams = getFilterParams()
+      const filterSuffix = filterParams ? `&${filterParams}` : ''
 
       const [
         overviewRes,
@@ -108,12 +181,12 @@ export default function DashboardPage() {
         recentRes,
         activityRes,
       ] = await Promise.all([
-        fetch('/api/analytics?type=overview'),
-        fetch('/api/analytics?type=campaign_stats'),
-        fetch('/api/analytics?type=email_stats'),
-        fetch('/api/analytics?type=weekly_comparison'),
-        fetch('/api/analytics?type=recent_campaigns&limit=5'),
-        fetch('/api/analytics?type=daily_activity&days=14'),
+        fetch(`/api/analytics?type=overview${filterSuffix}`),
+        fetch(`/api/analytics?type=campaign_stats${filterSuffix}`),
+        fetch(`/api/analytics?type=email_stats${filterSuffix}`),
+        fetch(`/api/analytics?type=weekly_comparison${filterSuffix}`),
+        fetch(`/api/analytics?type=recent_campaigns&limit=5${filterSuffix}`),
+        fetch(`/api/analytics?type=daily_activity&days=14${filterSuffix}`),
       ])
 
       const [overviewData, campaignData, emailData, weeklyData, recentData, activityData] = await Promise.all([
@@ -137,11 +210,54 @@ export default function DashboardPage() {
       setLoading(false)
       setRefreshing(false)
     }
+  }, [getFilterParams])
+
+  // Fetch user profile and filter options on mount
+  useEffect(() => {
+    const fetchUserAndOptions = async () => {
+      try {
+        // Fetch user profile
+        const profileRes = await fetch('/api/profile')
+        const profileData = await profileRes.json()
+        if (profileRes.ok && profileData.data) {
+          setUserProfile(profileData.data)
+
+          // If superadmin, fetch organizations
+          if (profileData.data.role === 'super_admin') {
+            const orgsRes = await fetch('/api/organizations')
+            const orgsData = await orgsRes.json()
+            if (orgsRes.ok && orgsData.data) {
+              setOrganizations(orgsData.data)
+            }
+          }
+
+          // If superadmin or org_admin, fetch users
+          if (profileData.data.role === 'super_admin' || profileData.data.role === 'org_admin') {
+            const usersRes = await fetch('/api/users')
+            const usersData = await usersRes.json()
+            if (usersRes.ok && usersData.data) {
+              setUsers(usersData.data)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error)
+      }
+    }
+
+    fetchUserAndOptions()
   }, [])
 
   useEffect(() => {
     fetchAnalytics()
   }, [fetchAnalytics])
+
+  // Refetch when filters change
+  useEffect(() => {
+    if (userProfile) {
+      fetchAnalytics(true)
+    }
+  }, [selectedOrgId, selectedUserId, dateFrom, dateTo])
 
   const statCards = [
     {
@@ -193,26 +309,169 @@ export default function DashboardPage() {
     )
   }
 
+  // Check if any filter is active
+  const hasActiveFilters = selectedOrgId !== 'all' || selectedUserId !== 'all' || dateFrom || dateTo
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSelectedOrgId('all')
+    setSelectedUserId('all')
+    setDateFrom('')
+    setDateTo('')
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="animate-slide-up">
-          <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            Email marketing analytics & performance overview
-          </p>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="animate-slide-up">
+            <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
+            <p className="text-sm text-neutral-500 mt-1">
+              Email marketing analytics & performance overview
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={showFilters ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className="gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+              {hasActiveFilters && (
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-primary-100 text-primary-700">
+                  {[selectedOrgId !== 'all', selectedUserId !== 'all', dateFrom || dateTo].filter(Boolean).length}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchAnalytics(true)}
+              disabled={refreshing}
+              className="gap-2"
+            >
+              <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
+              Refresh
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fetchAnalytics(true)}
-          disabled={refreshing}
-          className="gap-2"
-        >
-          <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
-          Refresh
-        </Button>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <Card className="animate-slide-up border-primary-200 bg-primary-50/30">
+            <CardContent className="py-4">
+              <div className="flex flex-wrap items-end gap-4">
+                {/* Organization Filter (Super Admin only) */}
+                {canFilterOrg && (
+                  <div className="flex flex-col gap-1.5 min-w-[200px]">
+                    <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      Organization
+                    </label>
+                    <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
+                      <SelectTrigger className="h-9 bg-white">
+                        <SelectValue placeholder="All Organizations" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Organizations</SelectItem>
+                        {organizations.map((org) => (
+                          <SelectItem key={org.id} value={org.id}>
+                            {org.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* User Filter (Super Admin & Org Admin) */}
+                {canFilterUser && (
+                  <div className="flex flex-col gap-1.5 min-w-[200px]">
+                    <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      User
+                    </label>
+                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                      <SelectTrigger className="h-9 bg-white">
+                        <SelectValue placeholder="All Users" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Users</SelectItem>
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.full_name || user.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Date Range Filter (All roles) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                    <CalendarDays className="h-3 w-3" />
+                    Date Range
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm"
+                      placeholder="From"
+                    />
+                    <span className="text-neutral-400">to</span>
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm"
+                      placeholder="To"
+                    />
+                  </div>
+                </div>
+
+                {/* Clear Filters Button */}
+                {hasActiveFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="h-9 text-neutral-500 hover:text-neutral-700"
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </div>
+
+              {/* Active Filters Summary */}
+              {hasActiveFilters && (
+                <div className="mt-3 pt-3 border-t border-primary-200 flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-neutral-500">Active filters:</span>
+                  {selectedOrgId !== 'all' && (
+                    <Badge variant="secondary" className="text-xs">
+                      Org: {organizations.find(o => o.id === selectedOrgId)?.name || selectedOrgId}
+                    </Badge>
+                  )}
+                  {selectedUserId !== 'all' && (
+                    <Badge variant="secondary" className="text-xs">
+                      User: {users.find(u => u.id === selectedUserId)?.full_name || users.find(u => u.id === selectedUserId)?.email || selectedUserId}
+                    </Badge>
+                  )}
+                  {(dateFrom || dateTo) && (
+                    <Badge variant="secondary" className="text-xs">
+                      Date: {dateFrom || 'any'} - {dateTo || 'any'}
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Stats Grid */}
@@ -385,13 +644,14 @@ export default function DashboardPage() {
               </div>
               Campaign Status
             </CardTitle>
-            <CardDescription>Campaign distribution by status</CardDescription>
+            <CardDescription>Campaign distribution by status with email details</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[
                 {
                   label: 'Completed',
+                  statusKey: 'completed' as const,
                   value: campaignStats?.completed_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'emerald',
@@ -399,6 +659,7 @@ export default function DashboardPage() {
                 },
                 {
                   label: 'Running',
+                  statusKey: 'running' as const,
                   value: campaignStats?.running_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'blue',
@@ -406,6 +667,7 @@ export default function DashboardPage() {
                 },
                 {
                   label: 'Draft',
+                  statusKey: 'draft' as const,
                   value: campaignStats?.draft_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'neutral',
@@ -413,6 +675,7 @@ export default function DashboardPage() {
                 },
                 {
                   label: 'Failed',
+                  statusKey: 'failed' as const,
                   value: campaignStats?.failed_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'red',
@@ -420,9 +683,17 @@ export default function DashboardPage() {
                 },
               ].map((item) => {
                 const percent = item.total > 0 ? Math.round((item.value / item.total) * 100) : 0
+                const details = campaignStats?.status_details?.[item.statusKey]
+                const sentPercent = details && details.total > 0 ? Math.round((details.sent / details.total) * 100) : 0
+                const failedPercent = details && details.total > 0 ? Math.round((details.failed / details.total) * 100) : 0
+
                 return (
-                  <div key={item.label} className="space-y-1.5">
-                    <div className="flex items-center justify-between">
+                  <Link
+                    key={item.label}
+                    href={`/app/campaigns?status=${item.statusKey}`}
+                    className="block p-3 rounded-xl border border-neutral-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <item.icon
                           className={cn(
@@ -433,38 +704,84 @@ export default function DashboardPage() {
                             item.color === 'red' && 'text-red-500'
                           )}
                         />
-                        <span className="text-sm text-neutral-600">{item.label}</span>
+                        <span className="text-sm font-medium text-neutral-700 group-hover:text-primary-700">{item.label}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-neutral-900">{item.value}</span>
+                        <span className="text-sm font-bold text-neutral-900">{item.value}</span>
                         <span className="text-xs text-neutral-400">({percent}%)</span>
                       </div>
                     </div>
-                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-                      <div
-                        className={cn(
-                          'h-full transition-all duration-500 rounded-full',
-                          item.color === 'emerald' && 'bg-emerald-500',
-                          item.color === 'blue' && 'bg-blue-500',
-                          item.color === 'neutral' && 'bg-neutral-300',
-                          item.color === 'red' && 'bg-red-500'
-                        )}
-                        style={{ width: `${percent}%` }}
-                      />
+
+                    {/* Dual-color progress bar: green for sent, red for failed */}
+                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden flex">
+                      {details && details.total > 0 ? (
+                        <>
+                          <div
+                            className="bg-emerald-500 transition-all duration-500"
+                            style={{ width: `${sentPercent}%` }}
+                          />
+                          <div
+                            className="bg-red-500 transition-all duration-500"
+                            style={{ width: `${failedPercent}%` }}
+                          />
+                        </>
+                      ) : (
+                        <div
+                          className={cn(
+                            'h-full transition-all duration-500',
+                            item.color === 'emerald' && 'bg-emerald-500',
+                            item.color === 'blue' && 'bg-blue-500',
+                            item.color === 'neutral' && 'bg-neutral-300',
+                            item.color === 'red' && 'bg-red-500'
+                          )}
+                          style={{ width: `${percent}%` }}
+                        />
+                      )}
                     </div>
-                  </div>
+
+                    {/* Detailed stats */}
+                    {details && details.total > 0 && (
+                      <div className="flex items-center justify-between mt-2 text-xs">
+                        <div className="flex items-center gap-3">
+                          <span className="text-emerald-600">
+                            <span className="font-semibold">{details.sent}</span> sent ({sentPercent}%)
+                          </span>
+                          <span className="text-red-600">
+                            <span className="font-semibold">{details.failed}</span> failed ({failedPercent}%)
+                          </span>
+                        </div>
+                        <span className="text-neutral-400">{details.total} recipients</span>
+                      </div>
+                    )}
+                  </Link>
                 )
               })}
             </div>
 
-            {/* Total */}
-            <div className="mt-4 pt-4 border-t border-neutral-100">
+            {/* Total Summary */}
+            <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-neutral-500">Total Campaigns</span>
                 <span className="text-lg font-bold text-neutral-900">
                   {campaignStats?.total_campaigns || 0}
                 </span>
               </div>
+              {(campaignStats?.total_recipients || 0) > 0 && (
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="text-center p-2 rounded-lg bg-neutral-50">
+                    <p className="font-bold text-neutral-900">{campaignStats?.total_recipients || 0}</p>
+                    <p className="text-neutral-500">Recipients</p>
+                  </div>
+                  <div className="text-center p-2 rounded-lg bg-emerald-50">
+                    <p className="font-bold text-emerald-600">{campaignStats?.total_sent || 0}</p>
+                    <p className="text-emerald-600">Sent</p>
+                  </div>
+                  <div className="text-center p-2 rounded-lg bg-red-50">
+                    <p className="font-bold text-red-600">{campaignStats?.total_failed || 0}</p>
+                    <p className="text-red-600">Failed</p>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -640,12 +957,15 @@ export default function DashboardPage() {
                 const successRate = campaign.total_recipients > 0
                   ? Math.round((campaign.sent_count / campaign.total_recipients) * 100)
                   : 0
+                const failedRate = campaign.total_recipients > 0
+                  ? Math.round((campaign.failed_count / campaign.total_recipients) * 100)
+                  : 0
 
                 return (
                   <Link
                     key={campaign.id}
                     href={`/app/campaigns/${campaign.id}`}
-                    className="flex items-center gap-4 p-3 rounded-xl border border-neutral-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 group"
+                    className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border border-neutral-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 group"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -677,29 +997,35 @@ export default function DashboardPage() {
                         })}
                       </p>
                     </div>
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="text-center">
+                    <div className="flex items-center gap-4 sm:gap-6 text-sm">
+                      <div className="text-center min-w-[50px]">
                         <p className="font-semibold text-neutral-900">{campaign.total_recipients}</p>
                         <p className="text-[10px] text-neutral-400">Recipients</p>
                       </div>
-                      <div className="text-center">
+                      <div className="text-center min-w-[40px]">
                         <p className="font-semibold text-emerald-600">{campaign.sent_count}</p>
                         <p className="text-[10px] text-neutral-400">Sent</p>
                       </div>
-                      {campaign.failed_count > 0 && (
-                        <div className="text-center">
-                          <p className="font-semibold text-red-600">{campaign.failed_count}</p>
-                          <p className="text-[10px] text-neutral-400">Failed</p>
-                        </div>
-                      )}
-                      <div className="w-16">
-                        <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                      <div className="text-center min-w-[40px]">
+                        <p className={cn('font-semibold', campaign.failed_count > 0 ? 'text-red-600' : 'text-neutral-300')}>{campaign.failed_count}</p>
+                        <p className="text-[10px] text-neutral-400">Failed</p>
+                      </div>
+                      {/* Dual-color progress bar */}
+                      <div className="w-20">
+                        <div className="h-2.5 bg-neutral-100 rounded-full overflow-hidden flex">
                           <div
-                            className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-500"
+                            className="bg-emerald-500 transition-all duration-500"
                             style={{ width: `${successRate}%` }}
                           />
+                          <div
+                            className="bg-red-500 transition-all duration-500"
+                            style={{ width: `${failedRate}%` }}
+                          />
                         </div>
-                        <p className="text-[10px] text-neutral-400 text-center mt-1">{successRate}%</p>
+                        <div className="flex justify-between text-[10px] mt-1">
+                          <span className="text-emerald-600">{successRate}%</span>
+                          {failedRate > 0 && <span className="text-red-600">{failedRate}%</span>}
+                        </div>
                       </div>
                     </div>
                   </Link>
