@@ -382,6 +382,196 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
 
 ---
 
+## 4. Password Changed Notification
+
+Template ini untuk notifikasi keamanan ketika password berhasil diubah. Bisa dikirim via aplikasi menggunakan Supabase atau SMTP.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Berhasil Diubah - BlastMail</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #fdf2f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fdf2f8;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 4px 24px rgba(236, 72, 153, 0.15);">
+
+          <!-- Header with gradient -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border-radius: 24px 24px 0 0; padding: 40px 40px 30px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center">
+                    <img src="https://raw.githubusercontent.com/assujiar/dbrblasting/main/public/blastmail_saiki_mainlogo-01.svg" alt="BlastMail" width="160" style="display: block; margin-bottom: 20px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center">
+                    <div style="width: 64px; height: 64px; background-color: rgba(255,255,255,0.2); border-radius: 16px; margin: 0 auto 16px; line-height: 64px; text-align: center;">
+                      <span style="font-size: 32px;">🔑</span>
+                    </div>
+                    <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 700;">
+                      Password Diubah
+                    </h1>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding-bottom: 24px;">
+                    <p style="margin: 0; color: #374151; font-size: 16px; line-height: 1.6;">
+                      Hai,
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom: 24px;">
+                    <p style="margin: 0; color: #6b7280; font-size: 15px; line-height: 1.7;">
+                      Password akun <strong style="color: #f97316;">BlastMail</strong> Anda telah berhasil diubah.
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Change Details -->
+                <tr>
+                  <td style="padding-bottom: 24px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border-radius: 12px; padding: 20px;">
+                      <tr>
+                        <td style="padding: 20px;">
+                          <p style="margin: 0 0 12px; color: #6b7280; font-size: 14px;">
+                            <strong style="color: #374151;">Waktu:</strong> {{ .Timestamp }}
+                          </p>
+                          <p style="margin: 0; color: #6b7280; font-size: 14px;">
+                            <strong style="color: #374151;">Email:</strong> {{ .Email }}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Divider -->
+                <tr>
+                  <td style="padding-bottom: 24px;">
+                    <hr style="border: none; border-top: 1px solid #f3f4f6; margin: 0;">
+                  </td>
+                </tr>
+
+                <!-- Success Message -->
+                <tr>
+                  <td style="padding-bottom: 24px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #ecfdf5; border-radius: 12px; border-left: 4px solid #10b981;">
+                      <tr>
+                        <td style="padding: 16px;">
+                          <p style="margin: 0; color: #065f46; font-size: 13px; line-height: 1.6;">
+                            <strong>✅ Berhasil:</strong> Jika Anda yang melakukan perubahan ini, tidak ada tindakan lebih lanjut yang diperlukan.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Security Warning -->
+                <tr>
+                  <td>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fef2f2; border-radius: 12px; border-left: 4px solid #ef4444;">
+                      <tr>
+                        <td style="padding: 16px;">
+                          <p style="margin: 0 0 12px; color: #991b1b; font-size: 13px; line-height: 1.6;">
+                            <strong>⚠️ Bukan Anda?</strong> Jika Anda tidak melakukan perubahan ini, akun Anda mungkin telah disusupi. Segera lakukan langkah berikut:
+                          </p>
+                          <ol style="margin: 0; padding-left: 20px; color: #991b1b; font-size: 13px; line-height: 1.8;">
+                            <li>Reset password Anda segera</li>
+                            <li>Periksa aktivitas akun Anda</li>
+                            <li>Hubungi tim support kami</li>
+                          </ol>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; border-radius: 0 0 24px 24px; padding: 24px 40px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center">
+                    <p style="margin: 0 0 8px; color: #9ca3af; font-size: 12px;">
+                      © 2026 BlastMail. All rights reserved.
+                    </p>
+                    <p style="margin: 0; color: #d1d5db; font-size: 11px;">
+                      Email ini dikirim untuk keamanan akun Anda 🔒
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+```
+
+**Subject:** Password Akun Anda Telah Diubah - BlastMail 🔑
+
+### Cara Implementasi
+
+Karena Supabase tidak menyediakan template bawaan untuk notifikasi password changed, Anda perlu mengirim email ini secara manual dari aplikasi setelah password berhasil diubah.
+
+**Contoh implementasi di Next.js:**
+
+```typescript
+// lib/email.ts
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function sendPasswordChangedEmail(email: string) {
+  const timestamp = new Date().toLocaleString('id-ID', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+    timeZone: 'Asia/Jakarta'
+  });
+
+  const html = `<!-- Paste template HTML di atas, ganti {{ .Email }} dengan ${email} dan {{ .Timestamp }} dengan ${timestamp} -->`;
+
+  await resend.emails.send({
+    from: 'BlastMail <noreply@yourdomain.com>',
+    to: email,
+    subject: 'Password Akun Anda Telah Diubah - BlastMail 🔑',
+    html: html
+  });
+}
+```
+
+**Panggil fungsi setelah password berubah:**
+
+```typescript
+// Setelah berhasil update password
+await sendPasswordChangedEmail(user.email);
+```
+
+---
+
 ## Konfigurasi Tambahan
 
 ### 1. Redirect URL
