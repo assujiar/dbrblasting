@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -116,7 +117,7 @@ function SidebarContent({
                 collapsed ? 'w-10 h-10' : 'w-10 h-10'
               )}>
                 <img
-                  src="/logo-icon.svg"
+                  src={APP_LOGO_URL}
                   alt="BlastMail"
                   className="w-full h-full object-contain p-1"
                 />
@@ -340,7 +341,7 @@ function SidebarContent({
                 collapsed ? 'w-8 h-8' : 'w-6 h-6'
               )}>
                 <img
-                  src="/logo-icon.svg"
+                  src={APP_LOGO_URL}
                   alt="BlastMail"
                   className="w-full h-full object-contain p-0.5"
                 />
@@ -360,7 +361,7 @@ function SidebarContent({
             <div className="p-4 rounded-2xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100/50">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/80 shadow-sm mb-2">
                 <img
-                  src="/logo-icon.svg"
+                  src={APP_LOGO_URL}
                   alt="BlastMail"
                   className="w-5 h-5 object-contain"
                 />
@@ -525,7 +526,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   ) : (
                     <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden bg-white shadow-md shadow-primary-500/25">
                       <img
-                        src="/logo-icon.svg"
+                        src={APP_LOGO_URL}
                         alt="BlastMail"
                         className="w-full h-full object-contain p-0.5"
                       />
