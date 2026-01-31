@@ -144,7 +144,6 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/blastmail_saiki_mainlogo-horizontal-01.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any' },
     ],
     apple: '/blastmail_saiki_mainlogo-02-01.png',
     shortcut: '/blastmail_saiki_mainlogo-horizontal-01.svg',
