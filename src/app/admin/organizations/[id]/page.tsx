@@ -355,9 +355,19 @@ export default function OrganizationDetailPage({ params }: { params: Promise<{ i
             </Button>
           </Link>
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-error-100 to-error-50 shrink-0">
-              <Building2 className="h-6 w-6 text-error-600" />
-            </div>
+            {organization.logo_url ? (
+              <div className="w-12 h-12 rounded-xl overflow-hidden border border-neutral-200 bg-white flex items-center justify-center shrink-0">
+                <img
+                  src={organization.logo_url}
+                  alt={organization.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-gradient-to-br from-error-100 to-error-50 shrink-0">
+                <Building2 className="h-6 w-6 text-error-600" />
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <h1 className="text-2xl font-bold text-neutral-900 break-words line-clamp-2">{organization.name}</h1>
               <p className="text-sm text-neutral-500 truncate">{organization.slug}</p>

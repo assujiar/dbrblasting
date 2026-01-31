@@ -295,9 +295,19 @@ export default function OrganizationsPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="p-2 rounded-xl bg-gradient-to-br from-error-100 to-error-50">
-                      <Building2 className="h-5 w-5 text-error-600" />
-                    </div>
+                    {org.logo_url ? (
+                      <div className="w-10 h-10 rounded-xl overflow-hidden border border-neutral-200 bg-white flex items-center justify-center">
+                        <img
+                          src={org.logo_url}
+                          alt={org.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="p-2 rounded-xl bg-gradient-to-br from-error-100 to-error-50">
+                        <Building2 className="h-5 w-5 text-error-600" />
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <CardTitle className="text-base truncate">{org.name}</CardTitle>
                       <p className="text-xs text-neutral-400">{org.slug}</p>
