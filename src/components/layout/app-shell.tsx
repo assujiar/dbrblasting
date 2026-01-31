@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { APP_LOGO_URL, APP_ICON_URL, APP_NAME } from '@/lib/constants'
+import { APP_LOGO_URL, APP_ICON_URL, APP_LOGO_HORIZONTAL_URL, APP_NAME } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -89,14 +89,14 @@ function SidebarContent({
       <div className="flex flex-col h-full overflow-hidden">
         {/* Logo */}
         <div className={cn(
-          'flex items-center border-b border-neutral-100 transition-all duration-300 shrink-0',
-          collapsed ? 'h-[72px] justify-center px-2' : 'h-[72px] px-4'
+          'flex items-center justify-center border-b border-neutral-100 transition-all duration-300 shrink-0',
+          collapsed ? 'h-[72px] px-2' : 'h-[88px] px-4'
         )}>
           <Link
             href="/app"
             onClick={onNavigate}
             className={cn(
-              'flex items-center transition-all duration-300',
+              'flex items-center justify-center transition-all duration-300',
               collapsed ? 'gap-0' : 'gap-3'
             )}
           >
@@ -104,7 +104,7 @@ function SidebarContent({
               <>
                 <div className={cn(
                   'flex items-center justify-center rounded-xl overflow-hidden bg-white shadow-lg transition-all duration-300 shrink-0',
-                  collapsed ? 'w-10 h-10' : 'w-10 h-10'
+                  collapsed ? 'w-10 h-10' : 'w-12 h-12'
                 )}>
                   <img
                     src={organization.logo_url}
@@ -120,21 +120,21 @@ function SidebarContent({
                 </span>
               </>
             ) : (
-              // BlastMail logo - use icon when collapsed, full logo when expanded
+              // BlastMail logo - bigger and centered
               collapsed ? (
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img
                     src={APP_ICON_URL}
                     alt={APP_NAME}
-                    className="w-9 h-9 object-contain"
+                    className="w-10 h-10 object-contain"
                   />
                 </div>
               ) : (
-                <div className="h-10 flex items-center">
+                <div className="flex items-center justify-center w-full">
                   <img
                     src={APP_LOGO_URL}
                     alt={APP_NAME}
-                    className="h-9 w-auto object-contain"
+                    className="h-14 w-auto object-contain"
                   />
                 </div>
               )
@@ -340,25 +340,23 @@ function SidebarContent({
         {organization?.logo_url && (
           <div className={cn(
             'shrink-0 border-t border-neutral-100 transition-all duration-300',
-            collapsed ? 'p-2' : 'px-4 py-3'
+            collapsed ? 'p-2' : 'px-4 py-4'
           )}>
             <div className={cn(
-              'flex items-center gap-2 text-neutral-400 transition-all duration-300',
-              collapsed ? 'justify-center' : 'justify-start'
+              'flex flex-col items-center gap-1.5 text-neutral-400 transition-all duration-300',
+              collapsed ? 'justify-center' : 'justify-center'
             )}>
+              {!collapsed && (
+                <span className="text-[10px] uppercase tracking-wider text-neutral-400">Powered by</span>
+              )}
               <img
-                src={APP_ICON_URL}
+                src={APP_LOGO_HORIZONTAL_URL}
                 alt={APP_NAME}
                 className={cn(
                   'object-contain transition-all duration-300',
-                  collapsed ? 'w-7 h-7' : 'w-5 h-5'
+                  collapsed ? 'w-8 h-8' : 'h-8 w-auto'
                 )}
               />
-              {!collapsed && (
-                <span className="text-xs">
-                  Powered by <span className="font-semibold text-neutral-500">{APP_NAME}</span>
-                </span>
-              )}
             </div>
           </div>
         )}
