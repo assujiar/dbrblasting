@@ -1,34 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
   <!-- Blast/Explosion Effect - Starburst -->
   <g>
-    <!-- Main burst rays -->
-    <path d="M60 8L65 35L75 12L68 38L92 20L70 42L105 35L72 48L108 55L72 55L105 68L70 58L92 82L68 62L75 108L65 65L60 112L55 65L45 108L52 62L28 82L50 58L15 68L48 55L12 55L48 48L15 35L50 42L28 20L52 38L45 12L55 35L60 8Z" fill="#1a1a1a"/>
-    <!-- Inner burst highlight -->
-    <path d="M60 18L63 40L70 22L66 42L85 30L68 46L95 42L70 52L98 58L70 58L95 70L68 60L85 85L66 62L70 98L63 62L60 102L57 62L50 98L54 62L35 85L52 60L25 70L50 58L22 58L50 52L25 42L52 46L35 30L54 42L50 22L57 40L60 18Z" fill="#2a2a2a"/>
+    <!-- Main burst rays - Deep Magenta -->
+    <path d="M60 8L65 35L75 12L68 38L92 20L70 42L105 35L72 48L108 55L72 55L105 68L70 58L92 82L68 62L75 108L65 65L60 112L55 65L45 108L52 62L28 82L50 58L15 68L48 55L12 55L48 48L15 35L50 42L28 20L52 38L45 12L55 35L60 8Z" fill="#be185d"/>
+    <!-- Inner burst highlight - Vibrant Pink -->
+    <path d="M60 18L63 40L70 22L66 42L85 30L68 46L95 42L70 52L98 58L70 58L95 70L68 60L85 85L66 62L70 98L63 62L60 102L57 62L50 98L54 62L35 85L52 60L25 70L50 58L22 58L50 52L25 42L52 46L35 30L54 42L50 22L57 40L60 18Z" fill="#db2777"/>
   </g>
 
   <!-- Envelope Body -->
   <g>
     <!-- Envelope back/shadow -->
-    <rect x="28" y="42" width="64" height="44" rx="4" fill="#e0e0e0"/>
+    <rect x="28" y="42" width="64" height="44" rx="4" fill="#fce7f3"/>
     <!-- Envelope main body -->
-    <rect x="26" y="40" width="64" height="44" rx="4" fill="white" stroke="#1a1a1a" stroke-width="2.5"/>
+    <rect x="26" y="40" width="64" height="44" rx="4" fill="white" stroke="#9d174d" stroke-width="2.5"/>
 
     <!-- Envelope flap (open) -->
-    <path d="M26 44L58 68L90 44" fill="white" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M26 44L58 68L90 44" fill="white" stroke="#9d174d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 
     <!-- Envelope inner shadow/fold -->
-    <path d="M30 48L58 70L86 48" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M30 48L58 70L86 48" fill="none" stroke="#fbcfe8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-    <!-- Speed lines on left -->
-    <line x1="18" y1="55" x2="8" y2="55" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
-    <line x1="20" y1="62" x2="12" y2="62" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
-    <line x1="18" y1="69" x2="8" y2="69" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+    <!-- Speed lines on left - Pink -->
+    <line x1="18" y1="55" x2="8" y2="55" stroke="#ec4899" stroke-width="2" stroke-linecap="round"/>
+    <line x1="20" y1="62" x2="12" y2="62" stroke="#ec4899" stroke-width="2" stroke-linecap="round"/>
+    <line x1="18" y1="69" x2="8" y2="69" stroke="#ec4899" stroke-width="2" stroke-linecap="round"/>
   </g>
 
-  <!-- Small accent dots -->
-  <circle cx="100" cy="30" r="2" fill="#1a1a1a"/>
-  <circle cx="20" cy="30" r="2" fill="#1a1a1a"/>
-  <circle cx="100" cy="90" r="2" fill="#1a1a1a"/>
-  <circle cx="20" cy="90" r="2" fill="#1a1a1a"/>
+  <!-- Small accent dots - Deep Magenta -->
+  <circle cx="100" cy="30" r="2" fill="#be185d"/>
+  <circle cx="20" cy="30" r="2" fill="#be185d"/>
+  <circle cx="100" cy="90" r="2" fill="#be185d"/>
+  <circle cx="20" cy="90" r="2" fill="#be185d"/>
 </svg>
