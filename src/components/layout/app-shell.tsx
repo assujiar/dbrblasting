@@ -48,6 +48,7 @@ import {
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import type { UserRole } from '@/types/database'
+import { NotificationsPanel } from '@/components/notifications'
 
 interface Organization {
   id: string
@@ -493,8 +494,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </Link>
               </div>
 
-              {/* Right section - User menu */}
-              <div className="flex items-center gap-3">
+              {/* Right section - Notifications & User menu */}
+              <div className="flex items-center gap-2">
+                {/* Notifications */}
+                <NotificationsPanel />
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
