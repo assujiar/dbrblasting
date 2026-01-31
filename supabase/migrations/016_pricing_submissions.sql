@@ -81,7 +81,10 @@ CREATE TRIGGER pricing_submissions_updated_at
 -- =============================================================================
 -- View for admin dashboard
 -- =============================================================================
-CREATE OR REPLACE VIEW public.pricing_submissions_summary AS
+-- Drop view first to allow column changes
+DROP VIEW IF EXISTS public.pricing_submissions_summary;
+
+CREATE VIEW public.pricing_submissions_summary AS
 SELECT
   ps.*,
   u.email as contacted_by_email
