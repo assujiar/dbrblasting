@@ -160,7 +160,7 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
             </Button>
           </Link>
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold text-neutral-900 break-words line-clamp-2">{template.name}</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-900 break-words">{template.name}</h1>
             <p className="text-sm text-neutral-500 mt-1">
               Created {formatDateShort(template.created_at)}
             </p>
@@ -189,12 +189,12 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
         <Card className="bg-gradient-to-br from-primary-50/50 to-white">
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-primary-100">
+              <div className="p-3 rounded-xl bg-primary-100 shrink-0">
                 <FileText className="h-6 w-6 text-primary-600" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-neutral-500">Template Name</p>
-                <p className="text-lg font-semibold text-neutral-900 truncate">{template.name}</p>
+                <p className="text-sm sm:text-base lg:text-lg font-semibold text-neutral-900 break-words">{template.name}</p>
               </div>
             </div>
           </CardContent>
@@ -202,12 +202,12 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
         <Card className="bg-gradient-to-br from-accent-50/50 to-white">
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-accent-100">
+              <div className="p-3 rounded-xl bg-accent-100 shrink-0">
                 <Mail className="h-6 w-6 text-accent-600" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-neutral-500">Email Subject</p>
-                <p className="text-lg font-semibold text-neutral-900 truncate">{template.subject}</p>
+                <p className="text-sm sm:text-base lg:text-lg font-semibold text-neutral-900 break-words">{template.subject}</p>
               </div>
             </div>
           </CardContent>
@@ -223,10 +223,11 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
               Raw HTML
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 overflow-hidden">
             <pre className={cn(
-              'h-[400px] overflow-auto p-4 text-xs font-mono',
-              'bg-neutral-900 text-neutral-300'
+              'h-[300px] sm:h-[400px] overflow-auto p-4 text-xs font-mono',
+              'bg-neutral-900 text-neutral-300',
+              'whitespace-pre-wrap break-all'
             )}>
               {template.html_body}
             </pre>
@@ -240,11 +241,12 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
               Preview
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-[400px] overflow-auto bg-neutral-100">
+          <CardContent className="p-0 overflow-hidden">
+            <div className="h-[300px] sm:h-[400px] overflow-auto bg-neutral-100">
               <iframe
                 srcDoc={sanitizeHtml(template.html_body)}
-                className="w-full h-full border-0 bg-white"
+                className="w-full min-h-full border-0 bg-white"
+                style={{ minHeight: '100%' }}
                 title="Email Preview"
                 sandbox="allow-same-origin"
               />
