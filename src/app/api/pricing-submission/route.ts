@@ -47,6 +47,36 @@ function formatRupiah(amount: number): string {
   }).format(amount)
 }
 
+/**
+ * Normalize Indonesian phone number to WhatsApp format (628xxx)
+ * Handles various input formats:
+ * - 08123456789 → 628123456789
+ * - +628123456789 → 628123456789
+ * - 628123456789 → 628123456789
+ * - 8123456789 → 628123456789
+ * - 0812-345-6789 → 628123456789
+ * - +62 812 345 6789 → 628123456789
+ */
+function normalizePhoneForWhatsApp(phone: string): string {
+  // Remove all non-digit characters
+  let cleaned = phone.replace(/\D/g, '')
+
+  // Handle different formats
+  if (cleaned.startsWith('62')) {
+    // Already has country code: 628xxx
+    return cleaned
+  } else if (cleaned.startsWith('0')) {
+    // Local format: 08xxx → 628xxx
+    return '62' + cleaned.substring(1)
+  } else if (cleaned.startsWith('8')) {
+    // Without leading zero: 8xxx → 628xxx
+    return '62' + cleaned
+  }
+
+  // Return as-is if format is unknown (might be international)
+  return cleaned
+}
+
 // Generate confirmation email HTML for user
 function generateUserConfirmationEmail(data: {
   fullName: string
@@ -273,7 +303,7 @@ function generateAdminNotificationEmail(data: {
                     </a>
                   </td>
                   <td style="padding-left: 10px; width: 50%;">
-                    <a href="https://wa.me/${data.phone.replace(/\D/g, '')}" style="display: block; background-color: #25D366; color: #ffffff; text-decoration: none; padding: 14px 20px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px;">
+                    <a href="https://wa.me/${normalizePhoneForWhatsApp(data.phone)}" style="display: block; background-color: #25D366; color: #ffffff; text-decoration: none; padding: 14px 20px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px;">
                       💬 WhatsApp
                     </a>
                   </td>
