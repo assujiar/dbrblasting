@@ -34,7 +34,7 @@ export async function GET() {
       .from('user_profiles')
       .select(`
         *,
-        organization:organizations(id, name, slug, is_active)
+        organization:organizations(id, name, slug, logo_url, is_active)
       `)
       .eq('user_id', user.id)
       .single()
@@ -119,7 +119,7 @@ export async function PUT(request: NextRequest) {
         .eq('user_id', user.id)
         .select(`
           *,
-          organization:organizations(id, name, slug, is_active)
+          organization:organizations(id, name, slug, logo_url, is_active)
         `)
         .single()
     } else {
@@ -132,7 +132,7 @@ export async function PUT(request: NextRequest) {
         })
         .select(`
           *,
-          organization:organizations(id, name, slug, is_active)
+          organization:organizations(id, name, slug, logo_url, is_active)
         `)
         .single()
     }

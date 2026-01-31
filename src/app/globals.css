@@ -11,72 +11,72 @@
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
   /* ========================================================================
-     PRIMARY PALETTE - Vibrant Purple/Indigo
+     PRIMARY PALETTE - Vibrant Magenta/Pink
      ======================================================================== */
-  --color-primary-50: #f5f3ff;
-  --color-primary-100: #ede9fe;
-  --color-primary-200: #ddd6fe;
-  --color-primary-300: #c4b5fd;
-  --color-primary-400: #a78bfa;
-  --color-primary-500: #8b5cf6;
-  --color-primary-600: #7c3aed;
-  --color-primary-700: #6d28d9;
-  --color-primary-800: #5b21b6;
-  --color-primary-900: #4c1d95;
+  --color-primary-50: #fdf2f8;
+  --color-primary-100: #fce7f3;
+  --color-primary-200: #fbcfe8;
+  --color-primary-300: #f9a8d4;
+  --color-primary-400: #f472b6;
+  --color-primary-500: #ec4899;
+  --color-primary-600: #db2777;
+  --color-primary-700: #be185d;
+  --color-primary-800: #9d174d;
+  --color-primary-900: #831843;
 
   /* ========================================================================
-     SECONDARY PALETTE - Soft Lavender/Pink
+     SECONDARY PALETTE - Deep Purple/Burgundy
      ======================================================================== */
-  --color-secondary-50: #fdf4ff;
-  --color-secondary-100: #fae8ff;
-  --color-secondary-200: #f5d0fe;
-  --color-secondary-300: #f0abfc;
-  --color-secondary-400: #e879f9;
-  --color-secondary-500: #d946ef;
-  --color-secondary-600: #c026d3;
-  --color-secondary-700: #a21caf;
-  --color-secondary-800: #86198f;
-  --color-secondary-900: #701a75;
+  --color-secondary-50: #faf5ff;
+  --color-secondary-100: #f3e8ff;
+  --color-secondary-200: #e9d5ff;
+  --color-secondary-300: #d8b4fe;
+  --color-secondary-400: #c084fc;
+  --color-secondary-500: #a855f7;
+  --color-secondary-600: #9333ea;
+  --color-secondary-700: #7e22ce;
+  --color-secondary-800: #6b21a8;
+  --color-secondary-900: #581c87;
 
   /* ========================================================================
-     ACCENT PALETTE - Electric Blue
+     ACCENT PALETTE - Coral/Rose Red
      ======================================================================== */
-  --color-accent-50: #eff6ff;
-  --color-accent-100: #dbeafe;
-  --color-accent-200: #bfdbfe;
-  --color-accent-300: #93c5fd;
-  --color-accent-400: #60a5fa;
-  --color-accent-500: #3b82f6;
-  --color-accent-600: #2563eb;
-  --color-accent-700: #1d4ed8;
-  --color-accent-800: #1e40af;
-  --color-accent-900: #1e3a8a;
+  --color-accent-50: #fff1f2;
+  --color-accent-100: #ffe4e6;
+  --color-accent-200: #fecdd3;
+  --color-accent-300: #fda4af;
+  --color-accent-400: #fb7185;
+  --color-accent-500: #f43f5e;
+  --color-accent-600: #e11d48;
+  --color-accent-700: #be123c;
+  --color-accent-800: #9f1239;
+  --color-accent-900: #881337;
 
   /* ========================================================================
      SEMANTIC COLORS
      ======================================================================== */
-  /* Success - Emerald */
-  --color-success-50: #ecfdf5;
-  --color-success-100: #d1fae5;
-  --color-success-200: #a7f3d0;
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
-  --color-success-700: #047857;
+  /* Success - Teal (for good contrast with pink) */
+  --color-success-50: #f0fdfa;
+  --color-success-100: #ccfbf1;
+  --color-success-200: #99f6e4;
+  --color-success-500: #14b8a6;
+  --color-success-600: #0d9488;
+  --color-success-700: #0f766e;
 
-  /* Warning - Amber */
-  --color-warning-50: #fffbeb;
-  --color-warning-100: #fef3c7;
-  --color-warning-200: #fde68a;
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
+  /* Warning - Orange/Amber */
+  --color-warning-50: #fff7ed;
+  --color-warning-100: #ffedd5;
+  --color-warning-200: #fed7aa;
+  --color-warning-500: #f97316;
+  --color-warning-600: #ea580c;
 
-  /* Error/Destructive - Rose */
-  --color-error-50: #fff1f2;
-  --color-error-100: #ffe4e6;
-  --color-error-200: #fecdd3;
-  --color-error-500: #f43f5e;
-  --color-error-600: #e11d48;
-  --color-error-700: #be123c;
+  /* Error/Destructive - Deep Red */
+  --color-error-50: #fef2f2;
+  --color-error-100: #fee2e2;
+  --color-error-200: #fecaca;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
 
   /* ========================================================================
      NEUTRAL PALETTE - Slate
@@ -113,12 +113,12 @@
   /* ========================================================================
      BACKGROUND GRADIENTS
      ======================================================================== */
-  --bg-gradient-start: #f8fafc;
-  --bg-gradient-mid: #f1f5f9;
-  --bg-gradient-end: #e0e7ff;
-  --bg-blob-1: rgba(139, 92, 246, 0.08);
-  --bg-blob-2: rgba(236, 72, 153, 0.06);
-  --bg-blob-3: rgba(59, 130, 246, 0.06);
+  --bg-gradient-start: #fffbfc;
+  --bg-gradient-mid: #fdf2f8;
+  --bg-gradient-end: #fce7f3;
+  --bg-blob-1: rgba(236, 72, 153, 0.1);
+  --bg-blob-2: rgba(168, 85, 247, 0.08);
+  --bg-blob-3: rgba(244, 63, 94, 0.06);
 
   /* ========================================================================
      GLASSMORPHISM TOKENS
@@ -142,9 +142,9 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-  --shadow-glass: 0 8px 32px rgba(139, 92, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-glow-primary: 0 0 20px rgba(139, 92, 246, 0.25);
-  --shadow-glow-accent: 0 0 20px rgba(59, 130, 246, 0.2);
+  --shadow-glass: 0 8px 32px rgba(236, 72, 153, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-glow-primary: 0 0 20px rgba(236, 72, 153, 0.25);
+  --shadow-glow-accent: 0 0 20px rgba(244, 63, 94, 0.2);
   --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.04);
 
   /* ========================================================================
@@ -626,7 +626,7 @@ button, a, input, select, textarea {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400));
+  background: linear-gradient(135deg, var(--color-primary-400), var(--color-secondary-400));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

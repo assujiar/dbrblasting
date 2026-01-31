@@ -28,6 +28,8 @@ import {
   Quote,
   ArrowLeftRight,
   MoreHorizontal,
+  Upload,
+  Loader2,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -59,6 +61,7 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface EmailEditorProps {
   value: string
@@ -129,22 +132,56 @@ export function EmailEditor({
   const [linkText, setLinkText] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [imageAlt, setImageAlt] = useState('')
+  const [imageTab, setImageTab] = useState<'upload' | 'url' | 'gallery'>('gallery')
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+  const [uploadedImages, setUploadedImages] = useState<Array<{ url: string; name: string }>>([])
+  const MAX_UPLOADS = 5
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const visualEditorRef = useRef<HTMLDivElement>(null)
   const [isVisualFocused, setIsVisualFocused] = useState(false)
+  const isInternalChange = useRef(false)
 
   // Responsive height
   const mobileHeight = Math.min(height, 350)
 
-  // Sync visual editor content when value changes externally
-  useEffect(() => {
-    if (visualEditorRef.current && !isVisualFocused) {
-      const currentContent = visualEditorRef.current.innerHTML
-      if (currentContent !== value) {
-        visualEditorRef.current.innerHTML = value
+  // Save and restore cursor position
+  const saveCursorPosition = useCallback(() => {
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      return selection.getRangeAt(0).cloneRange()
+    }
+    return null
+  }, [])
+
+  const restoreCursorPosition = useCallback((range: Range | null) => {
+    if (range) {
+      const selection = window.getSelection()
+      if (selection) {
+        selection.removeAllRanges()
+        selection.addRange(range)
       }
     }
+  }, [])
+
+  // Sync visual editor content when value changes externally (not from visual editor)
+  useEffect(() => {
+    if (visualEditorRef.current && !isVisualFocused && !isInternalChange.current) {
+      const currentContent = visualEditorRef.current.innerHTML
+      if (currentContent !== value) {
+        visualEditorRef.current.innerHTML = value || ''
+      }
+    }
+    isInternalChange.current = false
   }, [value, isVisualFocused])
+
+  // Initialize visual editor content on mount
+  useEffect(() => {
+    if (visualEditorRef.current && value) {
+      visualEditorRef.current.innerHTML = value
+    }
+  }, [])
 
   // Execute command for visual editor
   const execCommand = useCallback((command: string, value?: string) => {
@@ -158,6 +195,7 @@ export function EmailEditor({
   // Handle visual editor input
   const handleVisualInput = useCallback(() => {
     if (visualEditorRef.current) {
+      isInternalChange.current = true
       onChange(visualEditorRef.current.innerHTML)
     }
   }, [onChange])
@@ -186,7 +224,67 @@ export function EmailEditor({
     setImageDialogOpen(false)
     setImageUrl('')
     setImageAlt('')
+    setUploadError('')
+    setImageTab('upload')
   }, [imageUrl, imageAlt, execCommand])
+
+  // Handle image upload
+  const handleImageUpload = useCallback(async (file: File) => {
+    // Check upload limit
+    if (uploadedImages.length >= MAX_UPLOADS) {
+      setUploadError(`Maksimal ${MAX_UPLOADS} gambar per sesi edit`)
+      return
+    }
+
+    setIsUploading(true)
+    setUploadError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Upload failed')
+      }
+
+      // Add to uploaded images gallery
+      setUploadedImages(prev => [...prev, { url: result.data.url, name: file.name }])
+      setImageUrl(result.data.url)
+      setImageTab('gallery') // Switch to gallery tab to show all images
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Upload failed')
+    } finally {
+      setIsUploading(false)
+    }
+  }, [uploadedImages.length])
+
+  // Handle file input change
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleImageUpload(file)
+    }
+  }, [handleImageUpload])
+
+  // Handle drag and drop
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      handleImageUpload(file)
+    }
+  }, [handleImageUpload])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+  }, [])
 
   // Insert heading
   const insertHeading = useCallback((level: number) => {
@@ -524,7 +622,6 @@ export function EmailEditor({
                     lineHeight: '1.6',
                     fontSize: '14px',
                   }}
-                  dangerouslySetInnerHTML={{ __html: value }}
                   suppressContentEditableWarning
                 />
               </div>
@@ -593,53 +690,204 @@ export function EmailEditor({
         </DialogContent>
       </Dialog>
 
-      {/* Image Dialog - Mobile Optimized */}
-      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+      {/* Image Dialog - Mobile Optimized with Upload */}
+      <Dialog open={imageDialogOpen} onOpenChange={(open) => {
+        setImageDialogOpen(open)
+        if (!open) {
+          setImageUrl('')
+          setImageAlt('')
+          setUploadError('')
+          setImageTab('upload')
+        }
+      }}>
         <DialogContent className="max-w-md p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Insert Image</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 sm:space-y-4">
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="image-url" className="text-sm">Image URL</Label>
-              <Input
-                id="image-url"
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="h-9 sm:h-10 text-sm"
+
+          <Tabs value={imageTab} onValueChange={(v) => setImageTab(v as 'upload' | 'url' | 'gallery')}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="gallery" className="text-sm">
+                <Image className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Gallery</span>
+                {uploadedImages.length > 0 && (
+                  <span className="ml-1 text-xs bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full">
+                    {uploadedImages.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="upload" className="text-sm">
+                <Upload className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Upload</span>
+              </TabsTrigger>
+              <TabsTrigger value="url" className="text-sm">
+                <LinkIcon className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">URL</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Gallery Tab - Show uploaded images */}
+            <TabsContent value="gallery" className="space-y-3 sm:space-y-4 mt-4">
+              {uploadedImages.length === 0 ? (
+                <div className="text-center py-6 sm:py-8 border-2 border-dashed border-neutral-200 rounded-lg">
+                  <Image className="w-8 h-8 text-neutral-300 mx-auto mb-2" />
+                  <p className="text-sm text-neutral-500">Belum ada gambar diupload</p>
+                  <p className="text-xs text-neutral-400 mt-1">
+                    Upload gambar di tab Upload ({uploadedImages.length}/{MAX_UPLOADS})
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-neutral-500">
+                    Klik gambar untuk memilih ({uploadedImages.length}/{MAX_UPLOADS} diupload)
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {uploadedImages.map((img, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setImageUrl(img.url)}
+                        className={cn(
+                          'relative aspect-square rounded-lg overflow-hidden border-2 transition-all',
+                          imageUrl === img.url
+                            ? 'border-primary-500 ring-2 ring-primary-200'
+                            : 'border-neutral-200 hover:border-primary-300'
+                        )}
+                      >
+                        <img
+                          src={img.url}
+                          alt={img.name}
+                          className="w-full h-full object-cover"
+                        />
+                        {imageUrl === img.url && (
+                          <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center">
+                            <div className="w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value="upload" className="space-y-3 sm:space-y-4 mt-4">
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                onChange={handleFileChange}
+                className="hidden"
               />
-            </div>
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="image-alt" className="text-sm">Alt Text (optional)</Label>
-              <Input
-                id="image-alt"
-                placeholder="Image description"
-                value={imageAlt}
-                onChange={(e) => setImageAlt(e.target.value)}
-                className="h-9 sm:h-10 text-sm"
-              />
-            </div>
-            {imageUrl && (
-              <div className="p-3 sm:p-4 bg-neutral-100 rounded-lg">
-                <p className="text-xs text-neutral-500 mb-2">Preview:</p>
-                <img
-                  src={imageUrl}
-                  alt={imageAlt || 'Preview'}
-                  className="max-w-full max-h-32 sm:max-h-40 object-contain mx-auto"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none'
-                  }}
+
+              {/* Upload limit warning */}
+              {uploadedImages.length >= MAX_UPLOADS && (
+                <div className="p-3 bg-warning-50 border border-warning-200 rounded-lg text-center">
+                  <p className="text-sm text-warning-700">
+                    Batas upload tercapai ({MAX_UPLOADS} gambar)
+                  </p>
+                  <p className="text-xs text-warning-600 mt-1">
+                    Gunakan gambar dari Gallery atau URL eksternal
+                  </p>
+                </div>
+              )}
+
+              {/* Drop zone */}
+              {uploadedImages.length < MAX_UPLOADS && (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  className={cn(
+                    'border-2 border-dashed rounded-lg p-6 sm:p-8 text-center cursor-pointer transition-colors',
+                    'hover:border-primary-400 hover:bg-primary-50/50',
+                    isUploading ? 'border-primary-400 bg-primary-50/50' : 'border-neutral-300'
+                  )}
+                >
+                  {isUploading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+                      <p className="text-sm text-neutral-600">Mengupload...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="w-8 h-8 text-neutral-400" />
+                      <p className="text-sm text-neutral-600">
+                        Klik atau drag & drop
+                      </p>
+                      <p className="text-xs text-neutral-400">
+                        JPEG, PNG, GIF, WebP, SVG (max 5MB)
+                      </p>
+                      <p className="text-xs text-primary-500">
+                        {uploadedImages.length}/{MAX_UPLOADS} slot tersedia
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {uploadError && (
+                <p className="text-sm text-error-600 text-center">{uploadError}</p>
+              )}
+            </TabsContent>
+
+            <TabsContent value="url" className="space-y-3 sm:space-y-4 mt-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="image-url" className="text-sm">Image URL</Label>
+                <Input
+                  id="image-url"
+                  type="url"
+                  placeholder="https://example.com/image.jpg"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  className="h-9 sm:h-10 text-sm"
                 />
               </div>
-            )}
+
+              {imageUrl && (
+                <div className="p-3 sm:p-4 bg-neutral-100 rounded-lg">
+                  <p className="text-xs text-neutral-500 mb-2">Preview:</p>
+                  <img
+                    src={imageUrl}
+                    alt={imageAlt || 'Preview'}
+                    className="max-w-full max-h-32 sm:max-h-40 object-contain mx-auto"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          {/* Alt text - shared between tabs */}
+          <div className="space-y-1.5 sm:space-y-2 mt-4">
+            <Label htmlFor="image-alt" className="text-sm">Alt Text (optional)</Label>
+            <Input
+              id="image-alt"
+              placeholder="Image description for accessibility"
+              value={imageAlt}
+              onChange={(e) => setImageAlt(e.target.value)}
+              className="h-9 sm:h-10 text-sm"
+            />
           </div>
+
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2 mt-4">
             <Button variant="outline" onClick={() => setImageDialogOpen(false)} className="w-full sm:w-auto" size="sm">
               Cancel
             </Button>
-            <Button onClick={handleInsertImage} className="w-full sm:w-auto" size="sm">Insert Image</Button>
+            <Button
+              onClick={handleInsertImage}
+              disabled={!imageUrl || isUploading}
+              className="w-full sm:w-auto"
+              size="sm"
+            >
+              Insert Image
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

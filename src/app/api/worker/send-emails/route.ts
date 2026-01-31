@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { sendEmail, OrganizationSmtpConfig } from '@/lib/email/sender'
+import { TIER_LIMITS, SubscriptionTier } from '@/app/api/organization/usage/route'
 
 const BATCH_SIZE = 20
 const CONCURRENCY = 3
@@ -72,26 +73,61 @@ export async function POST(request: NextRequest) {
 
     // Get SMTP config from user's organization
     let smtpConfig: OrganizationSmtpConfig | undefined = undefined
+    let organizationTier: SubscriptionTier = 'free'
+    let maxRecipientsPerDay: number = TIER_LIMITS.free.maxRecipientsPerDay
+    let addWatermark: boolean = TIER_LIMITS.free.hasWatermark
 
     if (userProfile?.organization_id) {
       const { data: organization } = await adminClient
         .from('organizations')
-        .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure, smtp_from_name, smtp_from_email, smtp_reply_to')
+        .select('smtp_host, smtp_port, smtp_user, smtp_pass, smtp_secure, smtp_from_name, smtp_from_email, smtp_reply_to, subscription_tier')
         .eq('id', userProfile.organization_id)
         .eq('is_active', true)
         .single()
 
-      if (organization && organization.smtp_host) {
-        smtpConfig = {
-          smtp_host: organization.smtp_host,
-          smtp_port: organization.smtp_port,
-          smtp_user: organization.smtp_user,
-          smtp_pass: organization.smtp_pass,
-          smtp_secure: organization.smtp_secure || false,
-          smtp_from_name: organization.smtp_from_name,
-          smtp_from_email: organization.smtp_from_email,
-          smtp_reply_to: organization.smtp_reply_to,
+      if (organization) {
+        organizationTier = (organization.subscription_tier || 'free') as SubscriptionTier
+        maxRecipientsPerDay = TIER_LIMITS[organizationTier].maxRecipientsPerDay
+        addWatermark = TIER_LIMITS[organizationTier].hasWatermark
+
+        if (organization.smtp_host) {
+          smtpConfig = {
+            smtp_host: organization.smtp_host,
+            smtp_port: organization.smtp_port,
+            smtp_user: organization.smtp_user,
+            smtp_pass: organization.smtp_pass,
+            smtp_secure: organization.smtp_secure || false,
+            smtp_from_name: organization.smtp_from_name,
+            smtp_from_email: organization.smtp_from_email,
+            smtp_reply_to: organization.smtp_reply_to,
+          }
         }
+      }
+
+      // Check daily email limit
+      const today = new Date().toISOString().split('T')[0]
+      const { data: usageData } = await adminClient
+        .from('organization_daily_usage')
+        .select('emails_sent')
+        .eq('organization_id', userProfile.organization_id)
+        .eq('usage_date', today)
+        .single()
+
+      const emailsSentToday = usageData?.emails_sent || 0
+      const remainingQuota = maxRecipientsPerDay - emailsSentToday
+
+      if (remainingQuota <= 0) {
+        return NextResponse.json({
+          error: `Daily email limit reached. Your ${organizationTier} plan allows maximum ${maxRecipientsPerDay} recipients per day.`,
+          processed: 0,
+          sent: 0,
+          remaining: 0,
+          quota: {
+            used: emailsSentToday,
+            max: maxRecipientsPerDay,
+            remaining: 0,
+          }
+        }, { status: 429 })
       }
     }
 
@@ -142,6 +178,7 @@ export async function POST(request: NextRequest) {
           recipientData,
           senderData,
           smtpConfig,
+          addWatermark,
         })
 
         // Update recipient status
@@ -165,6 +202,40 @@ export async function POST(request: NextRequest) {
     const failed = results.filter(
       (r) => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success)
     ).length
+
+    // Track daily usage for organization
+    if (userProfile?.organization_id && sent > 0) {
+      const today = new Date().toISOString().split('T')[0]
+
+      // Get current usage
+      const { data: currentUsage } = await adminClient
+        .from('organization_daily_usage')
+        .select('emails_sent')
+        .eq('organization_id', userProfile.organization_id)
+        .eq('usage_date', today)
+        .single()
+
+      if (currentUsage) {
+        // Update existing record
+        await adminClient
+          .from('organization_daily_usage')
+          .update({
+            emails_sent: (currentUsage.emails_sent || 0) + sent,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('organization_id', userProfile.organization_id)
+          .eq('usage_date', today)
+      } else {
+        // Insert new record
+        await adminClient
+          .from('organization_daily_usage')
+          .insert({
+            organization_id: userProfile.organization_id,
+            usage_date: today,
+            emails_sent: sent,
+          })
+      }
+    }
 
     // Check if there are more pending
     const { count: remainingCount } = await supabase

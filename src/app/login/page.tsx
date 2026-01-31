@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
@@ -50,13 +51,13 @@ export default function LoginPage() {
       <div className="w-full max-w-sm relative z-10">
         {/* Logo */}
         <div className="text-center mb-8 animate-slide-up">
-          <div className={cn(
-            'inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4',
-            'bg-gradient-to-br from-primary-500 via-primary-600 to-accent-600',
-            'shadow-xl shadow-primary-500/40'
-          )}>
-            <Mail className="h-8 w-8 text-white" />
-          </div>
+          <Image
+            src="/logo.svg"
+            alt="BlastMail"
+            width={80}
+            height={80}
+            className="w-20 h-20 mx-auto mb-4"
+          />
           <h1 className="text-2xl font-bold text-neutral-900">
             BlastMail
           </h1>
@@ -126,6 +127,16 @@ export default function LoginPage() {
               <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
+
+          {/* Sign up link */}
+          <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/50 text-center">
+            <p className="text-sm text-neutral-600">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="text-primary-600 hover:text-primary-700 font-medium hover:underline">
+                Sign up free
+              </Link>
+            </p>
+          </div>
         </div>
 
         {/* Footer */}

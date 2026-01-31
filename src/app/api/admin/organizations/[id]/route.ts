@@ -111,6 +111,7 @@ export async function PUT(
       smtp_from_name,
       smtp_from_email,
       is_active,
+      subscription_tier,
     } = body
 
     if (!name) {
@@ -151,6 +152,13 @@ export async function PUT(
     if (smtp_from_name !== undefined) updateData.smtp_from_name = smtp_from_name
     if (smtp_from_email !== undefined) updateData.smtp_from_email = smtp_from_email
     if (is_active !== undefined) updateData.is_active = is_active
+    if (subscription_tier !== undefined) {
+      // Validate tier value
+      if (!['free', 'basic', 'regular', 'pro'].includes(subscription_tier)) {
+        return NextResponse.json({ error: 'Invalid subscription tier' }, { status: 400 })
+      }
+      updateData.subscription_tier = subscription_tier
+    }
 
     const { data, error } = await adminClient
       .from('organizations')
