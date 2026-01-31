@@ -241,7 +241,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           </Link>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-bold text-neutral-900 break-words line-clamp-2">{campaign.name}</h1>
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-900 break-words">{campaign.name}</h1>
               {getCampaignStatusBadge()}
             </div>
             <p className="text-sm text-neutral-500 mt-1">
@@ -273,13 +273,13 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-start gap-4 flex-1 min-w-0">
-                <div className="p-3 rounded-xl bg-primary-100">
+                <div className="p-3 rounded-xl bg-primary-100 shrink-0">
                   <FileText className="h-6 w-6 text-primary-600" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-neutral-500 uppercase tracking-wide mb-1">Template Used</p>
-                  <p className="text-lg font-semibold text-neutral-900 truncate">{campaign.template.name}</p>
-                  <p className="text-sm text-neutral-500 truncate mt-0.5">{campaign.template.subject}</p>
+                  <p className="text-sm sm:text-base lg:text-lg font-semibold text-neutral-900 break-words">{campaign.template.name}</p>
+                  <p className="text-xs sm:text-sm text-neutral-500 break-words mt-0.5">{campaign.template.subject}</p>
                 </div>
               </div>
               <ChevronRight className="h-5 w-5 text-neutral-400 shrink-0" />
