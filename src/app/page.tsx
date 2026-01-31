@@ -166,6 +166,17 @@ const pricingPlans = [
     gradient: 'from-slate-500 to-slate-600',
   },
   {
+    name: 'Basic',
+    description: 'Untuk pemula serius',
+    monthlyPrice: 74900,
+    yearlyPrice: 749000,
+    highlight: 'Terjangkau',
+    features: ['3 campaign aktif', '500 email/hari', 'All templates', 'Basic analytics', 'Email support'],
+    cta: 'Pilih Basic',
+    popular: false,
+    gradient: 'from-blue-500 to-cyan-500',
+  },
+  {
     name: 'Growth',
     description: 'Untuk bisnis berkembang',
     monthlyPrice: 149000,
@@ -272,7 +283,7 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden sm:block text-sm font-medium text-white/70 hover:text-white transition-colors px-4 py-2">
+            <Link href="/login" className="hidden sm:block text-sm font-medium text-pink-400 hover:text-white transition-colors px-4 py-2">
               Masuk
             </Link>
             <Link href="/signup">
@@ -285,7 +296,7 @@ export default function Home() {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-white/70 hover:text-white"
+              className="lg:hidden p-2 text-pink-400 hover:text-white"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -301,7 +312,7 @@ export default function Home() {
                   key={item}
                   href={`#${item.toLowerCase()}`}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-3 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                  className="px-4 py-3 text-pink-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
                 >
                   {item}
                 </a>
@@ -309,7 +320,7 @@ export default function Home() {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                className="px-4 py-3 text-pink-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
               >
                 Masuk
               </Link>
@@ -341,7 +352,7 @@ export default function Home() {
               </h1>
 
               {/* Subheadline */}
-              <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
+              <p className="text-lg sm:text-xl text-pink-200 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
                 Bukan sekadar kirim email massal. BlastMail membantu Anda membangun{' '}
                 <span className="text-white font-semibold">koneksi nyata</span> dengan audiens melalui email yang personal dan tepat sasaran.
               </p>
@@ -354,14 +365,14 @@ export default function Home() {
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 text-lg px-8 py-6">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-pink-400 text-pink-300 hover:bg-pink-500/10 hover:text-pink-200 text-lg px-8 py-6">
                   <Play className="h-5 w-5" />
                   Lihat Demo
                 </Button>
               </div>
 
               {/* Trust indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/80 animate-fade-in" style={{ animationDelay: '300ms' }}>
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-pink-300 animate-fade-in" style={{ animationDelay: '300ms' }}>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-400" />
                   <span>Setup 5 menit</span>
@@ -440,7 +451,7 @@ export default function Home() {
                     <p className="text-4xl lg:text-5xl font-black text-white mb-2">
                       {count}{stat.suffix}
                     </p>
-                    <p className="text-sm text-white/80">{stat.label}</p>
+                    <p className="text-sm text-pink-300">{stat.label}</p>
                   </div>
                 )
               })}
@@ -461,7 +472,7 @@ export default function Home() {
                   Dalam Satu Platform
                 </span>
               </h2>
-              <p className="text-lg text-white/80 max-w-2xl mx-auto">
+              <p className="text-lg text-pink-300 max-w-2xl mx-auto">
                 Dari lead management hingga analytics, BlastMail menyediakan semua tools untuk email marketing yang sukses.
               </p>
             </div>
@@ -486,7 +497,7 @@ export default function Home() {
                   </div>
 
                   <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-white/80 leading-relaxed">{feature.description}</p>
+                  <p className="text-pink-300 leading-relaxed">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -516,7 +527,7 @@ export default function Home() {
                 >
                   <Quote className="h-8 w-8 text-primary-500/30 mb-4" />
 
-                  <p className="text-white/90 mb-6 leading-relaxed">
+                  <p className="text-pink-200 mb-6 leading-relaxed">
                     "{testimonial.content}"
                   </p>
 
@@ -526,7 +537,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="font-semibold text-white">{testimonial.name}</p>
-                      <p className="text-sm text-white/80">{testimonial.role}, {testimonial.company}</p>
+                      <p className="text-sm text-pink-300">{testimonial.role}, {testimonial.company}</p>
                     </div>
                   </div>
 
@@ -554,7 +565,7 @@ export default function Home() {
                   Masuk Akal
                 </span>
               </h2>
-              <p className="text-lg text-white/80 max-w-2xl mx-auto mb-8">
+              <p className="text-lg text-pink-300 max-w-2xl mx-auto mb-8">
                 Mulai gratis, upgrade sesuai pertumbuhan bisnis Anda.
               </p>
 
@@ -566,7 +577,7 @@ export default function Home() {
                     'px-6 py-2.5 rounded-full text-sm font-medium transition-all',
                     billingPeriod === 'monthly'
                       ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-                      : 'text-white/90 hover:text-white'
+                      : 'text-pink-200 hover:text-white'
                   )}
                 >
                   Bulanan
@@ -577,7 +588,7 @@ export default function Home() {
                     'px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2',
                     billingPeriod === 'yearly'
                       ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-                      : 'text-white/90 hover:text-white'
+                      : 'text-pink-200 hover:text-white'
                   )}
                 >
                   Tahunan
@@ -588,7 +599,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3 max-w-5xl mx-auto">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
               {pricingPlans.map((plan) => {
                 const price = billingPeriod === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice
 
@@ -614,12 +625,12 @@ export default function Home() {
                     <div className="mb-6">
                       <p className={cn(
                         'text-xs font-medium uppercase tracking-wider mb-2',
-                        plan.popular ? 'text-primary-400' : 'text-white/80'
+                        plan.popular ? 'text-primary-400' : 'text-pink-300'
                       )}>
                         {plan.highlight}
                       </p>
                       <h3 className="text-2xl font-bold text-white mb-1">{plan.name}</h3>
-                      <p className="text-sm text-white/80">{plan.description}</p>
+                      <p className="text-sm text-pink-300">{plan.description}</p>
                     </div>
 
                     <div className="mb-6">
@@ -628,7 +639,7 @@ export default function Home() {
                           {price === 0 ? 'Gratis' : formatRupiah(price)}
                         </span>
                         {price > 0 && (
-                          <span className="text-white/80">
+                          <span className="text-pink-300">
                             /{billingPeriod === 'monthly' ? 'bln' : 'thn'}
                           </span>
                         )}
@@ -637,7 +648,7 @@ export default function Home() {
 
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3 text-sm text-white/90">
+                        <li key={feature} className="flex items-center gap-3 text-sm text-pink-200">
                           <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
                           {feature}
                         </li>
@@ -703,7 +714,7 @@ export default function Home() {
                     )} />
                   </button>
                   {openFaq === index && (
-                    <div className="px-5 pb-5 text-white/90 leading-relaxed">
+                    <div className="px-5 pb-5 text-pink-200 leading-relaxed">
                       {faq.a}
                     </div>
                   )}
@@ -725,7 +736,7 @@ export default function Home() {
                 <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
                   Siap Tingkatkan Email Marketing Anda?
                 </h2>
-                <p className="text-lg text-white mb-10 max-w-2xl mx-auto">
+                <p className="text-lg text-primary-100 mb-10 max-w-2xl mx-auto">
                   Bergabung dengan 10,000+ marketer yang sudah merasakan kemudahan BlastMail.
                   Mulai gratis, tanpa kartu kredit.
                 </p>
@@ -737,7 +748,7 @@ export default function Home() {
                     </Button>
                   </Link>
                   <Link href="/login">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-white bg-white/20 text-white hover:bg-white/30 text-lg px-8 py-6">
                       Sudah Punya Akun? Masuk
                     </Button>
                   </Link>
@@ -757,14 +768,14 @@ export default function Home() {
                   alt={APP_NAME}
                   className="h-8 w-auto object-contain"
                 />
-                <span className="text-sm text-white/70">by SAIKI Group</span>
+                <span className="text-sm text-pink-400">by SAIKI Group</span>
               </div>
 
-              <p className="text-sm text-white/80">
+              <p className="text-sm text-pink-300">
                 &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
               </p>
 
-              <div className="flex items-center gap-6 text-sm text-white/80">
+              <div className="flex items-center gap-6 text-sm text-pink-300">
                 <a href="#" className="hover:text-white transition-colors">Privacy</a>
                 <a href="#" className="hover:text-white transition-colors">Terms</a>
                 <a href="#" className="hover:text-white transition-colors">Contact</a>
