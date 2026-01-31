@@ -1,133 +1,219 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Menu, Mail, Send, Users, FileText, Zap, Shield, BarChart3, CheckCircle2, ArrowRight, Sparkles, Check, X, Crown, Star, Rocket } from 'lucide-react'
+import {
+  Menu,
+  X,
+  Send,
+  Users,
+  FileText,
+  Zap,
+  Shield,
+  BarChart3,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  Check,
+  Crown,
+  Star,
+  Rocket,
+  Play,
+  ChevronDown,
+  Quote,
+  Target,
+  TrendingUp,
+  Clock,
+  Globe,
+  MousePointer,
+  Inbox,
+  MessageSquare,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { APP_LOGO_URL, APP_NAME } from '@/lib/constants'
 
+// Animated counter hook
+function useCountUp(end: number, duration: number = 2000, start: boolean = true) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!start) return
+    let startTime: number
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      setCount(Math.floor(progress * end))
+      if (progress < 1) {
+        requestAnimationFrame(step)
+      }
+    }
+    requestAnimationFrame(step)
+  }, [end, duration, start])
+
+  return count
+}
+
+// Intersection Observer hook
+function useInView(threshold = 0.1) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          observer.disconnect()
+        }
+      },
+      { threshold }
+    )
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [threshold])
+
+  return { ref, inView }
+}
+
 const features = [
   {
     icon: Users,
-    title: 'Manage Leads',
-    description: 'Import dari Excel, kelola kontak, dan organisasi dalam grup untuk targeting yang lebih efektif.',
+    title: 'Smart Lead Management',
+    description: 'Import ribuan kontak dari Excel dalam hitungan detik. Organisasi otomatis dengan tags dan segmentasi cerdas.',
+    gradient: 'from-blue-500 to-cyan-500',
   },
   {
     icon: FileText,
-    title: 'Template Email',
-    description: 'Buat template HTML dengan live preview dan placeholder otomatis untuk personalisasi.',
+    title: 'Drag & Drop Template Builder',
+    description: 'Buat email stunning tanpa coding. Live preview, 50+ template siap pakai, dan personalisasi dinamis.',
+    gradient: 'from-purple-500 to-pink-500',
   },
   {
     icon: Send,
-    title: 'Bulk Sending',
-    description: 'Kirim email massal ke ribuan kontak sekaligus dengan tracking status real-time.',
+    title: 'Lightning Fast Delivery',
+    description: 'Kirim 10,000+ email dalam hitungan menit dengan delivery rate 99%. Anti-spam technology built-in.',
+    gradient: 'from-orange-500 to-red-500',
   },
   {
     icon: BarChart3,
-    title: 'Campaign Analytics',
-    description: 'Pantau performa campaign: sent, failed, pending dengan dashboard yang informatif.',
+    title: 'Real-time Analytics',
+    description: 'Dashboard live dengan open rate, click rate, dan bounce tracking. Insights yang actionable untuk optimize campaign.',
+    gradient: 'from-green-500 to-emerald-500',
+  },
+  {
+    icon: Shield,
+    title: 'Enterprise Security',
+    description: 'Data terenkripsi end-to-end. GDPR compliant. Multi-factor authentication dan audit logs lengkap.',
+    gradient: 'from-indigo-500 to-violet-500',
+  },
+  {
+    icon: Zap,
+    title: 'Automation Workflows',
+    description: 'Set it and forget it. Trigger email otomatis berdasarkan behavior, schedule, atau event tertentu.',
+    gradient: 'from-yellow-500 to-orange-500',
   },
 ]
 
-const benefits = [
-  'Import leads dari Excel dengan mudah',
-  'Template email dengan HTML editor & live preview',
-  'Placeholder otomatis (nama, email, company)',
-  'Kirim ke grup atau kontak individual',
-  'Tracking status pengiriman real-time',
-  'Filter campaign berdasarkan tanggal',
+const stats = [
+  { value: 50, suffix: 'M+', label: 'Email Terkirim', icon: Send },
+  { value: 99, suffix: '%', label: 'Delivery Rate', icon: CheckCircle2 },
+  { value: 10, suffix: 'K+', label: 'Happy Users', icon: Users },
+  { value: 24, suffix: '/7', label: 'Support', icon: Clock },
+]
+
+const testimonials = [
+  {
+    name: 'Andi Pratama',
+    role: 'Marketing Director',
+    company: 'TechStart Indonesia',
+    avatar: 'A',
+    content: 'BlastMail mengubah cara kami melakukan email marketing. Conversion rate naik 3x lipat dalam sebulan pertama!',
+    rating: 5,
+  },
+  {
+    name: 'Sarah Chen',
+    role: 'Founder',
+    company: 'Beauty by Sarah',
+    avatar: 'S',
+    content: 'Interface-nya super intuitif. Dari import leads sampai kirim campaign, semua bisa selesai dalam 10 menit.',
+    rating: 5,
+  },
+  {
+    name: 'Budi Santoso',
+    role: 'CEO',
+    company: 'PropertyHub',
+    avatar: 'B',
+    content: 'Support team-nya luar biasa responsif. Issue kami solve dalam hitungan jam, bukan hari.',
+    rating: 5,
+  },
 ]
 
 const pricingPlans = [
   {
-    name: 'Free',
-    description: 'Untuk mencoba platform',
+    name: 'Starter',
+    description: 'Perfect untuk memulai',
     monthlyPrice: 0,
     yearlyPrice: 0,
-    campaigns: 1,
-    recipientsPerDay: 5,
-    emailsPerDay: 5,
-    features: [
-      { text: '1 campaign aktif', included: true },
-      { text: 'Maks. 5 penerima/hari', included: true },
-      { text: 'Template email dasar', included: true },
-      { text: 'Import leads dari Excel', included: true },
-      { text: 'Watermark BlastMail', included: true, note: 'Ada watermark' },
-      { text: 'SMTP kustom', included: false },
-      { text: 'Priority support', included: false },
-    ],
+    highlight: 'Gratis Selamanya',
+    features: ['1 campaign aktif', '50 email/hari', 'Template dasar', 'Import Excel', 'Email support'],
+    cta: 'Mulai Gratis',
     popular: false,
-    icon: Sparkles,
-    color: 'neutral',
+    gradient: 'from-slate-500 to-slate-600',
   },
   {
-    name: 'Basic',
-    description: 'Untuk bisnis kecil',
-    monthlyPrice: 74900,
-    yearlyPrice: 800000,
-    campaigns: 3,
-    recipientsPerDay: 50,
-    emailsPerDay: 150,
-    features: [
-      { text: '3 campaign aktif', included: true },
-      { text: 'Maks. 50 penerima/hari', included: true },
-      { text: '150 email/hari', included: true },
-      { text: 'Template email lengkap', included: true },
-      { text: 'Tanpa watermark', included: true },
-      { text: 'SMTP kustom', included: true },
-      { text: 'Priority support', included: false },
-    ],
-    popular: false,
-    icon: Star,
-    color: 'primary',
-  },
-  {
-    name: 'Regular',
+    name: 'Growth',
     description: 'Untuk bisnis berkembang',
-    monthlyPrice: 124900,
-    yearlyPrice: 1350000,
-    campaigns: 5,
-    recipientsPerDay: 100,
-    emailsPerDay: 500,
-    features: [
-      { text: '5 campaign aktif', included: true },
-      { text: 'Maks. 100 penerima/hari', included: true },
-      { text: '500 email/hari', included: true },
-      { text: 'Template email lengkap', included: true },
-      { text: 'Tanpa watermark', included: true },
-      { text: 'SMTP kustom', included: true },
-      { text: 'Priority support', included: true },
-    ],
+    monthlyPrice: 149000,
+    yearlyPrice: 1490000,
+    highlight: 'Best Value',
+    features: ['5 campaign aktif', '1,000 email/hari', 'All templates', 'SMTP custom', 'Priority support', 'Analytics dashboard'],
+    cta: 'Pilih Growth',
     popular: true,
-    icon: Rocket,
-    color: 'accent',
+    gradient: 'from-primary-500 to-accent-500',
   },
   {
-    name: 'Pro',
+    name: 'Scale',
     description: 'Untuk bisnis besar',
-    monthlyPrice: 349000,
-    yearlyPrice: 3599000,
-    campaigns: 10,
-    recipientsPerDay: 500,
-    emailsPerDay: 5000,
-    features: [
-      { text: '10 campaign aktif', included: true },
-      { text: 'Maks. 500 penerima/hari', included: true },
-      { text: '5.000 email/hari', included: true },
-      { text: 'Template email lengkap', included: true },
-      { text: 'Tanpa watermark', included: true },
-      { text: 'SMTP kustom', included: true },
-      { text: 'Priority support', included: true },
-    ],
+    monthlyPrice: 499000,
+    yearlyPrice: 4990000,
+    highlight: 'Most Powerful',
+    features: ['Unlimited campaign', '10,000 email/hari', 'White-label', 'API access', 'Dedicated support', 'Custom integrations'],
+    cta: 'Pilih Scale',
     popular: false,
-    icon: Crown,
-    color: 'warning',
+    gradient: 'from-amber-500 to-orange-500',
+  },
+]
+
+const faqs = [
+  {
+    q: 'Apakah ada free trial?',
+    a: 'Ya! Paket Starter kami gratis selamanya dengan 50 email per hari. Tidak perlu kartu kredit untuk mendaftar.',
+  },
+  {
+    q: 'Bagaimana cara import kontak?',
+    a: 'Super mudah! Cukup drag & drop file Excel atau CSV Anda. BlastMail akan otomatis mapping kolom dan validasi email.',
+  },
+  {
+    q: 'Apakah email saya masuk spam?',
+    a: 'BlastMail dilengkapi anti-spam technology dan SPF/DKIM authentication. Delivery rate kami konsisten di atas 99%.',
+  },
+  {
+    q: 'Bisa pakai SMTP sendiri?',
+    a: 'Tentu! Mulai dari paket Growth, Anda bisa connect SMTP sendiri seperti Gmail, SendGrid, atau Mailgun.',
+  },
+  {
+    q: 'Ada garansi uang kembali?',
+    a: 'Ya, semua paket berbayar memiliki garansi 14 hari uang kembali tanpa pertanyaan.',
   },
 ]
 
 function formatRupiah(amount: number): string {
-  if (amount === 0) return 'Gratis'
+  if (amount === 0) return 'Rp 0'
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
@@ -138,182 +224,201 @@ function formatRupiah(amount: number): string {
 
 export default function Home() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const statsRef = useInView(0.3)
+
   return (
-    <div className="relative overflow-hidden bg-white">
-      {/* Background decorations */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute -top-24 right-10 h-96 w-96 rounded-full bg-primary-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-accent-500/10 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-gradient-to-br from-primary-500/5 to-accent-500/5 blur-3xl" />
+    <div className="relative overflow-hidden bg-[#0a0a0f]">
+      {/* Animated background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-950/50 via-[#0a0a0f] to-accent-950/30" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary-500/20 rounded-full blur-[128px] animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-accent-500/20 rounded-full blur-[128px] animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-600/5 rounded-full blur-[200px]" />
+
+        {/* Grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '64px 64px',
+          }}
+        />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 border-b border-neutral-100 bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 lg:h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
           <Link href="/" className="flex items-center">
             <img
               src={APP_LOGO_URL}
               alt={APP_NAME}
-              className="h-9 w-auto object-contain"
+              className="h-8 lg:h-10 w-auto object-contain"
             />
           </Link>
 
-          <nav className="hidden items-center gap-8 text-sm font-medium text-neutral-600 md:flex">
-            <a href="#features" className="transition-colors hover:text-primary-600">
-              Fitur
-            </a>
-            <a href="#benefits" className="transition-colors hover:text-primary-600">
-              Keunggulan
-            </a>
-            <a href="#pricing" className="transition-colors hover:text-primary-600">
-              Harga
-            </a>
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-1 text-sm font-medium lg:flex">
+            {['Fitur', 'Testimonial', 'Harga', 'FAQ'].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="px-4 py-2 text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+              >
+                {item}
+              </a>
+            ))}
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden sm:block text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors">
+            <Link href="/login" className="hidden sm:block text-sm font-medium text-white/70 hover:text-white transition-colors px-4 py-2">
               Masuk
             </Link>
             <Link href="/signup">
-              <Button size="sm" className="shadow-lg shadow-primary-500/25">
-                Mulai Gratis
+              <Button className="bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-400 hover:to-accent-400 text-white border-0 shadow-lg shadow-primary-500/25">
+                Coba Gratis
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 text-white/70 hover:text-white"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-white/5 bg-[#0a0a0f]/95 backdrop-blur-xl">
+            <nav className="flex flex-col p-4 space-y-2">
+              {['Fitur', 'Testimonial', 'Harga', 'FAQ'].map((item) => (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-3 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                >
+                  {item}
+                </a>
+              ))}
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+              >
+                Masuk
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
-      <main className="relative z-10">
+      <main className="relative z-10 pt-16 lg:pt-20">
         {/* Hero Section */}
-        <section className="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 lg:px-10 lg:pb-28 lg:pt-24">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-            {/* Left content */}
-            <div className="flex flex-col gap-6">
-              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-4 py-2 text-xs font-semibold text-primary-700">
-                <Sparkles className="h-3.5 w-3.5" />
-                Email Blasting Platform
+        <section className="relative min-h-[90vh] flex items-center">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-20 lg:py-32">
+            <div className="max-w-4xl mx-auto text-center">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary-500/30 bg-primary-500/10 px-4 py-2 text-sm font-medium text-primary-300 mb-8 animate-fade-in">
+                <Sparkles className="h-4 w-4" />
+                <span>Platform Email Marketing #1 di Indonesia</span>
+                <span className="flex h-2 w-2 rounded-full bg-primary-400 animate-pulse" />
               </div>
 
-              <h1 className="text-4xl font-extrabold leading-tight text-neutral-900 sm:text-5xl lg:text-6xl">
-                Kirim{' '}
-                <span className="relative">
-                  <span className="relative z-10 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-                    Ribuan Email
+              {/* Main headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-tight text-white mb-6 animate-slide-up">
+                Kirim Email yang{' '}
+                <span className="relative inline-block">
+                  <span className="relative z-10 bg-gradient-to-r from-primary-400 via-accent-400 to-primary-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+                    Benar-Benar Dibaca
                   </span>
-                  <span className="absolute bottom-2 left-0 right-0 h-3 bg-primary-200/50 -z-0" />
-                </span>{' '}
-                dalam Hitungan Menit
+                </span>
               </h1>
 
-              <p className="text-lg text-neutral-600 leading-relaxed">
-                Platform email blasting yang powerful untuk bisnis Anda. Kelola leads, buat template menarik,
-                dan kirim campaign massal dengan mudah dan efisien.
+              {/* Subheadline */}
+              <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
+                Bukan sekadar kirim email massal. BlastMail membantu Anda membangun{' '}
+                <span className="text-white font-medium">koneksi nyata</span> dengan audiens melalui email yang personal dan tepat sasaran.
               </p>
 
-              <div className="flex flex-col gap-4 sm:flex-row">
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style={{ animationDelay: '200ms' }}>
                 <Link href="/signup">
-                  <Button size="lg" className="w-full sm:w-auto shadow-xl shadow-primary-500/25">
-                    Mulai Sekarang
-                    <ArrowRight className="h-4 w-4" />
+                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-400 hover:to-accent-400 text-white border-0 shadow-2xl shadow-primary-500/30 text-lg px-8 py-6">
+                    Mulai Gratis Sekarang
+                    <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="#pricing">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    Lihat Harga
-                  </Button>
-                </Link>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 text-lg px-8 py-6">
+                  <Play className="h-5 w-5" />
+                  Lihat Demo
+                </Button>
               </div>
 
-              <div className="flex items-center gap-6 pt-4">
+              {/* Trust indicators */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/40 animate-fade-in" style={{ animationDelay: '300ms' }}>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-success-500" />
-                  <span className="text-sm text-neutral-600">Gratis untuk mulai</span>
+                  <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  <span>Setup 5 menit</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-success-500" />
-                  <span className="text-sm text-neutral-600">Tanpa kartu kredit</span>
+                  <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  <span>Tanpa kartu kredit</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  <span>Cancel kapan saja</span>
                 </div>
               </div>
             </div>
 
-            {/* Right - Dashboard Preview */}
-            <div className="relative">
-              {/* Main card */}
-              <div className="relative rounded-3xl border border-neutral-200 bg-white p-6 shadow-2xl shadow-neutral-900/10">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Campaign Dashboard</p>
-                    <p className="text-2xl font-bold text-neutral-900 mt-1">Email Statistics</p>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-full bg-success-50 px-3 py-1.5 text-xs font-semibold text-success-700">
-                    <span className="h-2 w-2 rounded-full bg-success-500 animate-pulse" />
-                    Live
-                  </div>
-                </div>
-
-                {/* Stats grid */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="rounded-2xl bg-gradient-to-br from-primary-50 to-primary-100/50 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Send className="h-4 w-4 text-primary-600" />
-                      <span className="text-xs font-medium text-primary-600">Total Sent</span>
+            {/* Dashboard preview */}
+            <div className="mt-16 lg:mt-24 relative animate-slide-up" style={{ animationDelay: '400ms' }}>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent z-10 pointer-events-none" />
+              <div className="relative rounded-2xl lg:rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-2 shadow-2xl shadow-primary-500/10">
+                <div className="rounded-xl lg:rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 p-4 lg:p-8">
+                  {/* Mock dashboard */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="h-3 w-3 rounded-full bg-red-500" />
+                      <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                      <div className="h-3 w-3 rounded-full bg-green-500" />
                     </div>
-                    <p className="text-3xl font-bold text-neutral-900">12,847</p>
-                  </div>
-                  <div className="rounded-2xl bg-gradient-to-br from-success-50 to-success-100/50 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 className="h-4 w-4 text-success-600" />
-                      <span className="text-xs font-medium text-success-600">Delivered</span>
+                    <div className="flex items-center gap-2 text-xs text-white/40">
+                      <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                      Live Dashboard
                     </div>
-                    <p className="text-3xl font-bold text-neutral-900">98.5%</p>
                   </div>
-                </div>
 
-                {/* Progress bars */}
-                <div className="space-y-4">
-                  {[
-                    { label: 'Campaign A - Promo Launch', value: 95, color: 'bg-primary-500' },
-                    { label: 'Campaign B - Newsletter', value: 87, color: 'bg-accent-500' },
-                    { label: 'Campaign C - Follow Up', value: 72, color: 'bg-success-500' },
-                  ].map((item) => (
-                    <div key={item.label} className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-neutral-600">{item.label}</span>
-                        <span className="font-semibold text-neutral-900">{item.value}%</span>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    {[
+                      { label: 'Total Sent', value: '12,847', change: '+23%', color: 'text-primary-400' },
+                      { label: 'Open Rate', value: '68.5%', change: '+12%', color: 'text-green-400' },
+                      { label: 'Click Rate', value: '24.3%', change: '+8%', color: 'text-accent-400' },
+                      { label: 'Conversions', value: '847', change: '+45%', color: 'text-yellow-400' },
+                    ].map((stat) => (
+                      <div key={stat.label} className="rounded-xl bg-white/5 p-4">
+                        <p className="text-xs text-white/40 mb-1">{stat.label}</p>
+                        <p className={cn('text-2xl font-bold', stat.color)}>{stat.value}</p>
+                        <p className="text-xs text-green-400">{stat.change}</p>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-neutral-100">
-                        <div
-                          className={`h-2 rounded-full ${item.color}`}
-                          style={{ width: `${item.value}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                    ))}
+                  </div>
 
-              {/* Floating card - Leads */}
-              <div className="absolute -bottom-6 -left-6 hidden lg:block w-48 rounded-2xl border border-neutral-200 bg-white p-4 shadow-xl">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent-100">
-                    <Users className="h-5 w-5 text-accent-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Total Leads</p>
-                    <p className="text-xl font-bold text-neutral-900">5,234</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating card - Templates */}
-              <div className="absolute -top-4 -right-4 hidden lg:block w-44 rounded-2xl border border-neutral-200 bg-white p-4 shadow-xl">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary-100">
-                    <FileText className="h-5 w-5 text-primary-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500">Templates</p>
-                    <p className="text-xl font-bold text-neutral-900">24</p>
+                  {/* Chart placeholder */}
+                  <div className="h-32 lg:h-48 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-500/10 flex items-end px-4 pb-4 gap-2">
+                    {[40, 65, 45, 80, 55, 90, 70, 85, 60, 95, 75, 88].map((h, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 bg-gradient-to-t from-primary-500 to-accent-500 rounded-t-sm opacity-80"
+                        style={{ height: `${h}%` }}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -321,117 +426,147 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Stats Section */}
+        <section ref={statsRef.ref} className="py-20 border-y border-white/5 bg-white/[0.02]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+              {stats.map((stat, index) => {
+                const count = useCountUp(stat.value, 2000, statsRef.inView)
+                return (
+                  <div key={stat.label} className="text-center">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-500/20 mb-4">
+                      <stat.icon className="h-6 w-6 text-primary-400" />
+                    </div>
+                    <p className="text-4xl lg:text-5xl font-black text-white mb-2">
+                      {count}{stat.suffix}
+                    </p>
+                    <p className="text-sm text-white/50">{stat.label}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
-        <section id="features" className="bg-gradient-to-b from-neutral-50 to-white py-20 lg:py-28">
+        <section id="fitur" className="py-20 lg:py-32">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div className="text-center mb-16">
-              <p className="text-sm font-semibold text-primary-600 uppercase tracking-wide mb-3">Fitur Lengkap</p>
-              <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl">
-                Semua yang Anda Butuhkan untuk Email Marketing
+              <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-4">
+                Powerful Features
+              </p>
+              <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
+                Semua yang Anda Butuhkan,{' '}
+                <span className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
+                  Dalam Satu Platform
+                </span>
               </h2>
-              <p className="mt-4 text-lg text-neutral-600 max-w-2xl mx-auto">
-                Dari manajemen kontak hingga pengiriman massal, BlastMail menyediakan tools yang Anda butuhkan.
+              <p className="text-lg text-white/50 max-w-2xl mx-auto">
+                Dari lead management hingga analytics, BlastMail menyediakan semua tools untuk email marketing yang sukses.
               </p>
             </div>
 
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature, index) => (
                 <div
                   key={feature.title}
-                  className="group relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  className="group relative rounded-2xl border border-white/10 bg-white/5 p-6 lg:p-8 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:-translate-y-1"
                 >
-                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 mb-5">
-                    <feature.icon className="h-6 w-6" />
+                  {/* Gradient glow on hover */}
+                  <div className={cn(
+                    'absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl',
+                    `bg-gradient-to-br ${feature.gradient}`
+                  )} style={{ transform: 'scale(0.8)' }} />
+
+                  <div className={cn(
+                    'inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br mb-5',
+                    feature.gradient
+                  )}>
+                    <feature.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-2">{feature.title}</h3>
-                  <p className="text-sm text-neutral-600 leading-relaxed">{feature.description}</p>
+
+                  <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                  <p className="text-white/50 leading-relaxed">{feature.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Benefits Section */}
-        <section id="benefits" className="py-20 lg:py-28">
+        {/* Testimonials Section */}
+        <section id="testimonial" className="py-20 lg:py-32 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-            <div className="grid gap-12 lg:grid-cols-2 items-center">
-              <div>
-                <p className="text-sm font-semibold text-primary-600 uppercase tracking-wide mb-3">Keunggulan</p>
-                <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl mb-6">
-                  Mengapa Memilih BlastMail?
-                </h2>
-                <p className="text-lg text-neutral-600 mb-8">
-                  BlastMail dirancang untuk kemudahan penggunaan tanpa mengorbankan fitur powerful yang Anda butuhkan.
-                </p>
+            <div className="text-center mb-16">
+              <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-4">
+                Testimonials
+              </p>
+              <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
+                Dipercaya oleh{' '}
+                <span className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
+                  10,000+ Marketer
+                </span>
+              </h2>
+            </div>
 
-                <div className="grid gap-4">
-                  {benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-success-100">
-                        <CheckCircle2 className="h-4 w-4 text-success-600" />
-                      </div>
-                      <span className="text-neutral-700">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
+            <div className="grid gap-6 lg:grid-cols-3">
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={testimonial.name}
+                  className="relative rounded-2xl border border-white/10 bg-white/5 p-6 lg:p-8"
+                >
+                  <Quote className="h-8 w-8 text-primary-500/30 mb-4" />
 
-                <div className="mt-8">
-                  <Link href="/signup">
-                    <Button size="lg" className="shadow-lg shadow-primary-500/25">
-                      Coba Sekarang - Gratis
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+                  <p className="text-white/70 mb-6 leading-relaxed">
+                    "{testimonial.content}"
+                  </p>
 
-              <div className="relative">
-                <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-primary-50 to-accent-50 p-8 lg:p-12">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="text-center">
-                      <p className="text-4xl font-bold text-primary-600">99%</p>
-                      <p className="text-sm text-neutral-600 mt-1">Delivery Rate</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-white font-bold text-lg">
+                      {testimonial.avatar}
                     </div>
-                    <div className="text-center">
-                      <p className="text-4xl font-bold text-accent-600">10x</p>
-                      <p className="text-sm text-neutral-600 mt-1">Lebih Cepat</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-4xl font-bold text-success-600">24/7</p>
-                      <p className="text-sm text-neutral-600 mt-1">Support</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-4xl font-bold text-warning-600">100%</p>
-                      <p className="text-sm text-neutral-600 mt-1">Secure</p>
+                    <div>
+                      <p className="font-semibold text-white">{testimonial.name}</p>
+                      <p className="text-sm text-white/50">{testimonial.role}, {testimonial.company}</p>
                     </div>
                   </div>
+
+                  <div className="flex gap-1 mt-4">
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="bg-gradient-to-b from-neutral-50 to-white py-20 lg:py-28">
+        <section id="harga" className="py-20 lg:py-32">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div className="text-center mb-12">
-              <p className="text-sm font-semibold text-primary-600 uppercase tracking-wide mb-3">Harga Terjangkau</p>
-              <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl">
-                Pilih Paket yang Sesuai untuk Bisnis Anda
+              <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-4">
+                Simple Pricing
+              </p>
+              <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
+                Harga yang{' '}
+                <span className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
+                  Masuk Akal
+                </span>
               </h2>
-              <p className="mt-4 text-lg text-neutral-600 max-w-2xl mx-auto">
-                Mulai gratis dan upgrade kapan saja sesuai kebutuhan bisnis Anda.
+              <p className="text-lg text-white/50 max-w-2xl mx-auto mb-8">
+                Mulai gratis, upgrade sesuai pertumbuhan bisnis Anda.
               </p>
 
-              {/* Billing Toggle */}
-              <div className="mt-8 inline-flex items-center gap-4 rounded-full bg-neutral-100 p-1.5">
+              {/* Billing toggle */}
+              <div className="inline-flex items-center gap-3 rounded-full bg-white/5 border border-white/10 p-1.5">
                 <button
                   onClick={() => setBillingPeriod('monthly')}
                   className={cn(
-                    'px-6 py-2 rounded-full text-sm font-medium transition-all',
+                    'px-6 py-2.5 rounded-full text-sm font-medium transition-all',
                     billingPeriod === 'monthly'
-                      ? 'bg-white text-neutral-900 shadow-sm'
-                      : 'text-neutral-600 hover:text-neutral-900'
+                      ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
+                      : 'text-white/60 hover:text-white'
                   )}
                 >
                   Bulanan
@@ -439,121 +574,86 @@ export default function Home() {
                 <button
                   onClick={() => setBillingPeriod('yearly')}
                   className={cn(
-                    'px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2',
+                    'px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2',
                     billingPeriod === 'yearly'
-                      ? 'bg-white text-neutral-900 shadow-sm'
-                      : 'text-neutral-600 hover:text-neutral-900'
+                      ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
+                      : 'text-white/60 hover:text-white'
                   )}
                 >
                   Tahunan
-                  <span className="text-xs bg-success-100 text-success-700 px-2 py-0.5 rounded-full">
-                    Hemat 10%
+                  <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                    -17%
                   </span>
                 </button>
               </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-4 md:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-3 max-w-5xl mx-auto">
               {pricingPlans.map((plan) => {
                 const price = billingPeriod === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice
-                const IconComponent = plan.icon
 
                 return (
                   <div
                     key={plan.name}
                     className={cn(
-                      'relative rounded-2xl border-2 bg-white p-6 transition-all duration-300 hover:shadow-xl',
+                      'relative rounded-2xl border p-6 lg:p-8 transition-all duration-300',
                       plan.popular
-                        ? 'border-primary-500 shadow-lg shadow-primary-500/10'
-                        : 'border-neutral-200 hover:border-neutral-300'
+                        ? 'border-primary-500/50 bg-gradient-to-b from-primary-500/10 to-transparent scale-105 shadow-2xl shadow-primary-500/20'
+                        : 'border-white/10 bg-white/5 hover:border-white/20'
                     )}
                   >
                     {plan.popular && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 px-4 py-1.5 text-xs font-semibold text-white shadow-lg">
-                        <Star className="h-3 w-3" />
-                        Paling Populer
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 px-4 py-1.5 text-xs font-semibold text-white">
+                          <Star className="h-3 w-3" />
+                          Most Popular
+                        </span>
                       </div>
                     )}
 
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={cn(
-                        'flex items-center justify-center w-10 h-10 rounded-xl',
-                        plan.color === 'neutral' && 'bg-neutral-100',
-                        plan.color === 'primary' && 'bg-primary-100',
-                        plan.color === 'accent' && 'bg-accent-100',
-                        plan.color === 'warning' && 'bg-warning-100',
+                    <div className="mb-6">
+                      <p className={cn(
+                        'text-xs font-medium uppercase tracking-wider mb-2',
+                        plan.popular ? 'text-primary-400' : 'text-white/40'
                       )}>
-                        <IconComponent className={cn(
-                          'h-5 w-5',
-                          plan.color === 'neutral' && 'text-neutral-600',
-                          plan.color === 'primary' && 'text-primary-600',
-                          plan.color === 'accent' && 'text-accent-600',
-                          plan.color === 'warning' && 'text-warning-600',
-                        )} />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-neutral-900">{plan.name}</h3>
-                        <p className="text-xs text-neutral-500">{plan.description}</p>
-                      </div>
+                        {plan.highlight}
+                      </p>
+                      <h3 className="text-2xl font-bold text-white mb-1">{plan.name}</h3>
+                      <p className="text-sm text-white/50">{plan.description}</p>
                     </div>
 
                     <div className="mb-6">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold text-neutral-900">
-                          {formatRupiah(price)}
+                        <span className="text-4xl font-black text-white">
+                          {price === 0 ? 'Gratis' : formatRupiah(price)}
                         </span>
                         {price > 0 && (
-                          <span className="text-sm text-neutral-500">
-                            /{billingPeriod === 'monthly' ? 'bulan' : 'tahun'}
+                          <span className="text-white/40">
+                            /{billingPeriod === 'monthly' ? 'bln' : 'thn'}
                           </span>
                         )}
                       </div>
-                      {billingPeriod === 'yearly' && price > 0 && (
-                        <p className="text-xs text-success-600 mt-1">
-                          Hemat {formatRupiah((plan.monthlyPrice * 12) - plan.yearlyPrice)}/tahun
-                        </p>
-                      )}
                     </div>
 
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-2 gap-3 mb-6 p-3 rounded-xl bg-neutral-50">
-                      <div className="text-center">
-                        <p className="text-xl font-bold text-neutral-900">{plan.campaigns}</p>
-                        <p className="text-xs text-neutral-500">Campaign</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xl font-bold text-neutral-900">{plan.emailsPerDay.toLocaleString('id-ID')}</p>
-                        <p className="text-xs text-neutral-500">Email/Hari</p>
-                      </div>
-                    </div>
-
-                    <ul className="space-y-3 mb-6">
-                      {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start gap-2.5">
-                          {feature.included ? (
-                            <Check className="h-4 w-4 text-success-500 mt-0.5 flex-shrink-0" />
-                          ) : (
-                            <X className="h-4 w-4 text-neutral-300 mt-0.5 flex-shrink-0" />
-                          )}
-                          <span className={cn(
-                            'text-sm',
-                            feature.included ? 'text-neutral-700' : 'text-neutral-400'
-                          )}>
-                            {feature.text}
-                          </span>
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-center gap-3 text-sm text-white/70">
+                          <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
+                          {feature}
                         </li>
                       ))}
                     </ul>
 
-                    <Link href={plan.monthlyPrice === 0 ? '/signup' : '/login'}>
+                    <Link href={price === 0 ? '/signup' : '/login'}>
                       <Button
                         className={cn(
                           'w-full',
-                          plan.popular && 'shadow-lg shadow-primary-500/25'
+                          plan.popular
+                            ? 'bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-400 hover:to-accent-400 text-white border-0 shadow-lg'
+                            : 'bg-white/10 hover:bg-white/20 text-white border-white/10'
                         )}
-                        variant={plan.popular ? 'default' : 'outline'}
                       >
-                        {plan.monthlyPrice === 0 ? 'Mulai Gratis' : 'Pilih Paket'}
+                        {plan.cta}
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
@@ -562,59 +662,135 @@ export default function Home() {
               })}
             </div>
 
-            {/* Money Back Guarantee */}
+            {/* Guarantee */}
             <div className="mt-12 text-center">
-              <div className="inline-flex items-center gap-3 rounded-full bg-success-50 px-6 py-3">
-                <Shield className="h-5 w-5 text-success-600" />
-                <span className="text-sm text-success-700 font-medium">
-                  Garansi 7 hari uang kembali untuk semua paket berbayar
+              <div className="inline-flex items-center gap-3 rounded-full bg-green-500/10 border border-green-500/20 px-6 py-3">
+                <Shield className="h-5 w-5 text-green-400" />
+                <span className="text-sm text-green-400 font-medium">
+                  14 hari garansi uang kembali untuk semua paket berbayar
                 </span>
               </div>
             </div>
           </div>
         </section>
 
+        {/* FAQ Section */}
+        <section id="faq" className="py-20 lg:py-32 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-10">
+            <div className="text-center mb-12">
+              <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-4">
+                FAQ
+              </p>
+              <h2 className="text-3xl lg:text-4xl font-black text-white">
+                Pertanyaan yang Sering Ditanyakan
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl border border-white/10 bg-white/5 overflow-hidden"
+                >
+                  <button
+                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                    className="w-full flex items-center justify-between p-5 text-left"
+                  >
+                    <span className="font-medium text-white">{faq.q}</span>
+                    <ChevronDown className={cn(
+                      'h-5 w-5 text-white/50 transition-transform',
+                      openFaq === index && 'rotate-180'
+                    )} />
+                  </button>
+                  {openFaq === index && (
+                    <div className="px-5 pb-5 text-white/60 leading-relaxed">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
-        <section className="bg-gradient-to-br from-primary-600 to-primary-700 py-16 lg:py-20">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10 text-center">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
-              Siap Meningkatkan Email Marketing Anda?
-            </h2>
-            <p className="text-lg text-primary-100 mb-8">
-              Mulai gratis hari ini dan rasakan kemudahan mengirim email massal dengan BlastMail.
-            </p>
-            <Link href="/signup">
-              <Button size="lg" variant="secondary" className="shadow-xl">
-                Mulai Gratis Sekarang
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+        <section className="py-20 lg:py-32">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10">
+            <div className="relative rounded-3xl overflow-hidden">
+              {/* Background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-accent-700" />
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+
+              <div className="relative px-6 py-16 lg:px-16 lg:py-24 text-center">
+                <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
+                  Siap Tingkatkan Email Marketing Anda?
+                </h2>
+                <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto">
+                  Bergabung dengan 10,000+ marketer yang sudah merasakan kemudahan BlastMail.
+                  Mulai gratis, tanpa kartu kredit.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link href="/signup">
+                    <Button size="lg" className="w-full sm:w-auto bg-white text-primary-600 hover:bg-white/90 shadow-2xl text-lg px-8 py-6">
+                      Mulai Gratis Sekarang
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6">
+                      Sudah Punya Akun? Masuk
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-neutral-100 bg-white py-12">
+        <footer className="border-t border-white/5 py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
                 <img
                   src={APP_LOGO_URL}
                   alt={APP_NAME}
                   className="h-8 w-auto object-contain"
                 />
+                <span className="text-sm text-white/30">by SAIKI Group</span>
               </div>
-              <p className="text-sm text-neutral-500">
+
+              <p className="text-sm text-white/40">
                 &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
               </p>
-              <div className="flex items-center gap-6 text-sm text-neutral-600">
-                <a href="#" className="hover:text-primary-600 transition-colors">Privacy</a>
-                <a href="#" className="hover:text-primary-600 transition-colors">Terms</a>
-                <a href="#" className="hover:text-primary-600 transition-colors">Contact</a>
+
+              <div className="flex items-center gap-6 text-sm text-white/40">
+                <a href="#" className="hover:text-white transition-colors">Privacy</a>
+                <a href="#" className="hover:text-white transition-colors">Terms</a>
+                <a href="#" className="hover:text-white transition-colors">Contact</a>
               </div>
             </div>
           </div>
         </footer>
       </main>
+
+      {/* Add custom animations */}
+      <style jsx global>{`
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient {
+          animation: gradient 3s ease infinite;
+        }
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out forwards;
+        }
+      `}</style>
     </div>
   )
 }
