@@ -39,12 +39,29 @@ interface OverviewData {
   campaigns_this_month: number
 }
 
+interface StatusDetail {
+  count: number
+  sent: number
+  failed: number
+  pending: number
+  total: number
+}
+
 interface CampaignStats {
   total_campaigns: number
   completed_campaigns: number
   running_campaigns: number
   draft_campaigns: number
   failed_campaigns: number
+  status_details?: {
+    completed: StatusDetail
+    running: StatusDetail
+    draft: StatusDetail
+    failed: StatusDetail
+  }
+  total_sent?: number
+  total_failed?: number
+  total_recipients?: number
 }
 
 interface EmailStats {
@@ -385,13 +402,14 @@ export default function DashboardPage() {
               </div>
               Campaign Status
             </CardTitle>
-            <CardDescription>Campaign distribution by status</CardDescription>
+            <CardDescription>Campaign distribution by status with email details</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[
                 {
                   label: 'Completed',
+                  statusKey: 'completed' as const,
                   value: campaignStats?.completed_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'emerald',
@@ -399,6 +417,7 @@ export default function DashboardPage() {
                 },
                 {
                   label: 'Running',
+                  statusKey: 'running' as const,
                   value: campaignStats?.running_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'blue',
@@ -406,6 +425,7 @@ export default function DashboardPage() {
                 },
                 {
                   label: 'Draft',
+                  statusKey: 'draft' as const,
                   value: campaignStats?.draft_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'neutral',
@@ -413,6 +433,7 @@ export default function DashboardPage() {
                 },
                 {
                   label: 'Failed',
+                  statusKey: 'failed' as const,
                   value: campaignStats?.failed_campaigns || 0,
                   total: campaignStats?.total_campaigns || 0,
                   color: 'red',
@@ -420,9 +441,17 @@ export default function DashboardPage() {
                 },
               ].map((item) => {
                 const percent = item.total > 0 ? Math.round((item.value / item.total) * 100) : 0
+                const details = campaignStats?.status_details?.[item.statusKey]
+                const sentPercent = details && details.total > 0 ? Math.round((details.sent / details.total) * 100) : 0
+                const failedPercent = details && details.total > 0 ? Math.round((details.failed / details.total) * 100) : 0
+
                 return (
-                  <div key={item.label} className="space-y-1.5">
-                    <div className="flex items-center justify-between">
+                  <Link
+                    key={item.label}
+                    href={`/app/campaigns?status=${item.statusKey}`}
+                    className="block p-3 rounded-xl border border-neutral-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <item.icon
                           className={cn(
@@ -433,38 +462,84 @@ export default function DashboardPage() {
                             item.color === 'red' && 'text-red-500'
                           )}
                         />
-                        <span className="text-sm text-neutral-600">{item.label}</span>
+                        <span className="text-sm font-medium text-neutral-700 group-hover:text-primary-700">{item.label}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-neutral-900">{item.value}</span>
+                        <span className="text-sm font-bold text-neutral-900">{item.value}</span>
                         <span className="text-xs text-neutral-400">({percent}%)</span>
                       </div>
                     </div>
-                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-                      <div
-                        className={cn(
-                          'h-full transition-all duration-500 rounded-full',
-                          item.color === 'emerald' && 'bg-emerald-500',
-                          item.color === 'blue' && 'bg-blue-500',
-                          item.color === 'neutral' && 'bg-neutral-300',
-                          item.color === 'red' && 'bg-red-500'
-                        )}
-                        style={{ width: `${percent}%` }}
-                      />
+
+                    {/* Dual-color progress bar: green for sent, red for failed */}
+                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden flex">
+                      {details && details.total > 0 ? (
+                        <>
+                          <div
+                            className="bg-emerald-500 transition-all duration-500"
+                            style={{ width: `${sentPercent}%` }}
+                          />
+                          <div
+                            className="bg-red-500 transition-all duration-500"
+                            style={{ width: `${failedPercent}%` }}
+                          />
+                        </>
+                      ) : (
+                        <div
+                          className={cn(
+                            'h-full transition-all duration-500',
+                            item.color === 'emerald' && 'bg-emerald-500',
+                            item.color === 'blue' && 'bg-blue-500',
+                            item.color === 'neutral' && 'bg-neutral-300',
+                            item.color === 'red' && 'bg-red-500'
+                          )}
+                          style={{ width: `${percent}%` }}
+                        />
+                      )}
                     </div>
-                  </div>
+
+                    {/* Detailed stats */}
+                    {details && details.total > 0 && (
+                      <div className="flex items-center justify-between mt-2 text-xs">
+                        <div className="flex items-center gap-3">
+                          <span className="text-emerald-600">
+                            <span className="font-semibold">{details.sent}</span> sent ({sentPercent}%)
+                          </span>
+                          <span className="text-red-600">
+                            <span className="font-semibold">{details.failed}</span> failed ({failedPercent}%)
+                          </span>
+                        </div>
+                        <span className="text-neutral-400">{details.total} recipients</span>
+                      </div>
+                    )}
+                  </Link>
                 )
               })}
             </div>
 
-            {/* Total */}
-            <div className="mt-4 pt-4 border-t border-neutral-100">
+            {/* Total Summary */}
+            <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-neutral-500">Total Campaigns</span>
                 <span className="text-lg font-bold text-neutral-900">
                   {campaignStats?.total_campaigns || 0}
                 </span>
               </div>
+              {(campaignStats?.total_recipients || 0) > 0 && (
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="text-center p-2 rounded-lg bg-neutral-50">
+                    <p className="font-bold text-neutral-900">{campaignStats?.total_recipients || 0}</p>
+                    <p className="text-neutral-500">Recipients</p>
+                  </div>
+                  <div className="text-center p-2 rounded-lg bg-emerald-50">
+                    <p className="font-bold text-emerald-600">{campaignStats?.total_sent || 0}</p>
+                    <p className="text-emerald-600">Sent</p>
+                  </div>
+                  <div className="text-center p-2 rounded-lg bg-red-50">
+                    <p className="font-bold text-red-600">{campaignStats?.total_failed || 0}</p>
+                    <p className="text-red-600">Failed</p>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -640,12 +715,15 @@ export default function DashboardPage() {
                 const successRate = campaign.total_recipients > 0
                   ? Math.round((campaign.sent_count / campaign.total_recipients) * 100)
                   : 0
+                const failedRate = campaign.total_recipients > 0
+                  ? Math.round((campaign.failed_count / campaign.total_recipients) * 100)
+                  : 0
 
                 return (
                   <Link
                     key={campaign.id}
                     href={`/app/campaigns/${campaign.id}`}
-                    className="flex items-center gap-4 p-3 rounded-xl border border-neutral-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 group"
+                    className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border border-neutral-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 group"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -677,29 +755,35 @@ export default function DashboardPage() {
                         })}
                       </p>
                     </div>
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="text-center">
+                    <div className="flex items-center gap-4 sm:gap-6 text-sm">
+                      <div className="text-center min-w-[50px]">
                         <p className="font-semibold text-neutral-900">{campaign.total_recipients}</p>
                         <p className="text-[10px] text-neutral-400">Recipients</p>
                       </div>
-                      <div className="text-center">
+                      <div className="text-center min-w-[40px]">
                         <p className="font-semibold text-emerald-600">{campaign.sent_count}</p>
                         <p className="text-[10px] text-neutral-400">Sent</p>
                       </div>
-                      {campaign.failed_count > 0 && (
-                        <div className="text-center">
-                          <p className="font-semibold text-red-600">{campaign.failed_count}</p>
-                          <p className="text-[10px] text-neutral-400">Failed</p>
-                        </div>
-                      )}
-                      <div className="w-16">
-                        <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                      <div className="text-center min-w-[40px]">
+                        <p className={cn('font-semibold', campaign.failed_count > 0 ? 'text-red-600' : 'text-neutral-300')}>{campaign.failed_count}</p>
+                        <p className="text-[10px] text-neutral-400">Failed</p>
+                      </div>
+                      {/* Dual-color progress bar */}
+                      <div className="w-20">
+                        <div className="h-2.5 bg-neutral-100 rounded-full overflow-hidden flex">
                           <div
-                            className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-500"
+                            className="bg-emerald-500 transition-all duration-500"
                             style={{ width: `${successRate}%` }}
                           />
+                          <div
+                            className="bg-red-500 transition-all duration-500"
+                            style={{ width: `${failedRate}%` }}
+                          />
                         </div>
-                        <p className="text-[10px] text-neutral-400 text-center mt-1">{successRate}%</p>
+                        <div className="flex justify-between text-[10px] mt-1">
+                          <span className="text-emerald-600">{successRate}%</span>
+                          {failedRate > 0 && <span className="text-red-600">{failedRate}%</span>}
+                        </div>
                       </div>
                     </div>
                   </Link>
