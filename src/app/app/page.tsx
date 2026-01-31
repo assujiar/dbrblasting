@@ -659,7 +659,7 @@ export default function DashboardPage() {
                               : campaign.status === 'running'
                                 ? 'default'
                                 : campaign.status === 'failed'
-                                  ? 'destructive'
+                                  ? 'error'
                                   : 'secondary'
                           }
                           className="text-[10px]"
