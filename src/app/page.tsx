@@ -341,9 +341,9 @@ export default function Home() {
               </h1>
 
               {/* Subheadline */}
-              <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
+              <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
                 Bukan sekadar kirim email massal. BlastMail membantu Anda membangun{' '}
-                <span className="text-white font-medium">koneksi nyata</span> dengan audiens melalui email yang personal dan tepat sasaran.
+                <span className="text-white font-semibold">koneksi nyata</span> dengan audiens melalui email yang personal dan tepat sasaran.
               </p>
 
               {/* CTA buttons */}
@@ -361,7 +361,7 @@ export default function Home() {
               </div>
 
               {/* Trust indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/40 animate-fade-in" style={{ animationDelay: '300ms' }}>
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400 animate-fade-in" style={{ animationDelay: '300ms' }}>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-400" />
                   <span>Setup 5 menit</span>
@@ -440,7 +440,7 @@ export default function Home() {
                     <p className="text-4xl lg:text-5xl font-black text-white mb-2">
                       {count}{stat.suffix}
                     </p>
-                    <p className="text-sm text-white/50">{stat.label}</p>
+                    <p className="text-sm text-gray-400">{stat.label}</p>
                   </div>
                 )
               })}
@@ -461,7 +461,7 @@ export default function Home() {
                   Dalam Satu Platform
                 </span>
               </h2>
-              <p className="text-lg text-white/50 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
                 Dari lead management hingga analytics, BlastMail menyediakan semua tools untuk email marketing yang sukses.
               </p>
             </div>
@@ -486,7 +486,7 @@ export default function Home() {
                   </div>
 
                   <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-white/50 leading-relaxed">{feature.description}</p>
+                  <p className="text-gray-400 leading-relaxed">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -516,7 +516,7 @@ export default function Home() {
                 >
                   <Quote className="h-8 w-8 text-primary-500/30 mb-4" />
 
-                  <p className="text-white/70 mb-6 leading-relaxed">
+                  <p className="text-gray-300 mb-6 leading-relaxed">
                     "{testimonial.content}"
                   </p>
 
@@ -526,7 +526,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="font-semibold text-white">{testimonial.name}</p>
-                      <p className="text-sm text-white/50">{testimonial.role}, {testimonial.company}</p>
+                      <p className="text-sm text-gray-400">{testimonial.role}, {testimonial.company}</p>
                     </div>
                   </div>
 
@@ -554,7 +554,7 @@ export default function Home() {
                   Masuk Akal
                 </span>
               </h2>
-              <p className="text-lg text-white/50 max-w-2xl mx-auto mb-8">
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
                 Mulai gratis, upgrade sesuai pertumbuhan bisnis Anda.
               </p>
 
@@ -566,7 +566,7 @@ export default function Home() {
                     'px-6 py-2.5 rounded-full text-sm font-medium transition-all',
                     billingPeriod === 'monthly'
                       ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-                      : 'text-white/60 hover:text-white'
+                      : 'text-gray-300 hover:text-white'
                   )}
                 >
                   Bulanan
@@ -577,7 +577,7 @@ export default function Home() {
                     'px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2',
                     billingPeriod === 'yearly'
                       ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-                      : 'text-white/60 hover:text-white'
+                      : 'text-gray-300 hover:text-white'
                   )}
                 >
                   Tahunan
@@ -614,12 +614,12 @@ export default function Home() {
                     <div className="mb-6">
                       <p className={cn(
                         'text-xs font-medium uppercase tracking-wider mb-2',
-                        plan.popular ? 'text-primary-400' : 'text-white/40'
+                        plan.popular ? 'text-primary-400' : 'text-gray-400'
                       )}>
                         {plan.highlight}
                       </p>
                       <h3 className="text-2xl font-bold text-white mb-1">{plan.name}</h3>
-                      <p className="text-sm text-white/50">{plan.description}</p>
+                      <p className="text-sm text-gray-400">{plan.description}</p>
                     </div>
 
                     <div className="mb-6">
@@ -628,7 +628,7 @@ export default function Home() {
                           {price === 0 ? 'Gratis' : formatRupiah(price)}
                         </span>
                         {price > 0 && (
-                          <span className="text-white/40">
+                          <span className="text-gray-400">
                             /{billingPeriod === 'monthly' ? 'bln' : 'thn'}
                           </span>
                         )}
@@ -637,7 +637,7 @@ export default function Home() {
 
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3 text-sm text-white/70">
+                        <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
                           <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
                           {feature}
                         </li>
@@ -703,7 +703,7 @@ export default function Home() {
                     )} />
                   </button>
                   {openFaq === index && (
-                    <div className="px-5 pb-5 text-white/60 leading-relaxed">
+                    <div className="px-5 pb-5 text-gray-300 leading-relaxed">
                       {faq.a}
                     </div>
                   )}
@@ -725,7 +725,7 @@ export default function Home() {
                 <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
                   Siap Tingkatkan Email Marketing Anda?
                 </h2>
-                <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto">
+                <p className="text-lg text-gray-100 mb-10 max-w-2xl mx-auto">
                   Bergabung dengan 10,000+ marketer yang sudah merasakan kemudahan BlastMail.
                   Mulai gratis, tanpa kartu kredit.
                 </p>
@@ -757,14 +757,14 @@ export default function Home() {
                   alt={APP_NAME}
                   className="h-8 w-auto object-contain"
                 />
-                <span className="text-sm text-white/30">by SAIKI Group</span>
+                <span className="text-sm text-gray-500">by SAIKI Group</span>
               </div>
 
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-gray-400">
                 &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
               </p>
 
-              <div className="flex items-center gap-6 text-sm text-white/40">
+              <div className="flex items-center gap-6 text-sm text-gray-400">
                 <a href="#" className="hover:text-white transition-colors">Privacy</a>
                 <a href="#" className="hover:text-white transition-colors">Terms</a>
                 <a href="#" className="hover:text-white transition-colors">Contact</a>
