@@ -36,8 +36,12 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <!-- Logo placeholder - ganti dengan URL logo Anda -->
-                    <img src="https://cakayvksusfrjxllfwuj.supabase.co/storage/v1/object/public/app-assets/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="180" style="display: block; margin-bottom: 20px;">
+                    <h2 style="margin: 0 0 8px; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">
+                      BlastMail
+                    </h2>
+                    <p style="margin: 0 0 16px; color: rgba(255,255,255,0.8); font-size: 13px;">
+                      Email Marketing Made Simple
+                    </p>
                   </td>
                 </tr>
                 <tr>
@@ -160,13 +164,17 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <!-- Logo placeholder -->
-                    <img src="https://cakayvksusfrjxllfwuj.supabase.co/storage/v1/object/public/app-assets/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="180" style="display: block; margin-bottom: 20px;">
+                    <h2 style="margin: 0 0 8px; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">
+                      BlastMail
+                    </h2>
+                    <p style="margin: 0 0 16px; color: rgba(255,255,255,0.8); font-size: 13px;">
+                      Email Marketing Made Simple
+                    </p>
                   </td>
                 </tr>
                 <tr>
                   <td align="center">
-                    <div style="width: 64px; height: 64px; background-color: rgba(255,255,255,0.2); border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
+                    <div style="width: 64px; height: 64px; background-color: rgba(255,255,255,0.2); border-radius: 16px; margin: 0 auto 16px; line-height: 64px; text-align: center;">
                       <span style="font-size: 32px;">🔐</span>
                     </div>
                     <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 700;">
@@ -296,13 +304,18 @@ Template email untuk konfirmasi pendaftaran dan reset password BlastMail.
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <img src="https://cakayvksusfrjxllfwuj.supabase.co/storage/v1/object/public/app-assets/blastmail_saiki_mainlogo-horizontal-01.svg" alt="BlastMail" width="180" style="display: block; margin-bottom: 20px;">
+                    <h2 style="margin: 0 0 8px; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">
+                      BlastMail
+                    </h2>
+                    <p style="margin: 0 0 16px; color: rgba(255,255,255,0.8); font-size: 13px;">
+                      Email Marketing Made Simple
+                    </p>
                   </td>
                 </tr>
                 <tr>
                   <td align="center">
-                    <div style="width: 64px; height: 64px; background-color: rgba(255,255,255,0.2); border-radius: 16px; margin: 0 auto 16px;">
-                      <span style="font-size: 32px; line-height: 64px;">✨</span>
+                    <div style="width: 64px; height: 64px; background-color: rgba(255,255,255,0.2); border-radius: 16px; margin: 0 auto 16px; line-height: 64px; text-align: center;">
+                      <span style="font-size: 32px;">✨</span>
                     </div>
                     <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 700;">
                       Login Tanpa Password
