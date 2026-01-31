@@ -28,6 +28,8 @@ import {
   Quote,
   ArrowLeftRight,
   MoreHorizontal,
+  Upload,
+  Loader2,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -59,6 +61,7 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface EmailEditorProps {
   value: string
@@ -129,6 +132,10 @@ export function EmailEditor({
   const [linkText, setLinkText] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [imageAlt, setImageAlt] = useState('')
+  const [imageTab, setImageTab] = useState<'upload' | 'url'>('upload')
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const visualEditorRef = useRef<HTMLDivElement>(null)
   const [isVisualFocused, setIsVisualFocused] = useState(false)
@@ -215,7 +222,59 @@ export function EmailEditor({
     setImageDialogOpen(false)
     setImageUrl('')
     setImageAlt('')
+    setUploadError('')
+    setImageTab('upload')
   }, [imageUrl, imageAlt, execCommand])
+
+  // Handle image upload
+  const handleImageUpload = useCallback(async (file: File) => {
+    setIsUploading(true)
+    setUploadError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Upload failed')
+      }
+
+      setImageUrl(result.data.url)
+      setImageTab('url') // Switch to URL tab to show preview
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Upload failed')
+    } finally {
+      setIsUploading(false)
+    }
+  }, [])
+
+  // Handle file input change
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleImageUpload(file)
+    }
+  }, [handleImageUpload])
+
+  // Handle drag and drop
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      handleImageUpload(file)
+    }
+  }, [handleImageUpload])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+  }, [])
 
   // Insert heading
   const insertHeading = useCallback((level: number) => {
@@ -621,53 +680,141 @@ export function EmailEditor({
         </DialogContent>
       </Dialog>
 
-      {/* Image Dialog - Mobile Optimized */}
-      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+      {/* Image Dialog - Mobile Optimized with Upload */}
+      <Dialog open={imageDialogOpen} onOpenChange={(open) => {
+        setImageDialogOpen(open)
+        if (!open) {
+          setImageUrl('')
+          setImageAlt('')
+          setUploadError('')
+          setImageTab('upload')
+        }
+      }}>
         <DialogContent className="max-w-md p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Insert Image</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 sm:space-y-4">
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="image-url" className="text-sm">Image URL</Label>
-              <Input
-                id="image-url"
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="h-9 sm:h-10 text-sm"
+
+          <Tabs value={imageTab} onValueChange={(v) => setImageTab(v as 'upload' | 'url')}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="upload" className="text-sm">
+                <Upload className="w-4 h-4 mr-2" />
+                Upload
+              </TabsTrigger>
+              <TabsTrigger value="url" className="text-sm">
+                <LinkIcon className="w-4 h-4 mr-2" />
+                URL
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="upload" className="space-y-3 sm:space-y-4 mt-4">
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                onChange={handleFileChange}
+                className="hidden"
               />
-            </div>
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="image-alt" className="text-sm">Alt Text (optional)</Label>
-              <Input
-                id="image-alt"
-                placeholder="Image description"
-                value={imageAlt}
-                onChange={(e) => setImageAlt(e.target.value)}
-                className="h-9 sm:h-10 text-sm"
-              />
-            </div>
-            {imageUrl && (
-              <div className="p-3 sm:p-4 bg-neutral-100 rounded-lg">
-                <p className="text-xs text-neutral-500 mb-2">Preview:</p>
-                <img
-                  src={imageUrl}
-                  alt={imageAlt || 'Preview'}
-                  className="max-w-full max-h-32 sm:max-h-40 object-contain mx-auto"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none'
-                  }}
+
+              {/* Drop zone */}
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className={cn(
+                  'border-2 border-dashed rounded-lg p-6 sm:p-8 text-center cursor-pointer transition-colors',
+                  'hover:border-primary-400 hover:bg-primary-50/50',
+                  isUploading ? 'border-primary-400 bg-primary-50/50' : 'border-neutral-300'
+                )}
+              >
+                {isUploading ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+                    <p className="text-sm text-neutral-600">Uploading...</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="w-8 h-8 text-neutral-400" />
+                    <p className="text-sm text-neutral-600">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-xs text-neutral-400">
+                      JPEG, PNG, GIF, WebP, SVG (max 5MB)
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {uploadError && (
+                <p className="text-sm text-error-600 text-center">{uploadError}</p>
+              )}
+
+              {imageUrl && (
+                <div className="p-3 sm:p-4 bg-success-50 border border-success-200 rounded-lg">
+                  <p className="text-xs text-success-700 mb-2 font-medium">Upload successful!</p>
+                  <img
+                    src={imageUrl}
+                    alt="Uploaded preview"
+                    className="max-w-full max-h-32 sm:max-h-40 object-contain mx-auto rounded"
+                  />
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="url" className="space-y-3 sm:space-y-4 mt-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="image-url" className="text-sm">Image URL</Label>
+                <Input
+                  id="image-url"
+                  type="url"
+                  placeholder="https://example.com/image.jpg"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  className="h-9 sm:h-10 text-sm"
                 />
               </div>
-            )}
+
+              {imageUrl && (
+                <div className="p-3 sm:p-4 bg-neutral-100 rounded-lg">
+                  <p className="text-xs text-neutral-500 mb-2">Preview:</p>
+                  <img
+                    src={imageUrl}
+                    alt={imageAlt || 'Preview'}
+                    className="max-w-full max-h-32 sm:max-h-40 object-contain mx-auto"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          {/* Alt text - shared between tabs */}
+          <div className="space-y-1.5 sm:space-y-2 mt-4">
+            <Label htmlFor="image-alt" className="text-sm">Alt Text (optional)</Label>
+            <Input
+              id="image-alt"
+              placeholder="Image description for accessibility"
+              value={imageAlt}
+              onChange={(e) => setImageAlt(e.target.value)}
+              className="h-9 sm:h-10 text-sm"
+            />
           </div>
+
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2 mt-4">
             <Button variant="outline" onClick={() => setImageDialogOpen(false)} className="w-full sm:w-auto" size="sm">
               Cancel
             </Button>
-            <Button onClick={handleInsertImage} className="w-full sm:w-auto" size="sm">Insert Image</Button>
+            <Button
+              onClick={handleInsertImage}
+              disabled={!imageUrl || isUploading}
+              className="w-full sm:w-auto"
+              size="sm"
+            >
+              Insert Image
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
