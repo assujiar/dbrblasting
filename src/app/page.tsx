@@ -620,7 +620,7 @@ export default function Home() {
                       ))}
                     </ul>
 
-                    <Link href={price === 0 ? '/signup' : '/login'}>
+                    <Link href={plan.monthlyPrice === 0 ? '/signup' : `/subscribe/${plan.name.toLowerCase()}`}>
                       <button
                         className={cn(
                           'w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2',
