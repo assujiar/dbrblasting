@@ -4,7 +4,7 @@ import { generateCampaignName } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
-    const { client, user } = await getClientForUser()
+    const { client, user, profile } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -23,6 +23,12 @@ export async function GET(request: NextRequest) {
         recipients:email_campaign_recipients(id, status, to_name, to_email, sent_at, lead_id)
       `)
       .order('created_at', { ascending: false })
+
+    // Filter by organization
+    const isSuperAdminWithoutOrg = profile?.role === 'super_admin' && !profile.organization_id
+    if (!isSuperAdminWithoutOrg && profile?.organization_id) {
+      query = query.eq('organization_id', profile.organization_id)
+    }
 
     // Filter by template_id
     if (templateId) {

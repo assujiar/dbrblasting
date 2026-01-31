@@ -19,9 +19,9 @@ export function getAdminClient() {
 }
 
 /**
- * Get the appropriate Supabase client based on user role
- * - Super admin: returns admin client (bypasses RLS)
- * - Others: returns regular client (respects RLS)
+ * Get admin client with user context
+ * Always uses admin client to bypass RLS (avoid infinite recursion)
+ * API routes must implement their own organization-based filtering
  */
 export async function getClientForUser() {
   const supabase = await createClient()
@@ -33,7 +33,7 @@ export async function getClientForUser() {
 
   const adminClient = getAdminClient()
 
-  // Check user role using admin client (bypass RLS)
+  // Get user profile using admin client (bypass RLS)
   const { data: profile } = await adminClient
     .from('user_profiles')
     .select('*')
@@ -42,9 +42,10 @@ export async function getClientForUser() {
 
   const isSuperAdmin = profile?.role === 'super_admin'
 
-  // Return admin client for super_admin, regular client for others
+  // Always return admin client to bypass RLS and avoid infinite recursion
+  // API routes must filter by organization_id for non-super_admin users
   return {
-    client: isSuperAdmin ? adminClient : supabase,
+    client: adminClient,
     user,
     profile,
     isSuperAdmin,

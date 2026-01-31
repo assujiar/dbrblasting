@@ -3,13 +3,13 @@ import { getClientForUser } from '@/lib/supabase/admin'
 
 export async function GET() {
   try {
-    const { client, user } = await getClientForUser()
+    const { client, user, profile } = await getClientForUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data, error } = await client
+    let query = client
       .from('contact_groups')
       .select(`
         *,
@@ -19,6 +19,14 @@ export async function GET() {
         )
       `)
       .order('created_at', { ascending: false })
+
+    // Filter by organization
+    const isSuperAdminWithoutOrg = profile?.role === 'super_admin' && !profile.organization_id
+    if (!isSuperAdminWithoutOrg && profile?.organization_id) {
+      query = query.eq('organization_id', profile.organization_id)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
