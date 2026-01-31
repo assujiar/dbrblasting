@@ -126,6 +126,16 @@ export default function LoginPage() {
               <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
+
+          {/* Sign up link */}
+          <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/50 text-center">
+            <p className="text-sm text-neutral-600">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="text-primary-600 hover:text-primary-700 font-medium hover:underline">
+                Sign up free
+              </Link>
+            </p>
+          </div>
         </div>
 
         {/* Footer */}
