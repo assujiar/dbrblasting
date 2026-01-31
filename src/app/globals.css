@@ -672,3 +672,43 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* ============================================================================
+   LANDING PAGE TEXT COLORS
+   For dark backgrounds - ensures high contrast and readability
+   ============================================================================ */
+
+/* Primary body text - descriptions, paragraphs */
+.lp-text {
+  color: #fbcfe8; /* pink-200 equivalent */
+}
+
+/* Muted text - secondary information */
+.lp-text-muted {
+  color: #f9a8d4; /* pink-300 equivalent */
+}
+
+/* Subtle text - tertiary information, hints */
+.lp-text-subtle {
+  color: #f472b6; /* pink-400 equivalent */
+}
+
+/* Headings - maximum contrast */
+.lp-heading {
+  color: #ffffff;
+}
+
+/* Accent/highlight text - lighter pink for emphasis */
+.lp-text-accent {
+  color: #fce7f3; /* pink-100 equivalent */
+}
+
+/* Link text - interactive elements */
+.lp-link {
+  color: #f472b6; /* pink-400 */
+  transition: color 150ms ease;
+}
+
+.lp-link:hover {
+  color: #ffffff;
+}
