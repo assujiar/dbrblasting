@@ -4,7 +4,8 @@ import { TIER_LIMITS, SubscriptionTier } from '@/app/api/organization/usage/rout
 import type { AIEmailDesignSpec, AIEmailPurpose } from '@/types/database'
 
 // Gemini API configuration
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+const GEMINI_MODEL = 'gemini-2.0-flash'
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
 
 interface GenerateRequest {
   designSpec: AIEmailDesignSpec
@@ -124,8 +125,17 @@ async function generateWithGemini(prompt: string): Promise<{ subject: string; ht
 
   if (!response.ok) {
     const errorText = await response.text()
-    console.error('Gemini API error:', errorText)
-    throw new Error(`Gemini API error: ${response.status}`)
+    console.error('Gemini API error:', response.status, errorText)
+    console.error('Gemini API URL used:', GEMINI_API_URL)
+
+    // Parse error for more details
+    try {
+      const errorJson = JSON.parse(errorText)
+      const errorMessage = errorJson.error?.message || `Gemini API error: ${response.status}`
+      throw new Error(errorMessage)
+    } catch {
+      throw new Error(`Gemini API error: ${response.status}`)
+    }
   }
 
   const data = await response.json()
