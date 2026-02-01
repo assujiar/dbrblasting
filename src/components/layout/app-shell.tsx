@@ -45,6 +45,7 @@ import {
   PanelLeftClose,
   PanelLeft,
   Shield,
+  Sparkles,
 } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -64,6 +65,7 @@ const navigation = [
   { name: 'Leads', href: '/app/leads', icon: Users },
   { name: 'Groups', href: '/app/groups', icon: FolderOpen },
   { name: 'Templates', href: '/app/templates', icon: FileText },
+  { name: 'AI Email', href: '/app/ai-email', icon: Sparkles },
   { name: 'Campaigns', href: '/app/campaigns', icon: Send },
   { name: 'Profile', href: '/app/profile', icon: User },
 ]
