@@ -73,6 +73,11 @@ function useInView(threshold = 0.1) {
 
 const features = [
   {
+    icon: Sparkles,
+    title: 'AI Email Generator',
+    description: 'Generate email profesional dengan AI. Pilih design, tujuan, dan tone - AI akan buatkan email HTML siap kirim.',
+  },
+  {
     icon: Users,
     title: 'Smart Lead Management',
     description: 'Import ribuan kontak dari Excel dalam hitungan detik. Organisasi otomatis dengan tags dan segmentasi cerdas.',
@@ -96,11 +101,6 @@ const features = [
     icon: Shield,
     title: 'Enterprise Security',
     description: 'Data terenkripsi end-to-end. GDPR compliant. Multi-factor authentication dan audit logs lengkap.',
-  },
-  {
-    icon: Zap,
-    title: 'Automation Workflows',
-    description: 'Set it and forget it. Trigger email otomatis berdasarkan behavior, schedule, atau event tertentu.',
   },
 ]
 
@@ -158,7 +158,7 @@ const pricingPlans = [
     monthlyPrice: 74900,
     yearlyPrice: 749000,
     highlight: 'Terjangkau',
-    features: ['3 campaign aktif', '50 email/hari', 'All templates', 'Basic analytics', 'Email support', 'Tanpa watermark'],
+    features: ['3 campaign aktif', '50 email/hari', 'All templates', '1 AI email/hari', 'Basic analytics', 'Email support', 'Tanpa watermark'],
     cta: 'Pilih Basic',
     popular: false,
   },
@@ -169,7 +169,7 @@ const pricingPlans = [
     monthlyPrice: 149000,
     yearlyPrice: 1490000,
     highlight: 'Best Value',
-    features: ['5 campaign aktif', '100 email/hari', 'All templates', 'SMTP custom', 'Priority support', 'Analytics dashboard'],
+    features: ['5 campaign aktif', '100 email/hari', 'All templates', '2 AI email/hari', 'SMTP custom', 'Priority support', 'Analytics dashboard'],
     cta: 'Pilih Regular',
     popular: true,
   },
@@ -180,7 +180,7 @@ const pricingPlans = [
     monthlyPrice: 499000,
     yearlyPrice: 4990000,
     highlight: 'Most Powerful',
-    features: ['10 campaign aktif', '500 email/hari', 'White-label', 'API access', 'Dedicated support', 'Custom integrations'],
+    features: ['10 campaign aktif', '500 email/hari', 'White-label', '5 AI email/hari', 'API access', 'Dedicated support', 'Custom integrations'],
     cta: 'Pilih Pro',
     popular: false,
   },
