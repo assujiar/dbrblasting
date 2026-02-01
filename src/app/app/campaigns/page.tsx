@@ -252,7 +252,7 @@ function CampaignsContent() {
 
       {/* Date Filter */}
       <Card className="animate-slide-up overflow-hidden" style={{ animationDelay: '100ms' }}>
-        <CardContent className="py-3 sm:py-4">
+        <CardContent className="p-3 sm:p-4">
           <div className="flex flex-col gap-2 sm:gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-neutral-600">
@@ -301,7 +301,7 @@ function CampaignsContent() {
       {/* Filter indicator */}
       {(statusFilter !== 'all' || hasFilters) && (
         <Card className="animate-slide-up border-primary-200 bg-primary-50/30 overflow-hidden" style={{ animationDelay: '125ms' }}>
-          <CardContent className="py-3">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <p className="text-sm text-primary-700">
                 Showing {filteredCampaigns.length} of {campaigns.length} campaigns
