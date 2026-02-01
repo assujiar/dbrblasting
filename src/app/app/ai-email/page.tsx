@@ -567,32 +567,30 @@ export default function AIEmailPage() {
   // Free tier - show upgrade message
   if (!isLoadingUsage && tier === 'free') {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-neutral-900">AI Email Generator</h1>
-            <p className="text-sm text-neutral-500 mt-1">
-              Generate professional email templates with AI
-            </p>
-          </div>
+      <div className="space-y-4 sm:space-y-6">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">AI Email Generator</h1>
+          <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+            Generate professional email templates with AI
+          </p>
         </div>
 
-        <Card className="max-w-2xl mx-auto mt-12">
-          <CardContent className="pt-8 pb-8 text-center">
-            <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="h-8 w-8 text-neutral-400" />
+        <Card className="max-w-2xl mx-auto mt-6 sm:mt-12">
+          <CardContent className="pt-6 sm:pt-8 pb-6 sm:pb-8 px-4 sm:px-6 text-center">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="h-7 w-7 sm:h-8 sm:w-8 text-neutral-400" />
             </div>
-            <h2 className="text-xl font-semibold text-neutral-900 mb-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-neutral-900 mb-2">
               Upgrade to Use AI Email Generator
             </h2>
-            <p className="text-neutral-600 mb-6 max-w-md mx-auto">
-              AI Email Generator is available on Basic plan and above. Upgrade your subscription to access this feature and generate professional email templates with AI.
+            <p className="text-sm text-neutral-600 mb-6 max-w-md mx-auto">
+              AI Email Generator is available on Basic plan and above. Upgrade your subscription to access this feature.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="w-full sm:w-auto">
                 <a href="/#pricing">View Plans</a>
               </Button>
-              <Button asChild>
+              <Button asChild className="w-full sm:w-auto">
                 <a href="/subscribe/basic">
                   <Zap className="h-4 w-4 mr-2" />
                   Upgrade Now
@@ -606,68 +604,71 @@ export default function AIEmailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">AI Email Generator</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">AI Email Generator</h1>
+          <p className="text-xs sm:text-sm text-neutral-500 mt-1">
             Generate professional email templates with AI
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {/* Quota indicator */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 rounded-lg">
-            <Sparkles className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium">
-              {remainingGenerations}/{maxGenerations} generations left today
+          <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 bg-neutral-100 rounded-lg">
+            <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
+            <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
+              {remainingGenerations}/{maxGenerations} left today
             </span>
           </div>
           {/* History button */}
           <Button
             variant="outline"
             size="sm"
+            className="h-8 sm:h-9 text-xs sm:text-sm"
             onClick={() => {
               setShowHistory(true)
               fetchHistory()
             }}
           >
-            <History className="h-4 w-4 mr-2" />
-            History
+            <History className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">History</span>
           </Button>
         </div>
       </div>
 
-      {/* Progress indicator */}
-      <div className="flex items-center justify-center gap-2">
-        {(['design', 'purpose', 'notes', 'result'] as Section[]).map((section, index) => (
-          <div key={section} className="flex items-center">
-            <button
-              onClick={() => {
-                if (section === 'result' && !generatedHtml) return
-                setCurrentSection(section)
-              }}
-              disabled={section === 'result' && !generatedHtml}
-              className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-lg transition-colors',
-                currentSection === section
-                  ? 'bg-blue-600 text-white'
-                  : section === 'result' && !generatedHtml
-                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+      {/* Progress indicator - scrollable on mobile */}
+      <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 pb-2">
+        <div className="flex items-center justify-start sm:justify-center gap-1 sm:gap-2 min-w-max">
+          {(['design', 'purpose', 'notes', 'result'] as Section[]).map((section, index) => (
+            <div key={section} className="flex items-center">
+              <button
+                onClick={() => {
+                  if (section === 'result' && !generatedHtml) return
+                  setCurrentSection(section)
+                }}
+                disabled={section === 'result' && !generatedHtml}
+                className={cn(
+                  'flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors',
+                  currentSection === section
+                    ? 'bg-blue-600 text-white'
+                    : section === 'result' && !generatedHtml
+                      ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                )}
+              >
+                {section === 'design' && <Palette className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                {section === 'purpose' && <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                {section === 'notes' && <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                {section === 'result' && <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                <span className="text-xs sm:text-sm font-medium capitalize">{section}</span>
+              </button>
+              {index < 3 && (
+                <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 mx-1 sm:mx-2 text-neutral-400 shrink-0" />
               )}
-            >
-              {section === 'design' && <Palette className="h-4 w-4" />}
-              {section === 'purpose' && <Target className="h-4 w-4" />}
-              {section === 'notes' && <FileText className="h-4 w-4" />}
-              {section === 'result' && <Sparkles className="h-4 w-4" />}
-              <span className="text-sm font-medium capitalize">{section}</span>
-            </button>
-            {index < 3 && (
-              <ChevronRight className="h-4 w-4 mx-2 text-neutral-400" />
-            )}
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Design Specification Section */}
