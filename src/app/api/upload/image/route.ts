@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getAdminClient } from '@/lib/supabase/admin'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 const MAX_SIZE = 5 * 1024 * 1024 // 5MB
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use admin client for storage (bypasses RLS to avoid infinite recursion)
-    const adminClient = createAdminClient()
+    const adminClient = getAdminClient()
 
     const formData = await request.formData()
     const file = formData.get('file') as File | null
