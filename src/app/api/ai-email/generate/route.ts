@@ -4,7 +4,7 @@ import { TIER_LIMITS, SubscriptionTier } from '@/app/api/organization/usage/rout
 import type { AIEmailDesignSpec, AIEmailPurpose } from '@/types/database'
 
 // Gemini API configuration
-const GEMINI_MODEL = 'gemini-2.5-flash-preview-05-20'
+const GEMINI_MODEL = 'gemini-1.5-flash-latest'
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
 
 interface GenerateRequest {
