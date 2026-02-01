@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getAdminClient } from '@/lib/supabase/admin'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 
 export async function POST(request: NextRequest) {
   try {
+    // Use regular client for auth check
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    // Use admin client for storage (bypasses RLS to avoid infinite recursion)
+    const adminClient = getAdminClient()
 
     const formData = await request.formData()
     const file = formData.get('file') as File | null
@@ -44,8 +49,8 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = new Uint8Array(arrayBuffer)
 
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    // Upload to Supabase Storage using admin client (bypasses RLS)
+    const { data, error } = await adminClient.storage
       .from('email-images')
       .upload(fileName, buffer, {
         contentType: file.type,
@@ -59,17 +64,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = adminClient.storage
       .from('email-images')
       .getPublicUrl(data.path)
 
     return NextResponse.json({
-      data: {
-        url: urlData.publicUrl,
-        path: data.path,
-        size: file.size,
-        type: file.type,
-      }
+      url: urlData.publicUrl,
+      path: data.path,
+      size: file.size,
+      type: file.type,
     })
   } catch (error) {
     console.error('Upload error:', error)
