@@ -165,7 +165,7 @@ function CampaignsContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
         <div>
@@ -177,73 +177,73 @@ function CampaignsContent() {
       </div>
 
       {/* Stats Cards - Clickable to filter */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 animate-slide-up" style={{ animationDelay: '50ms' }}>
+      <div className="grid gap-2 sm:gap-4 grid-cols-2 lg:grid-cols-4 animate-slide-up" style={{ animationDelay: '50ms' }}>
         <Card
           className={cn(
-            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-primary-50/50 to-white',
+            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-primary-50/50 to-white overflow-hidden',
             statusFilter === 'all' && 'ring-2 ring-primary-500 shadow-md'
           )}
           onClick={() => setStatusFilter('all')}
         >
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-primary-100">
-                <Send className="h-5 w-5 text-primary-600" />
+          <CardContent className="p-3 sm:pt-4 sm:pb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-primary-100 shrink-0">
+                <Send className="h-4 w-4 sm:h-5 sm:w-5 text-primary-600" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-neutral-900">{stats.total}</p>
-                <p className="text-xs text-neutral-500">Total Campaigns</p>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-neutral-900">{stats.total}</p>
+                <p className="text-[10px] sm:text-xs text-neutral-500 truncate">Campaigns</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card
           className={cn(
-            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-success-50/50 to-white',
+            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-success-50/50 to-white overflow-hidden',
             statusFilter === 'has_sent' && 'ring-2 ring-success-500 shadow-md'
           )}
           onClick={() => setStatusFilter('has_sent')}
         >
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-success-100">
-                <CheckCircle2 className="h-5 w-5 text-success-600" />
+          <CardContent className="p-3 sm:pt-4 sm:pb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-success-100 shrink-0">
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success-600" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-success-600">{stats.sent}</p>
-                <p className="text-xs text-neutral-500">Emails Sent</p>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-success-600">{stats.sent}</p>
+                <p className="text-[10px] sm:text-xs text-neutral-500 truncate">Sent</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card
           className={cn(
-            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-error-50/50 to-white',
+            'cursor-pointer transition-all duration-200 hover:shadow-md bg-gradient-to-br from-error-50/50 to-white overflow-hidden',
             statusFilter === 'has_failed' && 'ring-2 ring-error-500 shadow-md'
           )}
           onClick={() => setStatusFilter('has_failed')}
         >
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-error-100">
-                <XCircle className="h-5 w-5 text-error-600" />
+          <CardContent className="p-3 sm:pt-4 sm:pb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-error-100 shrink-0">
+                <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-error-600" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-error-600">{stats.failed}</p>
-                <p className="text-xs text-neutral-500">Emails Failed</p>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-error-600">{stats.failed}</p>
+                <p className="text-[10px] sm:text-xs text-neutral-500 truncate">Failed</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-accent-50/50 to-white">
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-accent-100">
-                <Users className="h-5 w-5 text-accent-600" />
+        <Card className="bg-gradient-to-br from-accent-50/50 to-white overflow-hidden">
+          <CardContent className="p-3 sm:pt-4 sm:pb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-accent-100 shrink-0">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-accent-600" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-neutral-900">{stats.recipients}</p>
-                <p className="text-xs text-neutral-500">Total Recipients</p>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-neutral-900">{stats.recipients}</p>
+                <p className="text-[10px] sm:text-xs text-neutral-500 truncate">Recipients</p>
               </div>
             </div>
           </CardContent>
@@ -251,7 +251,7 @@ function CampaignsContent() {
       </div>
 
       {/* Date Filter */}
-      <Card className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+      <Card className="animate-slide-up overflow-hidden" style={{ animationDelay: '100ms' }}>
         <CardContent className="py-3 sm:py-4">
           <div className="flex flex-col gap-2 sm:gap-3">
             <div className="flex items-center justify-between">
@@ -300,7 +300,7 @@ function CampaignsContent() {
 
       {/* Filter indicator */}
       {(statusFilter !== 'all' || hasFilters) && (
-        <Card className="animate-slide-up border-primary-200 bg-primary-50/30" style={{ animationDelay: '125ms' }}>
+        <Card className="animate-slide-up border-primary-200 bg-primary-50/30 overflow-hidden" style={{ animationDelay: '125ms' }}>
           <CardContent className="py-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <p className="text-sm text-primary-700">
@@ -319,7 +319,7 @@ function CampaignsContent() {
 
       {/* Content */}
       {isLoading ? (
-        <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
+        <Card className="animate-slide-up overflow-hidden" style={{ animationDelay: '150ms' }}>
           <CardContent className="py-16">
             <div className="flex flex-col items-center justify-center gap-3">
               <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
@@ -328,7 +328,7 @@ function CampaignsContent() {
           </CardContent>
         </Card>
       ) : filteredCampaigns.length === 0 ? (
-        <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
+        <Card className="animate-slide-up overflow-hidden" style={{ animationDelay: '150ms' }}>
           <CardContent className="py-4">
             <EmptyState
               icon={Send}
@@ -346,7 +346,7 @@ function CampaignsContent() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4 stagger-children">
+        <div className="space-y-3 sm:space-y-4 stagger-children">
           {filteredCampaigns.map((campaign) => {
             const progress = campaign.recipientCounts.total > 0
               ? ((campaign.recipientCounts.sent + campaign.recipientCounts.failed) / campaign.recipientCounts.total) * 100
@@ -356,13 +356,13 @@ function CampaignsContent() {
               <Card
                 key={campaign.id}
                 className={cn(
-                  'cursor-pointer transition-all duration-200',
+                  'cursor-pointer transition-all duration-200 overflow-hidden',
                   'hover:shadow-lg hover:-translate-y-0.5',
                   'bg-gradient-to-br from-white to-neutral-50/50'
                 )}
                 onClick={() => router.push(`/app/campaigns/${campaign.id}`)}
               >
-                <CardContent className="py-4">
+                <CardContent className="p-3 sm:py-4 sm:px-6">
                   <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
                     <div className="min-w-0 flex-1">
                       <h3 className="font-semibold text-neutral-900 truncate">{campaign.name}</h3>
@@ -377,22 +377,22 @@ function CampaignsContent() {
                   </div>
 
                   {/* Detailed Stats Grid */}
-                  <div className="grid grid-cols-4 gap-2 mb-3">
-                    <div className="text-center p-2 rounded-lg bg-neutral-50">
-                      <p className="text-lg font-bold text-neutral-900">{campaign.recipientCounts.total}</p>
-                      <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Recipients</p>
+                  <div className="grid grid-cols-4 gap-1 sm:gap-2 mb-3">
+                    <div className="text-center p-1.5 sm:p-2 rounded-lg bg-neutral-50">
+                      <p className="text-sm sm:text-lg font-bold text-neutral-900">{campaign.recipientCounts.total}</p>
+                      <p className="text-[8px] sm:text-[10px] text-neutral-500 uppercase tracking-wide">Recipients</p>
                     </div>
-                    <div className="text-center p-2 rounded-lg bg-success-50">
-                      <p className="text-lg font-bold text-success-600">{campaign.recipientCounts.sent}</p>
-                      <p className="text-[10px] text-success-600 uppercase tracking-wide">Sent</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded-lg bg-success-50">
+                      <p className="text-sm sm:text-lg font-bold text-success-600">{campaign.recipientCounts.sent}</p>
+                      <p className="text-[8px] sm:text-[10px] text-success-600 uppercase tracking-wide">Sent</p>
                     </div>
-                    <div className="text-center p-2 rounded-lg bg-error-50">
-                      <p className="text-lg font-bold text-error-600">{campaign.recipientCounts.failed}</p>
-                      <p className="text-[10px] text-error-600 uppercase tracking-wide">Failed</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded-lg bg-error-50">
+                      <p className="text-sm sm:text-lg font-bold text-error-600">{campaign.recipientCounts.failed}</p>
+                      <p className="text-[8px] sm:text-[10px] text-error-600 uppercase tracking-wide">Failed</p>
                     </div>
-                    <div className="text-center p-2 rounded-lg bg-warning-50">
-                      <p className="text-lg font-bold text-warning-600">{campaign.recipientCounts.pending}</p>
-                      <p className="text-[10px] text-warning-600 uppercase tracking-wide">Pending</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded-lg bg-warning-50">
+                      <p className="text-sm sm:text-lg font-bold text-warning-600">{campaign.recipientCounts.pending}</p>
+                      <p className="text-[8px] sm:text-[10px] text-warning-600 uppercase tracking-wide">Pending</p>
                     </div>
                   </div>
 
