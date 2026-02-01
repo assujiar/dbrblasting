@@ -359,14 +359,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="animate-slide-up">
-            <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
-            <p className="text-sm text-neutral-500 mt-1">
-              Email marketing analytics & performance overview
+            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Dashboard</h1>
+            <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+              Email marketing analytics & performance
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -374,12 +374,12 @@ export default function DashboardPage() {
               variant={showFilters ? 'default' : 'outline'}
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="gap-2"
+              className="gap-1.5 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9"
             >
-              <Filter className="h-4 w-4" />
-              Filters
+              <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Filters</span>
               {hasActiveFilters && (
-                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-primary-100 text-primary-700">
+                <span className="px-1.5 py-0.5 text-[10px] sm:text-xs rounded-full bg-primary-100 text-primary-700">
                   {[selectedOrgId !== 'all', selectedUserId !== 'all', dateFrom || dateTo].filter(Boolean).length}
                 </span>
               )}
@@ -389,10 +389,10 @@ export default function DashboardPage() {
               size="sm"
               onClick={() => fetchAnalytics(true)}
               disabled={refreshing}
-              className="gap-2"
+              className="gap-1.5 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9"
             >
-              <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
-              Refresh
+              <RefreshCw className={cn('h-3.5 w-3.5 sm:h-4 sm:w-4', refreshing && 'animate-spin')} />
+              <span className="hidden sm:inline">Refresh</span>
             </Button>
           </div>
         </div>
@@ -400,89 +400,93 @@ export default function DashboardPage() {
         {/* Filters Panel */}
         {showFilters && (
           <Card className="animate-slide-up border-primary-200 bg-primary-50/30">
-            <CardContent className="py-4">
-              <div className="flex flex-wrap items-end gap-4">
-                {/* Organization Filter (Super Admin only) */}
-                {canFilterOrg && (
-                  <div className="flex flex-col gap-1.5 min-w-[200px]">
-                    <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
-                      <Building2 className="h-3 w-3" />
-                      Organization
-                    </label>
-                    <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
-                      <SelectTrigger className="h-9 bg-white">
-                        <SelectValue placeholder="All Organizations" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Organizations</SelectItem>
-                        {organizations.map((org) => (
-                          <SelectItem key={org.id} value={org.id}>
-                            {org.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+            <CardContent className="py-3 sm:py-4">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end gap-3 sm:gap-4">
+                  {/* Organization Filter (Super Admin only) */}
+                  {canFilterOrg && (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                        <Building2 className="h-3 w-3" />
+                        Organization
+                      </label>
+                      <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
+                        <SelectTrigger className="h-9 bg-white">
+                          <SelectValue placeholder="All Organizations" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Organizations</SelectItem>
+                          {organizations.map((org) => (
+                            <SelectItem key={org.id} value={org.id}>
+                              {org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                {/* User Filter (Super Admin & Org Admin) */}
-                {canFilterUser && (
-                  <div className="flex flex-col gap-1.5 min-w-[200px]">
-                    <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
-                      <User className="h-3 w-3" />
-                      User
-                    </label>
-                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                      <SelectTrigger className="h-9 bg-white">
-                        <SelectValue placeholder="All Users" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Users</SelectItem>
-                        {users.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.full_name || user.email}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                  {/* User Filter (Super Admin & Org Admin) */}
+                  {canFilterUser && (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        User
+                      </label>
+                      <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                        <SelectTrigger className="h-9 bg-white">
+                          <SelectValue placeholder="All Users" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Users</SelectItem>
+                          {users.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              {user.full_name || user.email}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                {/* Date Range Filter (All roles) */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
-                    <CalendarDays className="h-3 w-3" />
-                    Date Range
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="date"
-                      value={dateFrom}
-                      onChange={(e) => setDateFrom(e.target.value)}
-                      className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm"
-                      placeholder="From"
-                    />
-                    <span className="text-neutral-400">to</span>
-                    <input
-                      type="date"
-                      value={dateTo}
-                      onChange={(e) => setDateTo(e.target.value)}
-                      className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm"
-                      placeholder="To"
-                    />
+                  {/* Date Range Filter (All roles) */}
+                  <div className="flex flex-col gap-1.5 col-span-1 sm:col-span-2 lg:col-span-1">
+                    <label className="text-xs font-medium text-neutral-600 flex items-center gap-1">
+                      <CalendarDays className="h-3 w-3" />
+                      Date Range
+                    </label>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                      <input
+                        type="date"
+                        value={dateFrom}
+                        onChange={(e) => setDateFrom(e.target.value)}
+                        className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm flex-1 min-w-0"
+                        placeholder="From"
+                      />
+                      <span className="text-neutral-400 text-center text-sm">to</span>
+                      <input
+                        type="date"
+                        value={dateTo}
+                        onChange={(e) => setDateTo(e.target.value)}
+                        className="h-9 px-3 rounded-md border border-neutral-200 bg-white text-sm flex-1 min-w-0"
+                        placeholder="To"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Clear Filters Button */}
                 {hasActiveFilters && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="h-9 text-neutral-500 hover:text-neutral-700"
-                  >
-                    Clear All
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-8 text-xs text-neutral-500 hover:text-neutral-700"
+                    >
+                      Clear All
+                    </Button>
+                  </div>
                 )}
               </div>
 
@@ -513,22 +517,22 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 stagger-children">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 stagger-children">
         {statCards.map((stat) => (
           <Link key={stat.title} href={stat.href}>
             <Card hover className="h-full group">
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
+              <CardContent className="p-3 sm:p-5">
+                <div className="flex items-start justify-between gap-2">
                   <div
                     className={cn(
-                      'w-11 h-11 rounded-xl flex items-center justify-center',
+                      'w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0',
                       'bg-gradient-to-br',
                       stat.bgLight,
                       'group-hover:scale-110 transition-transform duration-200'
                     )}
                   >
                     <stat.icon
-                      className="h-5 w-5"
+                      className="h-4 w-4 sm:h-5 sm:w-5"
                       style={{
                         color: stat.gradient.includes('pink')
                           ? '#ec4899'
@@ -543,25 +547,25 @@ export default function DashboardPage() {
                   {stat.change !== undefined && stat.change !== 0 && (
                     <div
                       className={cn(
-                        'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
+                        'flex items-center gap-0.5 text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full',
                         stat.change > 0
                           ? 'bg-emerald-50 text-emerald-600'
                           : 'bg-red-50 text-red-600'
                       )}
                     >
                       {stat.change > 0 ? (
-                        <ArrowUpRight className="h-3 w-3" />
+                        <ArrowUpRight className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       ) : (
-                        <ArrowDownRight className="h-3 w-3" />
+                        <ArrowDownRight className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       )}
                       {Math.abs(stat.change)}%
                     </div>
                   )}
                 </div>
-                <p className="text-3xl font-bold text-neutral-900 mt-4">{stat.value.toLocaleString()}</p>
-                <p className="text-sm text-neutral-500 mt-1">{stat.title}</p>
+                <p className="text-xl sm:text-3xl font-bold text-neutral-900 mt-3 sm:mt-4">{stat.value.toLocaleString()}</p>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-0.5 sm:mt-1">{stat.title}</p>
                 {stat.thisWeek !== undefined && (
-                  <p className="text-xs text-neutral-400 mt-1">
+                  <p className="text-[10px] sm:text-xs text-neutral-400 mt-0.5 sm:mt-1">
                     +{stat.thisWeek} this week
                   </p>
                 )}
@@ -572,44 +576,44 @@ export default function DashboardPage() {
       </div>
 
       {/* Email Performance & Campaign Status */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Email Performance */}
         <Card className="animate-slide-up">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-pink-100 to-pink-50">
-                <Mail className="h-4 w-4 text-pink-600" />
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="flex items-center gap-2">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-pink-100 to-pink-50">
+                <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-pink-600" />
               </div>
-              Email Performance
+              <span className="text-sm sm:text-base">Email Performance</span>
             </CardTitle>
-            <CardDescription>Overall email delivery statistics</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Overall email delivery statistics</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {/* Main Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                    <span className="text-xs font-medium text-emerald-700">Delivered</span>
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-100">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                    <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
+                    <span className="text-[10px] sm:text-xs font-medium text-emerald-700">Delivered</span>
                   </div>
-                  <p className="text-2xl font-bold text-emerald-900">
+                  <p className="text-lg sm:text-2xl font-bold text-emerald-900">
                     {emailStats?.sent_emails?.toLocaleString() || 0}
                   </p>
-                  <p className="text-xs text-emerald-600 mt-1">
-                    {emailStats?.delivery_rate || 0}% success rate
+                  <p className="text-[10px] sm:text-xs text-emerald-600 mt-0.5 sm:mt-1">
+                    {emailStats?.delivery_rate || 0}% success
                   </p>
                 </div>
-                <div className="p-4 rounded-xl bg-gradient-to-br from-red-50 to-red-100/50 border border-red-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <XCircle className="h-4 w-4 text-red-600" />
-                    <span className="text-xs font-medium text-red-700">Failed</span>
+                <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-gradient-to-br from-red-50 to-red-100/50 border border-red-100">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                    <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
+                    <span className="text-[10px] sm:text-xs font-medium text-red-700">Failed</span>
                   </div>
-                  <p className="text-2xl font-bold text-red-900">
+                  <p className="text-lg sm:text-2xl font-bold text-red-900">
                     {emailStats?.failed_emails?.toLocaleString() || 0}
                   </p>
-                  <p className="text-xs text-red-600 mt-1">
-                    {emailStats?.failure_rate || 0}% failure rate
+                  <p className="text-[10px] sm:text-xs text-red-600 mt-0.5 sm:mt-1">
+                    {emailStats?.failure_rate || 0}% failed
                   </p>
                 </div>
               </div>
@@ -675,17 +679,17 @@ export default function DashboardPage() {
 
         {/* Campaign Status */}
         <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-violet-50">
-                <BarChart3 className="h-4 w-4 text-violet-600" />
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="flex items-center gap-2">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-violet-50">
+                <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-violet-600" />
               </div>
-              Campaign Status
+              <span className="text-sm sm:text-base">Campaign Status</span>
             </CardTitle>
-            <CardDescription>Campaign distribution by status with email details</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Campaign distribution by status</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {[
                 {
                   label: 'Completed',
@@ -826,20 +830,20 @@ export default function DashboardPage() {
       </div>
 
       {/* Weekly Comparison & Activity */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Weekly Comparison */}
         <Card className="animate-slide-up lg:col-span-1">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-blue-50">
-                <Calendar className="h-4 w-4 text-blue-600" />
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="flex items-center gap-2">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-blue-50">
+                <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
               </div>
-              Weekly Comparison
+              <span className="text-sm sm:text-base">Weekly Comparison</span>
             </CardTitle>
-            <CardDescription>This week vs last week</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">This week vs last week</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {[
                 {
                   label: 'Emails Sent',
@@ -898,14 +902,15 @@ export default function DashboardPage() {
 
         {/* Daily Activity Chart - Line Chart with Points */}
         <Card className="animate-slide-up lg:col-span-2" style={{ animationDelay: '50ms' }}>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-50">
-                <Activity className="h-4 w-4 text-emerald-600" />
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="flex items-center gap-2">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-50">
+                <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
               </div>
-              Email Activity (Last 14 Days)
+              <span className="text-sm sm:text-base">Email Activity</span>
+              <span className="text-[10px] sm:text-xs text-neutral-400 font-normal hidden xs:inline">(14 days)</span>
             </CardTitle>
-            <CardDescription>Daily email sending trends</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Daily email sending trends</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             {dailyActivity.length > 0 ? (
@@ -1127,20 +1132,20 @@ export default function DashboardPage() {
 
       {/* Recent Campaigns */}
       <Card className="animate-slide-up">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-pink-100 to-pink-50">
-                <Target className="h-4 w-4 text-pink-600" />
+        <CardHeader className="pb-3 sm:pb-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-pink-100 to-pink-50">
+                <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-pink-600" />
               </div>
               <div>
-                <CardTitle>Recent Campaigns</CardTitle>
-                <CardDescription>Latest campaign activity</CardDescription>
+                <CardTitle className="text-sm sm:text-base">Recent Campaigns</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Latest campaign activity</CardDescription>
               </div>
             </div>
             <Link href="/app/campaigns">
-              <Button variant="ghost" size="sm" className="gap-1.5">
-                View All
+              <Button variant="ghost" size="sm" className="gap-1 sm:gap-1.5 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+                <span className="hidden xs:inline">View All</span>
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </Button>
             </Link>

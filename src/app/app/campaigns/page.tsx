@@ -252,46 +252,47 @@ function CampaignsContent() {
 
       {/* Date Filter */}
       <Card className="animate-slide-up" style={{ animationDelay: '100ms' }}>
-        <CardContent className="py-4">
-          <div className="flex flex-col gap-3">
+        <CardContent className="py-3 sm:py-4">
+          <div className="flex flex-col gap-2 sm:gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-neutral-600">
-                <div className="p-2 rounded-lg bg-neutral-100">
-                  <Filter className="h-4 w-4 text-neutral-500" />
+                <div className="p-1.5 sm:p-2 rounded-lg bg-neutral-100">
+                  <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-500" />
                 </div>
-                <span className="font-medium">Filter by Date</span>
+                <span className="font-medium text-xs sm:text-sm">Filter by Date</span>
               </div>
               {hasFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-500 sm:hidden">
-                  <X className="h-4 w-4" />
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-500 h-7 sm:h-8 text-xs px-2">
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline ml-1">Clear</span>
                 </Button>
               )}
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Calendar className="h-4 w-4 text-neutral-400 shrink-0" />
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] sm:text-xs text-neutral-500 font-medium flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  From
+                </label>
                 <Input
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="h-9 flex-1 min-w-0"
-                  placeholder="From"
+                  className="h-9 text-sm"
                 />
               </div>
-              <span className="text-neutral-400 text-center sm:text-left">to</span>
-              <Input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="h-9 flex-1 min-w-0"
-                placeholder="To"
-              />
-              {hasFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-500 hidden sm:flex">
-                  <X className="h-4 w-4" />
-                  Clear
-                </Button>
-              )}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] sm:text-xs text-neutral-500 font-medium flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  To
+                </label>
+                <Input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
             </div>
           </div>
         </CardContent>

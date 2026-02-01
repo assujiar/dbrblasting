@@ -268,24 +268,30 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
                 View all campaigns sent using this template
               </CardDescription>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 text-sm">
-                <Filter className="h-4 w-4 text-neutral-400" />
-                <Input
-                  type="date"
-                  value={dateFrom}
-                  onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-auto h-9"
-                  placeholder="From"
-                />
-                <span className="text-neutral-400">-</span>
-                <Input
-                  type="date"
-                  value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                  className="w-auto h-9"
-                  placeholder="To"
-                />
+            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 w-full sm:w-auto">
+              <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+                <Filter className="h-3.5 w-3.5" />
+                <span className="hidden xs:inline">Filter:</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 flex-1 xs:flex-initial">
+                <div className="flex flex-col gap-0.5">
+                  <label className="text-[10px] text-neutral-400">From</label>
+                  <Input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="h-8 text-xs xs:w-32"
+                  />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <label className="text-[10px] text-neutral-400">To</label>
+                  <Input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="h-8 text-xs xs:w-32"
+                  />
+                </div>
               </div>
             </div>
           </div>
