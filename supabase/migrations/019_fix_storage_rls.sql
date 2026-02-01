@@ -56,7 +56,7 @@ ON storage.objects FOR UPDATE
 TO authenticated
 USING (
   bucket_id IN ('email-images', 'app-assets', 'ai-logos')
-  AND owner_id = auth.uid()
+  AND owner_id::uuid = auth.uid()
 )
 WITH CHECK (
   bucket_id IN ('email-images', 'app-assets', 'ai-logos')
@@ -68,5 +68,5 @@ ON storage.objects FOR DELETE
 TO authenticated
 USING (
   bucket_id IN ('email-images', 'app-assets', 'ai-logos')
-  AND owner_id = auth.uid()
+  AND owner_id::uuid = auth.uid()
 );
