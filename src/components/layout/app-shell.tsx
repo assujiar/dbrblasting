@@ -610,8 +610,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {/* Page content with proper padding */}
           <main className="p-4 sm:p-6 lg:p-8 overflow-x-hidden">
             <div className={cn(
-              'mx-auto transition-all duration-300 ease-in-out w-full',
-              collapsed ? 'max-w-[1400px]' : 'max-w-6xl'
+              'mx-auto transition-all duration-300 ease-in-out w-full max-w-full',
+              collapsed ? 'lg:max-w-[1400px]' : 'lg:max-w-6xl'
             )}>
               {children}
             </div>
